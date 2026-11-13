@@ -112,6 +112,7 @@
   #mini{width:200px;height:144px;border-radius:8px;display:block;box-shadow:0 2px 8px rgba(0,0,0,.15)}
   #loc{margin-top:6px;background:var(--panel);border-radius:8px;padding:5px 9px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.12);max-width:300px}
   #ctrl #btnLoop{grid-column:3;grid-row:1;font-size:15px;line-height:1}#ctrl #btnLoop small{display:block;font-size:10px}body.bal #btnLoop{visibility:hidden}
+  body:not(.flying) #btnCam{display:none}#btnCam small{display:block;font-size:10px;font-weight:500;color:#60646c}
   #btnCam{position:absolute;right:10px;bottom:200px;z-index:12;min-height:40px;padding:6px 12px;border-radius:8px;border:1px solid #c9ced6;background:#fff;font:600 13px system-ui;box-shadow:0 2px 8px rgba(0,0,0,.15)}
   .vario{padding:0 5px;border-radius:4px}.vario.up{background:#d6f5e3;color:#18794e}.vario.dn{background:#fde2e1;color:#b42318}
   #ctrl{position:absolute;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,44px);gap:5px;user-select:none;-webkit-user-select:none}
@@ -175,7 +176,7 @@
   <div class="flysec"><h3>Vliegen</h3>
   <div class="row"><input type="range" id="tempo" min="0" max="6" step="1" value="2"><span class="val" id="tempoVal"></span></div>
   <p class="note">Tempo: ×1 is echte snelheid. Ook met scrollen of + en −.</p>
-  <p class="note">Camera: slepen = rondkijken (loslaten = terug achter het toestel). Shift+scrollen of knijpen = zoomen, <b>C</b> = zoom terug. <b>L</b> = looping.</p>
+  <p class="note">Camera: slepen = rondkijken (loslaten = terug achter het toestel). Shift+scrollen of knijpen = zoomen. <b>C</b> of 🎥 = camera terug. <b>L</b> = looping.</p>
   <div class="row"><input type="checkbox" id="optTilt"><label for="optTilt">📱 Sturen door de telefoon te kantelen</label></div><p class="note" id="tiltNote" style="display:none"></p>
   <button id="btnAc">Ander toestel kiezen</button></div>
   <h3>Hulpmiddelen</h3>
@@ -216,7 +217,7 @@
   <button data-k="arrowdown" title="Dalen (↓ of S)">▼</button>
   <button id="btnLoop" title="Looping (L)" aria-label="Looping">🔄<small>looping</small></button>
 </div>
-<button id="btnCam" style="display:none" title="Camera terug achter het toestel (C)">🎥 Zoom terug</button>
+<button id="btnCam" title="Camera terug achter het toestel (toets C)" aria-label="Camera resetten">🎥 Camera<small>reset · C</small></button>
 <div id="modal"><div class="box">
   <h2>Luchtruim in 3D</h2>
   <p class="disc">⚠ <b>Alleen voor educatie.</b> De AIP van LVNL is leidend.</p>
@@ -1368,8 +1369,9 @@ function chase(dt,instant){
   // klimmen voelbaar (Boyd): camera zakt iets achter en onder het toestel als je stijgt, komt erboven als je daalt
   const vz=LOOP?0:VZ_S,el=Math.atan2(H0,D0)+CAM.pitch-vz*.22,R=Math.hypot(D0,H0),D=Math.cos(el)*R,H=Math.sin(el)*R;
   camTarget.set(PLANE.x+CAM.panX-Math.sin(h)*D,Math.max(.35,py+H),-(PLANE.n+CAM.panN-Math.cos(h)*D));
-  if(instant)camera.position.copy(camTarget);else camera.position.lerp(camTarget,Math.min(1,dt*1.6));
-  const hh=PLANE.hdg*Math.PI/180,lk=dragging?0:3*Math.min(1,CAM.dist);// vrije camera kijkt naar het toestel zelf, zodat het in beeld blijftlook.set(PLANE.x+CAM.panX+Math.sin(hh)*lk,py+(dragging?0:.35*CAM.dist+vz*.6),-(PLANE.n+CAM.panN+Math.cos(hh)*lk));
+  camTween=null;if(instant||camera.position.distanceTo(camTarget)>4*Math.max(1,CAM.dist))camera.position.copy(camTarget);else camera.position.lerp(camTarget,Math.min(1,dt*3.5));// direct achter het toestel bij start/sprong; in bochten sneller meedraaien (bug 13 nov)
+  const hh=PLANE.hdg*Math.PI/180,lk=dragging?0:3*Math.min(1,CAM.dist);// tijdens rondkijken kijkt de camera naar het toestel zelf
+  look.set(PLANE.x+CAM.panX+Math.sin(hh)*lk,py+(dragging?0:.35*CAM.dist+vz*.6),-(PLANE.n+CAM.panN+Math.cos(hh)*lk));
   camera.lookAt(look);
   if(SHAKE>0){SHAKE=Math.max(0,SHAKE-dt);const s=SHAKE*.25;camera.position.x+=(Math.random()-.5)*s;camera.position.y+=(Math.random()-.5)*s;}
   if(puffT>0){puffT=Math.max(0,puffT-dt);const k=1-puffT;puff.scale.setScalar(1+k*5);puff.material.opacity=.6*puffT;}
@@ -1646,10 +1648,10 @@ if(ONLY_MAP){$('ok').onclick=()=>{$('modal').style.display='none';showProbe();};
 let last=performance.now(),acc=0;
 (function loop(){requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(.1,(now-last)/1000);last=now;
   if(camTween){const k=Math.min(1,(now-camTween.st)/camTween.ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;camera.position.lerpVectors(camTween.p0,camTween.p1,e);controls.target.lerpVectors(camTween.t0,camTween.t1,e);if(k>=1)camTween=null;}
-  if(MODE==='fly'){if(!PAUSED)sim(dt);if(!dragging){camYaw*=.95;CAM.pitch*=.95;}CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);$('btnCam').style.display=CAM.free?'':'none';document.body.classList.toggle('bal',ACTYPE==='balloon');}else controls.update();
+  if(MODE==='fly'){if(!PAUSED)sim(dt);if(!dragging){camYaw*=.95;CAM.pitch*=.95;}CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+window.__vfr={get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 // ---------- voorbeeldcircuit Eindhoven (AIP EHEH AD 2.22: 1000 ft AMSL, RWY 03 links, RWY 21 rechts → beide aan de NW-kant) ----------
 var CIRC_RW='03';
