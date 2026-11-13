@@ -28,6 +28,11 @@
 ## Sprintdoelen
 
 **S1 – za 14 nov: Afwerking hosting + panel 11**
+- **Feedback Christian (14 nov 00:05) — eerst doen:**
+  1. Vakje "Sturen door de telefoon te kantelen" doet niks: testen op GitHub Pages op een echte telefoon (Christian), oorzaak zoeken (permissie iOS/Android, https, deviceorientation-events, ijkpunt), duidelijke melding als het niet kan.
+  2. Mobiel: opdrachttekst past net niet → mag over twee regels (niet afkappen).
+  3. Dalen ziet er te overdreven uit (camera/neus); stijgen is goed. Daal-effect ongeveer halveren.
+  4. Standaard zichtbare luchtruimtypen herzien: paradropzones, dronegebieden (UAS/TSA), paraglide-/schermvliegvelden en ander relevant luchtruim moeten standaard aan. Inventariseer alle LVNL-lagen in de data, kies per type met reden (log), en check welke lagen we nog niet hebben (bijv. schermvliegterreinen/lierlocaties: bron uitzoeken, LVNL VFRchart/Miscellaneous of AIP).
 - Domein luchtruim3d.nl: DNS controleren, `CNAME` in repo, HTTPS (samen met Christian).
 - Panel 11: labels bovenaan/onderaan niet onder knoppen en kaartjes; RT-kaart mobiel compacter of inklapbaar; profielpaneel "Boven de sonde" mobiel inklapbaar; modusknop niet over twee regels.
 - Mooiere toestelmodellen (zweef/motor) en schaduw in de vorm van het toestel.
@@ -44,6 +49,7 @@
 - Legenda/afkortingen kort terug als "?"-knop.
 
 **S4 – di 17 nov: Spelplezier**
+- Feedback Christian 14 nov: missies zijn te makkelijk en te kort → langere routes, meerdere tussendoelen, uitdagingen waarbij je echt om luchtruim heen moet plannen.
 - Reeks opdrachten met sterren en voortgang (localStorage), dagelijkse uitdaging.
 - "Nieuwe opdracht" na geslaagd/gefaald verfijnen, score bij foutloos vliegen.
 
