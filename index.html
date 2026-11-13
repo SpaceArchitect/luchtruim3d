@@ -969,6 +969,13 @@ const vrpGroup=new THREE.Group();scene.add(vrpGroup);const circGroup=new THREE.G
   if(a[0]==='U'){const ring=pts.map(p=>[p.x,p.y]);const big=CITYXY.filter(c=>insideRing([c.x,c.n],ring)),sm=TOWNXY.filter(c=>insideRing([c.x,c.n],ring));if(!big.length&&!sm.length)continue;// zonder naam niet tekenen
     for(const t of sm)if(!big.some(c=>Math.hypot(c.x-t.x,c.n-t.n)<3)){const LL=addLabel('• '+t.nm,'city town',()=>new THREE.Vector3(t.x,0,-t.n),9.5);LL.isTown=true;}}
   const geo=new THREE.ShapeGeometry(new THREE.Shape(pts));geo.rotateX(-Math.PI/2);const m=new THREE.Mesh(geo,a[0]==='S'?sand:a[0]==='U'?urb:a[0]==='H'?heathM:lake);if(a[0]==='S'){m.position.y=.004;m.renderOrder=1;}else if(a[0]==='U'){m.position.y=-.04;m.renderOrder=-.5;}else if(a[0]==='H'){m.position.y=-.042;m.renderOrder=-.55;}else{m.position.y=-.035;m.renderOrder=-.45;}areaGroup.add(m);
+  if(a[0]==='S'){// duinen met reliëf (Christian: "niet herkenbaar"): zachte zandheuvels, vaste willekeur zodat ze elke keer gelijk liggen
+    const ring=pts.map(p=>[p.x,p.y]);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const [x,y] of ring){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
+    let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647,P=[];for(let i=0;i<4000&&P.length<260;i++){const x=x0+(x1-x0)*rnd(),y=y0+(y1-y0)*rnd();if(insideRing([x,y],ring))P.push([x,y,.12+rnd()*.22,.008+rnd()*.016,rnd()*Math.PI]);}
+    const dg=new THREE.SphereGeometry(1,14,8,0,Math.PI*2,0,Math.PI/2),dm=new THREE.MeshLambertMaterial?new THREE.MeshBasicMaterial({color:0xe8d7a6}):null,im=new THREE.InstancedMesh(dg,dm,P.length),M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),E=new THREE.Euler();
+    P.forEach(([x,y,r,h,rot],i)=>{Q.setFromEuler(E.set(0,rot,0));M4.compose(new THREE.Vector3(x,.004,-y),Q,new THREE.Vector3(r,h*EXAG/6*6,r*.6));im.setMatrixAt(i,M4);});
+    const sh=new THREE.InstancedMesh(dg,new THREE.MeshBasicMaterial({color:0xc9b27a}),P.length);P.forEach(([x,y,r,h,rot],i)=>{Q.setFromEuler(E.set(0,rot,0));M4.compose(new THREE.Vector3(x+r*.15,.003,-y+r*.1),Q,new THREE.Vector3(r*1.02,h*.55*EXAG,r*.62));sh.setMatrixAt(i,M4);});
+    m.parent?m.parent.add(im,sh):scene.add(im,sh);}
   if(a[1]){const lp=labelPoint(pts.map(p=>[p.x,p.y]));const LL=addLabel((a[0]==='S'?'🏜️ ':'💧 ')+a[1],'lm',()=>new THREE.Vector3(lp[0],.05,-lp[1]),2);LL.isLm=true;if(a[0]==='Q'){LL.isLake=true;LL.prio=1.8;}}}}
 // ---------- hoogspanning (≥150 kV) en windmolens: eigen laag, standaard uit ----------
 const pwGroup=new THREE.Group();pwGroup.visible=true;scene.add(pwGroup);const windGroup=new THREE.Group();pwGroup.add(windGroup);
