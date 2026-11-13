@@ -58,7 +58,13 @@ Panelinbreng (14 nov, 5 persona's): hoog = kantelsturing, mobiele fixes, WCAG, g
 - Korte legenda/"?"-knop.
 
 **S5 – wo 18 nov: Spelplezier**
-- **Idee Christian (14 nov): sturen door te kantelen als hoofdbesturing op telefoon/tablet, liggend vasthouden, minder knoppen (ook looping via kantelen).** Aanpak: S1 laat kantelen eerst überhaupt werken en laat het panel kort reageren. Is dat positief, dan in S5 een **liggende kantelmodus** als prototype: telefoon dwars, kantelen = sturen/stijgen/dalen, looping door de telefoon ver naar je toe te kantelen, knoppen ingeklapt. Knoppen blijven altijd beschikbaar als alternatief (WCAG 2.5.4 'Motion Actuation': bewegingsbesturing moet ook via de interface kunnen en uit te zetten zijn; nodig voor o.a. Kees en mensen met een motorische beperking). Wordt het een grote ombouw, dan naar de volgende PI.
+- **Besluit Christian (14 nov): minimale interface.** Zodra kantelen werkt en getest is (Claude + Christian), gaan de stuurknoppen weg.
+  - Telefoon/tablet: liggend vasthouden; kantelen = draaien/stijgen/dalen; looping door ver naar je toe te kantelen.
+  - Scherm in drie tikvlakken: **links = langzamer, midden = pauze, rechts = sneller**.
+  - Desktop: geen knoppen op het scherm, alles met het toetsenbord (pijltjes/WASD, spatie, +/−, L, C).
+  - Overblijvende knoppen: alleen **kaart/vliegen** en **weergave/toegankelijkheid**.
+  - Toegankelijkheid (WCAG 2.5.4 'Motion Actuation'): in het menu weergave/toegankelijkheid een schakelaar **"Bediening met knoppen"** (standaard uit) voor wie niet kan kantelen; dan verschijnen de stuurknoppen weer.
+  - S5 bouwt dit als het in één sprint past; anders eerste item van de volgende PI. Panel (Sanne, Kees, Fatima) laten testen.
 - Missies zijn nu te makkelijk en te kort (Christian): langere routes, tussendoelen, opdrachten waarbij je om luchtruim heen moet plannen (onder TMA door, om CTR heen, paradropzone vermijden).
 - Sterren en voortgang (localStorage), dagelijkse uitdaging.
 
