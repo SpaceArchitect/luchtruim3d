@@ -1315,7 +1315,7 @@ function landText(){const x=PLANE.x,n=PLANE.n,f=nearField(x,n),r=nearRoad(x,n),g
   let t;if(f)t=`<b>Geland</b> op ${f.g?'zweefveld':'vliegveld'} ${f.nm}.`;else if(ACTYPE==='balloon')t=`<b>Geland</b> ${whereText(x,n)}.`;else t=`<b>Buitenlanding</b> ${whereText(x,n)}${ACTYPE==='glider'?' (in een weiland)':''}.`;
   return `${SVG[ACTYPE]} ${t}`+(r&&!f?`<br>⚠ Snelweg ${r} dichtbij.`:'')+(needsClr(g)?`<br>⚠ Je staat in ${g.name}.`:'')+`<br>▲ = ${ACTYPE==='glider'?'lierstart':'opstijgen'}.`;}
 // ---------- looping (Boyd): 3 s schermtijd, straal 300 ft, eindigt op dezelfde hoogte ----------
-function startLoop(){if(MODE!=='fly'||ACTYPE==='balloon'||LOOP||PAUSED)return;if(PLANE.alt<700){NOTICE='🔄 Te laag voor een looping: eerst boven 700 ft.<br><small>▶ = verder</small>';PAUSED=true;return;}
+function startLoop(){if(MODE!=='fly'||ACTYPE==='balloon'||LOOP)return;if(PAUSED){PAUSED=false;NOTICE='';}// looping-knop start ook vanuit pauze (eindtest 13 nov)if(PLANE.alt<700){NOTICE='🔄 Te laag voor een looping: eerst boven 700 ft.<br><small>▶ = verder</small>';PAUSED=true;return;}
   LOOP={t:0,alt0:PLANE.alt,x0:PLANE.x,n0:PLANE.n};VZ=0;}
 function loopStep(dt){const k=Math.min(1,(LOOP.t+=dt)/3),th=k*2*Math.PI,R=300,h=PLANE.hdg*Math.PI/180,fwd=R*Math.sin(th)*.0003048*EXAG/1;
   PLANE.pitch=th;PLANE.bank=0;PLANE.alt=LOOP.alt0+R*(1-Math.cos(th));PLANE.x=LOOP.x0+Math.sin(h)*fwd;PLANE.n=LOOP.n0+Math.cos(h)*fwd;
