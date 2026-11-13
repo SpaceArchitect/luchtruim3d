@@ -33,6 +33,7 @@
 - Mooiere toestelmodellen (zweef/motor) en schaduw in de vorm van het toestel.
 
 **S2 – zo 15 nov: Toegankelijkheid**
+- **Eerst de norm uitzoeken en toetsen** (verzoek Christian/Boyd, 13 nov): waarschijnlijk WCAG 2.2 niveau AA (in Europa via EN 301 549; in NL de standaard voor digitoegankelijkheid). Zoek uit welke norm geldt, maak een checklist van de relevante succescriteria (contrast, toetsenbord, labels, tekstgrootte, beweging, touch-doelen) en toets de site; leg de uitkomst vast in het sprintverslag en het project.
 - Kleurenblind: ATZ vs P/R/D, klasse B/C/D (patroon of letter als tweede kanaal).
 - Hoog contrast ook in de 3D-scène.
 - Grote letters overal, schermlezerlabels nalopen.
@@ -57,6 +58,9 @@
 **S7 – vr 20 nov: Doorsnede + PI-afsluiting**
 - Doorsnede langs een lijn (verticaal profiel A→B).
 - Stabiliseren, volledige eindtest, PI-review voor Christian, voorstel volgende PI.
+
+## Roadmap na deze PI (Christian, 13 nov)
+- **Elke week één regio erbij**, tot heel Nederland gedekt is (na Nijmegen–Arnhem bijvoorbeeld Utrecht/Gelderse Vallei, Randstad/Schiphol, Noord, Zeeland/West-Brabant, Limburg-Zuid, Twente/Oost). Datapijplijn uit S5 herbruikbaar maken, zodat een nieuwe regio vooral data ophalen + controleren tegen de AIP is.
 
 ## Buiten de PI (wachten op anderen)
 - Antwoord van LVNL op licentiemail (concept staat in Gmail; Christian verstuurt).
