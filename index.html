@@ -174,8 +174,8 @@
 <div id="panel" class="hidden">
   <div class="flysec"><h3>Vliegen</h3>
   <div class="row"><input type="range" id="tempo" min="0" max="6" step="1" value="2"><span class="val" id="tempoVal"></span></div>
-  <p class="note">Tempo: ×1 is echte snelheid. Ook met + en −.</p>
-  <p class="note">Camera: slepen = draaien, rechts slepen of twee vingers = schuiven, scrollen of knijpen = zoomen. <b>C</b> = terug achter het toestel, <b>L</b> = looping.</p>
+  <p class="note">Tempo: ×1 is echte snelheid. Ook met scrollen of + en −.</p>
+  <p class="note">Camera: slepen = rondkijken (loslaten = terug achter het toestel). Shift+scrollen of knijpen = zoomen, <b>C</b> = zoom terug. <b>L</b> = looping.</p>
   <div class="row"><input type="checkbox" id="optTilt"><label for="optTilt">📱 Sturen door de telefoon te kantelen</label></div><p class="note" id="tiltNote" style="display:none"></p>
   <button id="btnAc">Ander toestel kiezen</button></div>
   <h3>Hulpmiddelen</h3>
@@ -211,12 +211,12 @@
 <div id="flash"></div><div id="tChip">×5</div>
 <div id="ctrl">
   <button data-k="arrowup" title="Stijgen (↑ of W)">▲</button>
-  <button id="tSlow" title="Langzamer (− toets)">⏪</button><button id="tFast" title="Sneller (+ toets)">⏩</button>
+  <button id="tSlow" title="Langzamer (− of scrollen)">⏪</button><button id="tFast" title="Sneller (+ of scrollen)">⏩</button>
   <button data-k="arrowleft" title="Links (← of A)">◀</button><button id="btnPause" title="Pauze (spatie)">❚❚</button><button data-k="arrowright" title="Rechts (→ of D)">▶</button>
   <button data-k="arrowdown" title="Dalen (↓ of S)">▼</button>
   <button id="btnLoop" title="Looping (L)" aria-label="Looping">🔄<small>looping</small></button>
 </div>
-<button id="btnCam" style="display:none" title="Camera terug achter het toestel (C)">🎥 Achter toestel</button>
+<button id="btnCam" style="display:none" title="Camera terug achter het toestel (C)">🎥 Zoom terug</button>
 <div id="modal"><div class="box">
   <h2>Luchtruim in 3D</h2>
   <p class="disc">⚠ <b>Alleen voor educatie.</b> De AIP van LVNL is leidend.</p>
@@ -229,7 +229,7 @@
     <label class="relaxpick"><input type="checkbox" id="relaxBox"> 🌤️ Vliegen zonder luchtruim</label>
   </div>
   <p class="note touch"><b>Vliegen op de telefoon:</b> ◀ ▶ draaien · ▲ ▼ stijgen/dalen · ⏩ ⏪ tempo · ❚❚ pauze (knoppen rechtsonder).</p>
-  <p class="note kb"><b>Vliegen:</b> ← → draaien · ↑ ↓ stijgen/dalen · scrollen of + − = tempo · spatie = pauze. Telefoon: knoppen rechtsonder.</p>
+  <p class="note kb"><b>Vliegen:</b> ← → draaien · ↑ ↓ stijgen/dalen · scrollen of + − = tempo · spatie = pauze · slepen = rondkijken · L = looping. Telefoon: knoppen rechtsonder.</p>
   <p class="note">Je start steeds op een andere plek en krijgt een kleine opdracht.</p>
   <button id="ok" style="display:none">ok</button>
 </div></div>
@@ -1241,7 +1241,7 @@ document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);});
 function setTempo(i){TI=Math.max(0,Math.min(TEMPOS.length-1,i));$('tempo').value=TI;$('tempoVal').textContent='×'+TEMPO();$('tChip').textContent='×'+TEMPO();}
 function togglePause(){PAUSED=!PAUSED;if(!PAUSED)NOTICE='';}
-renderer.domElement.addEventListener('wheel',e=>{if(MODE!=='fly')return;e.preventDefault();CAM.dist=Math.max(.35,Math.min(8,CAM.dist*Math.exp(e.deltaY*.0012)));CAM.free=true;},{passive:false});// scrollen = zoomen (Boyd), tempo met ⏪ ⏩ of +/−
+let wheelAcc=0;renderer.domElement.addEventListener('wheel',e=>{if(MODE!=='fly')return;e.preventDefault();if(e.shiftKey||e.ctrlKey){CAM.dist=Math.max(.35,Math.min(6,CAM.dist*Math.exp(e.deltaY*.0012)));return;}wheelAcc+=e.deltaY;if(Math.abs(wheelAcc)>=60){setTempo(TI+(wheelAcc<0?1:-1));wheelAcc=0;}},{passive:false});// scrollen = tempo (zoals eerst), Shift/Ctrl+scrollen of knijpen = zoomen
 $('btnLoop').onclick=()=>startLoop();
 // ---------- kantelsturing (Boyd): links/rechts kantelen = draaien, voorover = dalen, achterover = stijgen ----------
 let TILT=null,tiltSeen=false;const tiltNote=t=>{const n=$('tiltNote');n.style.display=t?'':'none';n.textContent=t||'';};
@@ -1369,7 +1369,7 @@ function chase(dt,instant){
   const vz=LOOP?0:VZ_S,el=Math.atan2(H0,D0)+CAM.pitch-vz*.22,R=Math.hypot(D0,H0),D=Math.cos(el)*R,H=Math.sin(el)*R;
   camTarget.set(PLANE.x+CAM.panX-Math.sin(h)*D,Math.max(.35,py+H),-(PLANE.n+CAM.panN-Math.cos(h)*D));
   if(instant)camera.position.copy(camTarget);else camera.position.lerp(camTarget,Math.min(1,dt*1.6));
-  const hh=PLANE.hdg*Math.PI/180,lk=3*Math.min(1,CAM.dist);look.set(PLANE.x+CAM.panX+Math.sin(hh)*lk,py+.35*CAM.dist+vz*.6,-(PLANE.n+CAM.panN+Math.cos(hh)*lk));
+  const hh=PLANE.hdg*Math.PI/180,lk=dragging?0:3*Math.min(1,CAM.dist);// vrije camera kijkt naar het toestel zelf, zodat het in beeld blijftlook.set(PLANE.x+CAM.panX+Math.sin(hh)*lk,py+(dragging?0:.35*CAM.dist+vz*.6),-(PLANE.n+CAM.panN+Math.cos(hh)*lk));
   camera.lookAt(look);
   if(SHAKE>0){SHAKE=Math.max(0,SHAKE-dt);const s=SHAKE*.25;camera.position.x+=(Math.random()-.5)*s;camera.position.y+=(Math.random()-.5)*s;}
   if(puffT>0){puffT=Math.max(0,puffT-dt);const k=1-puffT;puff.scale.setScalar(1+k*5);puff.material.opacity=.6*puffT;}
@@ -1381,9 +1381,8 @@ renderer.domElement.addEventListener('pointerdown',e=>{if(MODE!=='fly')return;PT
   if(PTR.size===2){const [a,b]=[...PTR.values()];pinch0={d:Math.hypot(a.x-b.x,a.y-b.y),dist:CAM.dist,mx:(a.x+b.x)/2,my:(a.y+b.y)/2};}});
 renderer.domElement.addEventListener('contextmenu',e=>{if(MODE==='fly')e.preventDefault();});
 addEventListener('pointermove',e=>{if(MODE!=='fly'||!PTR.has(e.pointerId))return;const p=PTR.get(e.pointerId),dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
-  if(PTR.size>=2&&pinch0){const [a,b]=[...PTR.values()],d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;CAM.dist=Math.max(.35,Math.min(8,pinch0.dist*pinch0.d/Math.max(20,d)));camPan(mx-pinch0.mx,my-pinch0.my);pinch0.mx=mx;pinch0.my=my;CAM.free=true;return;}
-  if(p.b===2||p.sh)camPan(dx,dy);else{camYaw-=dx*.006;CAM.pitch=Math.max(-.5,Math.min(1.25,CAM.pitch+dy*.005));}
-  if(Math.abs(dx)+Math.abs(dy)>2)CAM.free=true;});
+  if(PTR.size>=2&&pinch0){const [a,b]=[...PTR.values()],d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;CAM.dist=Math.max(.35,Math.min(6,pinch0.dist*pinch0.d/Math.max(20,d)));return;}
+  camYaw-=dx*.006;CAM.pitch=Math.max(-.5,Math.min(1.25,CAM.pitch+dy*.005));});// rondkijken; bij loslaten veert de camera terug achter het toestel
 function camPan(dx,dy){const h=PLANE.hdg*Math.PI/180+camYaw,k=.012*CAM.dist*(ACTYPE==='balloon'?1.2:1);CAM.panX+=(-Math.cos(h)*dx-Math.sin(h)*dy)*k;CAM.panN+=(Math.sin(h)*dx-Math.cos(h)*dy)*k;}
 addEventListener('pointerup',e=>{PTR.delete(e.pointerId);if(PTR.size<2)pinch0=null;if(!PTR.size)dragging=false;});addEventListener('pointercancel',e=>{PTR.delete(e.pointerId);pinch0=null;if(!PTR.size)dragging=false;});
 
@@ -1647,7 +1646,7 @@ if(ONLY_MAP){$('ok').onclick=()=>{$('modal').style.display='none';showProbe();};
 let last=performance.now(),acc=0;
 (function loop(){requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(.1,(now-last)/1000);last=now;
   if(camTween){const k=Math.min(1,(now-camTween.st)/camTween.ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;camera.position.lerpVectors(camTween.p0,camTween.p1,e);controls.target.lerpVectors(camTween.t0,camTween.t1,e);if(k>=1)camTween=null;}
-  if(MODE==='fly'){if(!PAUSED)sim(dt);if(!dragging&&!CAM.free)camYaw*=.96;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);$('btnCam').style.display=CAM.free?'':'none';document.body.classList.toggle('bal',ACTYPE==='balloon');}else controls.update();
+  if(MODE==='fly'){if(!PAUSED)sim(dt);if(!dragging){camYaw*=.95;CAM.pitch*=.95;}CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);$('btnCam').style.display=CAM.free?'':'none';document.body.classList.toggle('bal',ACTYPE==='balloon');}else controls.update();
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
 window.__vfr={camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
