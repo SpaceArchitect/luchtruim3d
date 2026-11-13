@@ -4,7 +4,7 @@
 
 **Doel van de PI:** Luchtruim in 3D van "werkende demo regio Eindhoven" naar een nette, gehoste site waarop je **alle gevaren en mogelijke conflictgebieden in één oogopslag** ziet, die goed werkt op de telefoon, en die vliegers graag gebruiken. Plus de eerste extra regio.
 
-**Leidend principe (Christian, 14 nov):** alles wat op de 2D ICAO/VFR-kaart staat, moet uiteindelijk ook in de app zichtbaar zijn. Gevaren/conflictgebieden standaard aan; de rest uit te zetten; labels vervagen geleidelijk op afstand zodat het niet te druk wordt.
+**Leidend principe (Christian, 14 nov):** alles wat op de 2D ICAO/VFR-kaart staat, moet uiteindelijk ook in de app zichtbaar zijn. Gevaren/conflictgebieden standaard aan — **daar horen ook gecontroleerd luchtruim klasse A/B/C/D (klaring nodig of verboden voor VFR) en P/R/D bij**; de rest uit te zetten; labels vervagen geleidelijk op afstand zodat het niet te druk wordt.
 
 **Budget:** op vrijdag 20 nov om 17:59 maximaal **80% van de weeklimiet** (stand 13 nov 23:50: 15%). Let op: andere geplande taken van Christian (CVZ za, RAM-mail zo, LinkedIn ma) tellen ook mee.
 
@@ -58,6 +58,7 @@ Panelinbreng (14 nov, 5 persona's): hoog = kantelsturing, mobiele fixes, WCAG, g
 - Korte legenda/"?"-knop.
 
 **S5 – wo 18 nov: Spelplezier**
+- **Idee Christian (14 nov): sturen door te kantelen als hoofdbesturing op telefoon/tablet, liggend vasthouden, minder knoppen (ook looping via kantelen).** Aanpak: S1 laat kantelen eerst überhaupt werken en laat het panel kort reageren. Is dat positief, dan in S5 een **liggende kantelmodus** als prototype: telefoon dwars, kantelen = sturen/stijgen/dalen, looping door de telefoon ver naar je toe te kantelen, knoppen ingeklapt. Knoppen blijven altijd beschikbaar als alternatief (WCAG 2.5.4 'Motion Actuation': bewegingsbesturing moet ook via de interface kunnen en uit te zetten zijn; nodig voor o.a. Kees en mensen met een motorische beperking). Wordt het een grote ombouw, dan naar de volgende PI.
 - Missies zijn nu te makkelijk en te kort (Christian): langere routes, tussendoelen, opdrachten waarbij je om luchtruim heen moet plannen (onder TMA door, om CTR heen, paradropzone vermijden).
 - Sterren en voortgang (localStorage), dagelijkse uitdaging.
 
