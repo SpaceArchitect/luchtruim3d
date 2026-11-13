@@ -112,7 +112,7 @@
   #mini{width:200px;height:144px;border-radius:8px;display:block;box-shadow:0 2px 8px rgba(0,0,0,.15)}
   #loc{margin-top:6px;background:var(--panel);border-radius:8px;padding:5px 9px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.12);max-width:300px}
   #ctrl #btnLoop{grid-column:3;grid-row:1;font-size:15px;line-height:1}#ctrl #btnLoop small{display:block;font-size:10px}body.bal #btnLoop{visibility:hidden}
-  body:not(.flying) #btnCam{display:none}#btnCam small{display:block;font-size:10px;font-weight:500;color:#60646c}
+  body:not(.flying) #btnCam{display:none}@media (pointer:coarse){#btnCam small{display:none}}#btnCam small{display:block;font-size:10px;font-weight:500;color:#60646c}
   #btnCam{position:absolute;right:10px;bottom:200px;z-index:12;min-height:40px;padding:6px 12px;border-radius:8px;border:1px solid #c9ced6;background:#fff;font:600 13px system-ui;box-shadow:0 2px 8px rgba(0,0,0,.15)}
   .vario{padding:0 5px;border-radius:4px}.vario.up{background:#d6f5e3;color:#18794e}.vario.dn{background:#fde2e1;color:#b42318}
   #ctrl{position:absolute;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,44px);gap:5px;user-select:none;-webkit-user-select:none}
