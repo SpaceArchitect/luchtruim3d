@@ -1320,7 +1320,7 @@ function startLoop(){if(MODE!=='fly'||ACTYPE==='balloon'||LOOP)return;if(PAUSED)
 function loopStep(dt){const k=Math.min(1,(LOOP.t+=dt)/3),th=k*2*Math.PI,R=300,h=PLANE.hdg*Math.PI/180,fwd=R*Math.sin(th)*.0003048*EXAG/1;
   PLANE.pitch=th;PLANE.bank=0;PLANE.alt=LOOP.alt0+R*(1-Math.cos(th));PLANE.x=LOOP.x0+Math.sin(h)*fwd;PLANE.n=LOOP.n0+Math.cos(h)*fwd;
   if(k>=1){PLANE.pitch=0;PLANE.alt=LOOP.alt0;LOOP=null;LOOPS++;
-    const g=governing(INSIDE);NOTICE=`🔄 <b>Looping!</b> ${ACTYPE==='motor'?'In het echt mag een gewone Cessna 172 dit niet: kunstvliegen kan alleen met een toestel dat daarvoor is goedgekeurd.':'Kunstvliegen mag alleen met een zweefvliegtuig dat daarvoor is goedgekeurd en met de juiste training.'}${needsClr(g)?`<br>⚠ Je zat in <b>${short(g)}</b>: daar doe je zonder toestemming geen kunstvlucht.`:''}<br><small>(vereenvoudigd) · ▶ = verder</small>`;PAUSED=true;}}
+    const g=governing(INSIDE);if(needsClr(g)){NOTICE=`🔄 Looping in <b>${short(g)}</b>: daar doe je zonder toestemming geen kunstvlucht.<br><small>(vereenvoudigd) · ▶ = verder</small>`;PAUSED=true;}}}// geen melding meer na elke looping (Christian 14 nov: buzzkill); alleen als het niet mocht
 let LOOPS=0;
 function sim(dt){
   const ac=AC[ACTYPE],T=TEMPO();
