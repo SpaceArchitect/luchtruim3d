@@ -981,7 +981,7 @@ const vrpGroup=new THREE.Group();scene.add(vrpGroup);const circGroup=new THREE.G
 // ---------- hoogspanning (≥150 kV) en windmolens: eigen laag, standaard uit ----------
 const pwGroup=new THREE.Group();pwGroup.visible=true;scene.add(pwGroup);const windGroup=new THREE.Group();pwGroup.add(windGroup);
 {const raw=document.getElementById('pwdata').textContent.trim().split('\n');const dec=s=>{let x=0,y=0;return s.split(' ').map(p=>{const v=p.split(',').map(Number);x+=v[0];y+=v[1];return [x/1e4,y/1e4,v[2]||0];});};
- const m380=new THREE.LineBasicMaterial({color:0x8a3324}),m150=new THREE.LineBasicMaterial({color:0x8a8f96,transparent:true,opacity:.5}),post=new THREE.LineBasicMaterial({color:0x7a7f86,transparent:true,opacity:.6});
+ const m380=new THREE.LineBasicMaterial({color:0x6b7076}),m150=new THREE.LineBasicMaterial({color:0x8a8f96,transparent:true,opacity:.5}),post=new THREE.LineBasicMaterial({color:0x7a7f86,transparent:true,opacity:.6});
  const wm=new THREE.MeshBasicMaterial({color:0xf2f3f5}),edge=new THREE.LineBasicMaterial({color:0x8b8d98});
  for(const l of raw){const [k,body]=l.split('|');const P=dec(body).filter(([lo,la])=>lo>=BBOX.x0&&lo<=BBOX.x1&&la>=BBOX.y0&&la<=BBOX.y1);if(P.length<2&&k[0]==='P')continue;
   if(k[0]==='P'){const H=k==='P3'?.055:.045;const v=P.map(([lo,la])=>{const [x,n]=proj(lo,la);return new THREE.Vector3(x,H,-n);});
@@ -1400,7 +1400,7 @@ function pickTask(x,n,hdg,ac){let best=null;
     const brg=(Math.atan2(px-x,pn-n)*180/Math.PI+360)%360,diff=Math.abs(((brg-hdg+540)%360)-180);if(diff>30)continue;
     const score=d+(f.t==='L'?-4:f.t==='R'?0:2)+diff/10;if(!best||score<best.score)best={f,d,score,px,pn};}}
   if(!best)return null;const f=best.f,km=Math.round(best.d);LASTGOAL={x:best.px,n:best.pn,name:f.name};
-  const Q='<br><small>Vrij? Klaring nodig? Verboden?</small>';
+  const Q='<br><small>Luchtruim vrij?</small>';
   if(f.t!=='L')LASTGOAL.name=`de ${f.name} richting ${towardTown(x,n,best.px,best.pn)}`.replace(/^de (?!A)/,'');
   if(ac==='balloon')return `Drijf naar <b>${f.name}</b> (${km} km)`+Q;
   return f.t==='L'?`Naar <b>${f.name}</b> (${km} km)`+Q:f.t==='R'?`Volg de <b>${f.name}</b> richting ${towardTown(x,n,best.px,best.pn)}`+Q:`Volg <b>${f.name}</b> richting ${towardTown(x,n,best.px,best.pn)}`+Q;}
