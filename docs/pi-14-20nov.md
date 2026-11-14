@@ -6,9 +6,9 @@
 
 **Leidend principe (Christian, 14 nov):** alles wat op de 2D ICAO/VFR-kaart staat, moet uiteindelijk ook in de app zichtbaar zijn. Gevaren/conflictgebieden standaard aan — **daar horen ook gecontroleerd luchtruim klasse A/B/C/D (klaring nodig of verboden voor VFR) en P/R/D bij**; de rest uit te zetten; labels vervagen geleidelijk op afstand zodat het niet te druk wordt.
 
-**Budget:** op vrijdag 20 nov om 17:59 maximaal **80% van de weeklimiet** (stand 13 nov 23:50: 15%). Andere geplande taken van Christian (CVZ za, RAM-mail zo, LinkedIn ma) tellen ook mee (~3%). S7 start vrijdag **18:13, na de reset** van de weeklimiet, en valt dus in de volgende week.
+**Budget:** op vrijdag 20 nov om 17:59 maximaal **80% van de weeklimiet** (stand 13 nov 23:50: 15%). Andere geplande taken van Christian (CVZ za, RAM-mail zo, LinkedIn ma) tellen ook mee (~3%). S7 opent vrijdag om 09:13; het echte werk start na Christians seintje (na werktijd, dus na de reset van de weeklimiet).
 
-**Beschikbaarheid (Christian, 14 nov):** zijn pc staat meestal pas na werktijd aan. Elke sprint start daarom als nieuwe chat (za/zo 09:13, ma–do 17:43, vr 18:13), **stuurt een startbericht en wacht op Christians seintje** voordat er iets gebeurt dat de pc nodig heeft (Chrome: weeklimiet, LVNL/OSM-data, eindtest; Documenten-map). Werk dat alleen de cloud nodig heeft (code, Playwright-tests, onderzoek) mag na het startbericht al beginnen.
+**Beschikbaarheid (Christian, 14 nov):** zijn pc staat meestal pas na werktijd aan. Elke sprint start daarom als nieuwe chat (elke dag 09:13), **stuurt een startbericht en wacht op Christians seintje** voordat er iets gebeurt dat de pc nodig heeft (Chrome: weeklimiet, LVNL/OSM-data, eindtest; Documenten-map). Werk dat alleen de cloud nodig heeft (code, Playwright-tests, onderzoek) mag na het startbericht al beginnen.
 
 | Sprint | Dag | Thema (herzien na sanity-check 14 nov 01:00) | Weeklimiet na de sprint (max) |
 |---|---|---|---|
@@ -18,7 +18,7 @@
 | S4 | di 17 nov | Radiogesprek en AIP-correctheid | 55% |
 | S5 | wo 18 nov | Minimale interface (kantelen, tikvlakken) **óf** langere missies — keuze na de kanteltest in S1 | 65% |
 | S6 | do 19 nov | Regio Nijmegen–Arnhem als **proef** (pijplijn herbruikbaar, kosten meten) | 77% |
-| S7 | vr 20 nov 18:13 | Buffer, stabiliseren, PI-review (nieuwe week, max ~12%) | — |
+| S7 | vr 20 nov | Buffer, stabiliseren, PI-review (nieuwe week, max ~12%) | — |
 
 **Sanity-check (14 nov):** de eerste versie was te vol (één avond werk kostte 11% van de week). Daarom: deze PI alleen de **gevaren** van de 2D-kaart (de rest van de ICAO-legenda later); S5 maar één van de twee grote onderwerpen; regio's pas in een vast tempo als de proef in S6 laat zien wat een regio kost (schatting 10–15% per regio); doorsnede A→B naar de backlog.
 
@@ -77,7 +77,7 @@ Panelinbreng (14 nov, 5 persona's): hoog = kantelsturing, mobiele fixes, WCAG, g
 - Luchtruim + gevaren (zelfde lagen als S2/S3) + belangrijkste herkenningspunten (Waalbrug, De Oversteek, rivieren); controle tegen AIP (SUP 03/2022 Nieuw Milligen).
 - Prestaties op mobiel bewaken.
 
-**S7 – vr 20 nov 18:13 (na reset weeklimiet): Buffer + PI-review**
+**S7 – vr 20 nov (werk na seintje, na reset weeklimiet): Buffer + PI-review**
 - Open punten uit S1–S6, stabiliseren, volledige eindtest.
 - PI-review `claude/09-pi-review-14-20nov.md`: gebouwd/niet gebouwd, verbruik per sprint, lessen, voorstel volgende PI (met wat S5 niet koos en de regio-tempo-keuze).
 - De "harde grens 17:59" in de taaktekst geldt niet meer: S7 valt in de nieuwe week; houd het op max ~12%.
