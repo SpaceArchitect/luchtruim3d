@@ -6,6 +6,8 @@
 
 **Leidend principe (Christian, 14 nov):** alles wat op de 2D ICAO/VFR-kaart staat, moet uiteindelijk ook in de app zichtbaar zijn. Gevaren/conflictgebieden standaard aan — **daar horen ook gecontroleerd luchtruim klasse A/B/C/D (klaring nodig of verboden voor VFR) en P/R/D bij**; de rest uit te zetten; labels vervagen geleidelijk op afstand zodat het niet te druk wordt.
 
+**Leidraad bij elke ontwerpkeuze (Christian, 14 nov):** minimale interface · intuïtief · gebruiksvriendelijk · immersie. Bij twijfel kiezen we één oplossingsrichting, geen extra opties of knoppen.
+
 **Budget:** op vrijdag 20 nov om 17:59 maximaal **80% van de weeklimiet** (stand 13 nov 23:50: 15%). Andere geplande taken van Christian (CVZ za, RAM-mail zo, LinkedIn ma) tellen ook mee (~3%). S7 opent vrijdag om 09:13; het echte werk start na Christians seintje (na werktijd, dus na de reset van de weeklimiet).
 
 **Beschikbaarheid (Christian, 14 nov):** zijn pc staat meestal pas na werktijd aan. Elke sprint start daarom als nieuwe chat (elke dag 09:13), **stuurt een startbericht en wacht op Christians seintje** voordat er iets gebeurt dat de pc nodig heeft (Chrome: weeklimiet, LVNL/OSM-data, eindtest; Documenten-map). Werk dat alleen de cloud nodig heeft (code, Playwright-tests, onderzoek) mag na het startbericht al beginnen.
