@@ -16,7 +16,7 @@
 | S2 | zo 15 nov | Gevaren op de kaart (1): data + standaard aan | 35% |
 | S3 | ma 16 nov | Gevaren (2) + toetsen aan WCAG 2.2 AA | 45% |
 | S4 | di 17 nov | Radiogesprek en AIP-correctheid | 55% |
-| S5 | wo 18 nov | Minimale interface (kantelen, tikvlakken) **óf** langere missies — keuze na de kanteltest in S1 | 65% |
+| S5 | wo 18 nov | Mobiele schermindeling + minimale interface (kaart én vliegen; besloten 14 nov 02:29) | 65% |
 | S6 | do 19 nov | Regio Nijmegen–Arnhem als **proef** (pijplijn herbruikbaar, kosten meten) | 77% |
 | S7 | vr 20 nov | Buffer, stabiliseren, PI-review (nieuwe week, max ~12%) | — |
 
@@ -61,7 +61,7 @@ Panelinbreng (14 nov, 5 persona's): hoog = kantelsturing, mobiele fixes, WCAG, g
 - AIP-checks uit de backlog: squawk in CTR, eerste oproep Tower/Arrival, Niederrhein TMZ (DFS-AIP).
 - Korte legenda/"?"-knop.
 
-**S5 – wo 18 nov: Minimale interface óf spelplezier (één van beide, keuze na S1)**
+**S5 – wo 18 nov: Mobiele schermindeling + minimale interface** (besloten 14 nov: één paneel tegelijk, panelen als lade onder/zij, kaart altijd ≥ half zichtbaar, hoogtekolom blijft; eerst schetsen staand/liggend → panel → bouwen). Langere missies → volgende PI.
 - **Besluit Christian (14 nov): minimale interface.** Zodra kantelen werkt en getest is (Claude + Christian), gaan de stuurknoppen weg.
   - Telefoon/tablet: liggend vasthouden; kantelen = draaien/stijgen/dalen; looping door ver naar je toe te kantelen.
   - Scherm in drie tikvlakken: **links = langzamer, midden = pauze, rechts = sneller**.
