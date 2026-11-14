@@ -1503,7 +1503,7 @@ function showProbe(){if(MODE!=='map')return;const col=featsAt(PROBE.x,PROBE.n).f
   box.innerHTML=`<button class="close" aria-label="Sluiten">✕</button><h4 class="ptitle">Sonde: ${PROBE.name}</h4>
    <div class="free ${fl.cls}">${fl.txt}</div>
    <div class="note">Alle luchtruimen boven deze plek, van laag naar hoog. Hoogtes in ft AMSL; FL bij 1013 hPa. Tik op een regel voor uitleg.</div>`+
-   (col.length?col.map(f=>`<details class="item" style="border-left-color:${f.color}"><summary><span class="lim">${f.loTxt} – ${f.hiTxt}</span> ${f.name}${f.cls?' · klasse '+f.cls:''}</summary><p>${TYPE_TXT[f.layer]||''}${CLS_TXT[f.cls]&&CTRL.includes(f.layer)?' '+CLS_TXT[f.cls]:''}</p>${radioLine(f)?'<p>'+radioLine(f)+'</p>':''}${EXCL[f.ident]&&col.some(g=>EXCL[f.ident].includes(g.ident))?'<p><b>Geldt hier niet overal:</b> volgens de AIP is het deel dat overlapt met '+col.filter(g=>EXCL[f.ident].includes(g.ident)).map(g=>g.name).join(', ')+' uitgezonderd.</p>':''}</details>`).join(''):'<p>Hier ligt geen bijzonder luchtruim: klasse G.</p>')+
+   (col.length?col.map(f=>`<details class="item" style="border-left-color:${f.color}"><summary><span class="lim">${f.loTxt} – ${f.hiTxt}</span> ${f.name}${f.cls?' · klasse '+f.cls:''}</summary><p>${TYPE_TXT[f.layer]||''}${CLS_TXT[f.cls]&&CTRL.includes(f.layer)?' '+CLS_TXT[f.cls]:''}</p>${radioLine(f)?'<p>'+radioLine(f)+'</p>':''}${EXCL[f.ident]&&col.some(g=>EXCL[f.ident].includes(g.ident))?'<p><b>Geldt hier niet overal:</b> volgens de AIP is het deel dat overlapt met '+col.filter(g=>EXCL[f.ident].includes(g.ident)).map(g=>g.name).join(', ')+' uitgezonderd.</p>':''}</details>`).join(''):(inNL(PROBE.x,PROBE.n)?'<p>Hier ligt geen bijzonder luchtruim: klasse G.</p>':'<p>Buiten Nederland staat de luchtruimindeling (nog) niet in deze app. Kijk in de AIP van dat land.</p>'))+
    (false&&ovl.length?`<details class="ovl"><summary>Overlap: welke geldt?</summary><p>${[...new Set(ovl)].slice(0,4).join('<br>')}</p><p class="note">Vereenvoudigd: een CTR gaat voor, daarna het kleinste (meest lokale) gebied. Check de AIP.</p></details>`:'')+
    `<p class="note">Tijdstip: ${TIMELABEL.replace(/^nu:\s*/,'')}. Bron: eAIP LVNL AIRAC 11-2026. Vereenvoudigd; controleer altijd de AIP en NOTAMs.</p>`;
   box.style.display='block';if(innerWidth<=700)$('panel').classList.add('hidden');box.querySelector('.close').onclick=()=>{box.style.display='none';};}
@@ -1525,6 +1525,7 @@ function status(inside,x,n){
   else if(g&&g.cls==='A'){cls='bad';tags.push(tag('bad','GEEN VFR'));head=where;}
   else if(needsClr(g)&&CLR.has(g.ident)){tags.push(tag('ok','✓ KLARING GEKREGEN'));head=where;}
   else if(needsClr(g)){cls='clr';tags.push(tag('clr','🔶 KLARING'));head=where;}
+  else if(!g&&!inNL(x,n)){cls='warn';tags.push(tag('warn','? BUITEN NL'));head='luchtruim van dit land staat niet in de app';}// geen klasse G claimen buiten NL (Christian 14 nov)
   else{tags.push(tag('ok','✓ VRIJ'));head=where;}
   if(has('R')){cls=cls==='ok'?'warn':cls;tags.push(tag('warn','BEPERKT'));}
   if(has('TRA')||has('TSA')){cls=cls==='ok'?'warn':cls;tags.push(tag('warn','MIL · ALS ACTIEF VERBODEN'));}
