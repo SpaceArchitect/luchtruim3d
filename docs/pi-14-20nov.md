@@ -6,22 +6,26 @@
 
 **Leidend principe (Christian, 14 nov):** alles wat op de 2D ICAO/VFR-kaart staat, moet uiteindelijk ook in de app zichtbaar zijn. Gevaren/conflictgebieden standaard aan — **daar horen ook gecontroleerd luchtruim klasse A/B/C/D (klaring nodig of verboden voor VFR) en P/R/D bij**; de rest uit te zetten; labels vervagen geleidelijk op afstand zodat het niet te druk wordt.
 
-**Budget:** op vrijdag 20 nov om 17:59 maximaal **80% van de weeklimiet** (stand 13 nov 23:50: 15%). Let op: andere geplande taken van Christian (CVZ za, RAM-mail zo, LinkedIn ma) tellen ook mee.
+**Budget:** op vrijdag 20 nov om 17:59 maximaal **80% van de weeklimiet** (stand 13 nov 23:50: 15%). Andere geplande taken van Christian (CVZ za, RAM-mail zo, LinkedIn ma) tellen ook mee (~3%). S7 start vrijdag **18:13, na de reset** van de weeklimiet, en valt dus in de volgende week.
 
-| Sprint | Dag | Thema | Weeklimiet na de sprint (max) |
+**Beschikbaarheid (Christian, 14 nov):** zijn pc staat meestal pas na werktijd aan. Elke sprint start daarom als nieuwe chat (za/zo 09:13, ma–do 17:43, vr 18:13), **stuurt een startbericht en wacht op Christians seintje** voordat er iets gebeurt dat de pc nodig heeft (Chrome: weeklimiet, LVNL/OSM-data, eindtest; Documenten-map). Werk dat alleen de cloud nodig heeft (code, Playwright-tests, onderzoek) mag na het startbericht al beginnen.
+
+| Sprint | Dag | Thema (herzien na sanity-check 14 nov 01:00) | Weeklimiet na de sprint (max) |
 |---|---|---|---|
-| S1 | za 14 nov | Telefoon & besturing + domein + LVNL-mail | 24% |
-| S2 | zo 15 nov | Alles van de 2D-kaart (1): inventaris en gevaren standaard aan | 33% |
-| S3 | ma 16 nov | Alles van de 2D-kaart (2) + toegankelijkheid (WCAG 2.2 AA) | 42% |
-| S4 | di 17 nov | Radiogesprek en AIP-correctheid | 51% |
-| S5 | wo 18 nov | Spelplezier: langere, moeilijkere missies | 60% |
-| S6 | do 19 nov | Regio Nijmegen–Arnhem | 69% |
-| S7 | vr 20 nov (klaar vóór 17:00) | Doorsnede A→B + stabiliseren + PI-review | 78% |
+| S1 | za 14 nov | Telefoon (kantelen testen) + domein + LVNL-mail | 25% |
+| S2 | zo 15 nov | Gevaren op de kaart (1): data + standaard aan | 35% |
+| S3 | ma 16 nov | Gevaren (2) + toetsen aan WCAG 2.2 AA | 45% |
+| S4 | di 17 nov | Radiogesprek en AIP-correctheid | 55% |
+| S5 | wo 18 nov | Minimale interface (kantelen, tikvlakken) **óf** langere missies — keuze na de kanteltest in S1 | 65% |
+| S6 | do 19 nov | Regio Nijmegen–Arnhem als **proef** (pijplijn herbruikbaar, kosten meten) | 77% |
+| S7 | vr 20 nov 18:13 | Buffer, stabiliseren, PI-review (nieuwe week, max ~12%) | — |
 
-Panelinbreng (14 nov, 5 persona's): hoog = kantelsturing, mobiele fixes, WCAG, gevaren in één oogopslag (met tweede kanaal naast kleur); midden = dalen, RT/AIP, spelplezier, doorsnede, domein; laag = nieuwe regio, toestelmodellen. Christian wil elke week een regio → één regio in S6, de rest op de roadmap.
+**Sanity-check (14 nov):** de eerste versie was te vol (één avond werk kostte 11% van de week). Daarom: deze PI alleen de **gevaren** van de 2D-kaart (de rest van de ICAO-legenda later); S5 maar één van de twee grote onderwerpen; regio's pas in een vast tempo als de proef in S6 laat zien wat een regio kost (schatting 10–15% per regio); doorsnede A→B naar de backlog.
+
+Panelinbreng (14 nov, 5 persona's): hoog = kantelsturing, mobiele fixes, WCAG, gevaren in één oogopslag (met tweede kanaal naast kleur); midden = dalen, RT/AIP, spelplezier, doorsnede, domein; laag = nieuwe regio, toestelmodellen.
 
 ## Werkwijze per sprint
-1. Elke sprint start als **nieuwe chat** (geplande taak, 09:13). Christian geeft daar feedback.
+1. Elke sprint start als **nieuwe chat** (geplande taak). Startbericht sturen en **wachten op Christians seintje** voor pc-werk. Christian geeft daar feedback.
 2. Begin: lees `02-instructies.md`, `06-backlog.md`, het laatste sprintverslag en dit plan; **lees de weeklimiet af** (Chrome → claude.ai/settings/usage). Ligt het verbruik boven het maximum van de vorige sprint, maak de sprint kleiner.
 3. Bouwen in de repo `SpaceArchitect/luchtruim3d` (clone, `index.html`), testen met echte klikken (`tools/shot.py`, Playwright).
 4. Kanbanbord bijwerken: https://claude.ai/artifact/6ogPFEojFzEi7WxTrp2H3m (collectie `cards`).
@@ -41,13 +45,13 @@ Panelinbreng (14 nov, 5 persona's): hoog = kantelsturing, mobiele fixes, WCAG, g
 - LVNL-mail: concept in Gmail nalopen met Christian (URL luchtruim3d.nl), Christian verstuurt.
 - Optioneel: Christian laat EasyVFR zien als inspiratie voor S2/S3 (welke lagen, hoe decluttering).
 
-**S2 – zo 15 nov: Alles van de 2D-kaart (1)**
+**S2 – zo 15 nov: Gevaren op de kaart (1)** (deze PI alleen gevaren; de rest van de ICAO-legenda later)
 - Inventaris: legenda van de ICAO-kaart 1:500.000 / LVNL VFR chart viewer naast wat de app toont. Welke LVNL-lagen hebben we, welke niet (Airspaces, Miscellaneous, Routes, Aerodrome, Obstacles…)? Lijst in het verslag.
 - Standaard aan: paradropzones, dronegebieden (UAS/TSA), schermvlieg-/lier-/ULV-terreinen en andere gevaren die op de 2D-kaart staan (bron: LVNL-laag of AIP), laagvlieggebieden waar relevant. Per type vastleggen waarom aan/uit.
 - Ontbrekende lagen ophalen via Chrome (same-origin op geoservices.lvnl.nl).
 - Decluttering: labels vervagen geleidelijk op afstand; lagen per groep uit te zetten.
 
-**S3 – ma 16 nov: Alles van de 2D-kaart (2) + toegankelijkheid**
+**S3 – ma 16 nov: Gevaren (2) + toegankelijkheid**
 - Restant S2 (obstakels/masten uit LVNL-laag Obstacles, symbolen voor nieuwe lagen).
 - **Norm uitzoeken en toetsen** (Christian/Boyd): WCAG 2.2 niveau AA (EN 301 549). Checklist van relevante succescriteria (contrast, toetsenbord, labels, tekstgrootte, beweging, touch-doelen) en de site toetsen; uitkomst vastleggen.
 - Gevaren niet alleen op kleur: patroon/randstijl/letter (kleurenblind: ATZ vs P/R/D, klasse B/C/D). Hoog contrast ook in de 3D-scène.
@@ -57,7 +61,7 @@ Panelinbreng (14 nov, 5 persona's): hoog = kantelsturing, mobiele fixes, WCAG, g
 - AIP-checks uit de backlog: squawk in CTR, eerste oproep Tower/Arrival, Niederrhein TMZ (DFS-AIP).
 - Korte legenda/"?"-knop.
 
-**S5 – wo 18 nov: Spelplezier**
+**S5 – wo 18 nov: Minimale interface óf spelplezier (één van beide, keuze na S1)**
 - **Besluit Christian (14 nov): minimale interface.** Zodra kantelen werkt en getest is (Claude + Christian), gaan de stuurknoppen weg.
   - Telefoon/tablet: liggend vasthouden; kantelen = draaien/stijgen/dalen; looping door ver naar je toe te kantelen.
   - Scherm in drie tikvlakken: **links = langzamer, midden = pauze, rechts = sneller**.
@@ -68,20 +72,22 @@ Panelinbreng (14 nov, 5 persona's): hoog = kantelsturing, mobiele fixes, WCAG, g
 - Missies zijn nu te makkelijk en te kort (Christian): langere routes, tussendoelen, opdrachten waarbij je om luchtruim heen moet plannen (onder TMA door, om CTR heen, paradropzone vermijden).
 - Sterren en voortgang (localStorage), dagelijkse uitdaging.
 
-**S6 – do 19 nov: Regio Nijmegen–Arnhem**
+**S6 – do 19 nov: Regio Nijmegen–Arnhem als proef** (meet wat een regio kost in % weeklimiet; daarna kiezen we het tempo)
 - Data via Chrome (LVNL + OSM) voor de nieuwe bbox; ophaal-/bouwscript herbruikbaar in `tools/` (basis voor "elke week een regio").
 - Luchtruim + gevaren (zelfde lagen als S2/S3) + belangrijkste herkenningspunten (Waalbrug, De Oversteek, rivieren); controle tegen AIP (SUP 03/2022 Nieuw Milligen).
 - Prestaties op mobiel bewaken.
 
-**S7 – vr 20 nov: Doorsnede + stabiliseren + PI-review**
-- Doorsnede langs een lijn (twee punten tikken → verticaal profiel).
-- Open bugs uit S1–S6; volledige eindtest.
-- PI-review `claude/09-pi-review-14-20nov.md` en voorstel volgende PI.
+**S7 – vr 20 nov 18:13 (na reset weeklimiet): Buffer + PI-review**
+- Open punten uit S1–S6, stabiliseren, volledige eindtest.
+- PI-review `claude/09-pi-review-14-20nov.md`: gebouwd/niet gebouwd, verbruik per sprint, lessen, voorstel volgende PI (met wat S5 niet koos en de regio-tempo-keuze).
+- De "harde grens 17:59" in de taaktekst geldt niet meer: S7 valt in de nieuwe week; houd het op max ~12%.
 
 ## Backlog (niet in deze PI, tenzij er ruimte is)
+- Doorsnede langs een lijn (A→B profiel).
+- Rest van de ICAO-legenda (niet-gevaren).
 - Mooiere toestelmodellen en schaduw in toestelvorm (panel: laag).
 - Live NOTAMs (eigen server nodig).
 - Contact met Frank (vfr3d.nl): samenwerken, naar elkaar verwijzen, samen naar LVNL.
 
 ## Roadmap na deze PI (Christian, 13 nov)
-- **Elke week één regio erbij**, tot heel Nederland gedekt is (na Nijmegen–Arnhem bijvoorbeeld Utrecht/Gelderse Vallei, Randstad/Schiphol, Noord, Zeeland/West-Brabant, Zuid-Limburg, Twente/Oost).
+- **Regio's toevoegen tot heel Nederland gedekt is** (wens Christian: elke week; tempo kiezen na de proef in S6) (na Nijmegen–Arnhem bijvoorbeeld Utrecht/Gelderse Vallei, Randstad/Schiphol, Noord, Zeeland/West-Brabant, Zuid-Limburg, Twente/Oost).
