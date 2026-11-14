@@ -433,9 +433,19 @@ async def cam_smooth(a, ac):
     ok(jerk < max(1.5, 12 * med), f'{ac}: camera springt: max sprong {jerk:.2f} (mediaan stap {med:.3f})')
     if a.touch: ok(max(x[3] for x in L) - min(x[3] for x in L) > 0.05, f'{ac}: knijpen verandert de zoom niet ({L[0][3]:.2f}→{L[-1][3]:.2f})')
 
+SEND = '(o)=>window.dispatchEvent(Object.assign(new Event("deviceorientation"),{alpha:0,beta:o.beta,gamma:o.gamma}))'
+
+async def tilt_on(a):
+    """Kantelen aan (staat op telefoon standaard aan sinds S1c) en meteen sensordata sturen zodat de terugval naar knoppen niet afgaat."""
+    if not await a.ev('()=>document.getElementById("optTilt").checked'):
+        await a.hit('#btnPanel'); await a.hit('label[for=optTilt]'); await a.hit('#btnPanel')
+    ang = await a.v('v.tiltAng()')
+    await a.ev(SEND, orient(0, 0, ang)); await a.frames(1)
+    ok(await a.ev('()=>document.getElementById("optTilt").checked'), 'kantelsturing gaat niet aan: ' + await a.ev('()=>document.getElementById("tiltNote").textContent'))
+
 def orient(turn, back, ang, p0=60):
-    """beta/gamma zoals een echte telefoon ze geeft voor een stand: rol 'turn' (rechts +), 'back' graden achterover t.o.v. p0."""
-    t, p = math.radians(turn), math.radians(p0 - back)
+    """beta/gamma zoals een echte telefoon ze geeft voor een stand: rol 'turn' (rechts +), 'back' graden naar je toe gekanteld t.o.v. p0."""
+    t, p = math.radians(turn), math.radians(p0 + back)  # 'back' = naar je toe kantelen (Christian 14 nov: = stijgen)
     sx, sy, sz = -math.sin(t), math.cos(t) * math.sin(p), math.cos(t) * math.cos(p)
     if ang == 90: ux, uy = sy, -sx
     elif ang == 270: ux, uy = -sy, sx
@@ -447,9 +457,7 @@ def orient(turn, back, ang, p0=60):
 async def d_tilt(a):  # Christian 14 nov: kantelen deed niks; liggend achterover = ineens een bocht
     if not a.touch: return
     await a.hit('#modal [data-ac=glider]')
-    await a.hit('#btnPanel'); await a.hit('label[for=optTilt]')
-    ok(await a.ev('()=>document.getElementById("optTilt").checked'), 'kantelsturing gaat niet aan: ' + await a.ev('()=>document.getElementById("tiltNote").textContent'))
-    await a.hit('#btnPanel')
+    await tilt_on(a)
     st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2000, 0, paused=False)
     send = '(o)=>window.dispatchEvent(Object.assign(new Event("deviceorientation"),{alpha:0,beta:o.beta,gamma:o.gamma}))'
     keys = '[v.keys.tl,v.keys.tr,v.keys.tu,v.keys.td]'
@@ -471,14 +479,20 @@ async def d_tilt(a):  # Christian 14 nov: kantelen deed niks; liggend achterover
             ok(k == [True, False, False, False], f'{angle}°/{p0}°: links kantelen → {k}')
             for back in (5, 11, 13, 20, 30):  # achterover = stijgen, nooit een bocht
                 await a.ev(send, orient(0, back, angle, p0)); k = await a.v(keys)
-                ok(not k[0] and not k[1], f'{angle}°/{p0}°: {back}° achterover geeft een bocht {k}')
-                if back > 9: ok(k[2] and not k[3], f'{angle}°/{p0}°: {back}° achterover ≠ stijgen {k}')
+                ok(not k[0] and not k[1], f'{angle}°/{p0}°: {back}° naar je toe geeft een bocht {k}')
+                if back > 9: ok(k[2] and not k[3], f'{angle}°/{p0}°: {back}° naar je toe ≠ stijgen {k}')
             await a.ev(send, orient(0, -15, angle, p0)); k = await a.v(keys)
-            ok(k == [False, False, False, True], f'{angle}°/{p0}°: voorover ≠ dalen {k}')
+            ok(k == [False, False, False, True], f'{angle}°/{p0}°: naar voren ≠ dalen {k}')
             await a.ev(send, orient(12, 15, angle, p0)); k = await a.v(keys)
             ok(k == [False, True, True, False], f'{angle}°/{p0}°: rechts + achterover {k}')
             for x in (20, -20, 25, -25, 0): await a.ev(send, orient(x, 0, angle, p0)); await a.frames(1)  # schokkerig
             ok(await a.v(keys) == [False] * 4, f'{angle}°/{p0}°: blijft sturen na terug naar neutraal')
+        # panel 3 (ernst 8): telefoon iets scheef bij ▶ → dat is rechtuit, geen blijvende bocht
+        await a.ev('()=>window.__vfr.resetTilt()'); await a.ev(send, orient(12, 0, angle)); await a.ev(send, orient(12, 0, angle))
+        ok(await a.v(keys) == [False] * 4, f'{angle}°: scheef geijkt (12°) geeft toch een bocht')
+        await a.ev(send, orient(28, 0, angle)); ok((await a.v(keys))[1], f'{angle}°: na scheef ijken geen bocht rechts bij +16°')
+        await a.ev(send, orient(-4, 0, angle)); ok((await a.v(keys))[0], f'{angle}°: na scheef ijken geen bocht links bij -16°')
+        await a.ev(send, orient(0, 0, angle))
         await a.sane()
     await a.ev(send, {'beta': float('nan'), 'gamma': 10}); await a.sane()
     await cdp.send('Emulation.clearDeviceMetricsOverride'); await a.frames(2)
@@ -554,6 +568,91 @@ async def d_probe_task(a):  # panel ronde 2 (Fatima): vanaf de sonde vliegen = o
         await a.hit('#btnMode')
     ok(got >= 2, f'vanaf de sonde vaak geen opdracht ({got}/3)')
 
+async def d_tilt_default(a):  # S1c (Christian): op telefoon standaard kantelen + knoppen weg; geen sensor = knoppen terug; uitzetten onthouden
+    await a.hit('#modal [data-ac=glider]'); await a.frames(2)
+    on = await a.ev('()=>document.getElementById("optTilt").checked')
+    if not a.touch:
+        ok(not on, 'desktop: kantelen staat aan'); ok(await a.visible('#ctrl [data-k=arrowup]'), 'desktop: stuurknoppen weg'); return
+    ok(on, 'telefoon: kantelen niet standaard aan')
+    ok(await a.visible('#ctrl [data-k=arrowup]'), 'stuurknoppen al weg vóór er sensordata is')
+    await a.ev(SEND, orient(0, 0, await a.v('v.tiltAng()'))); await a.frames(2)
+    ok(not await a.visible('#ctrl [data-k=arrowup]') and not await a.visible('#btnLoop'), 'stuurknoppen niet verborgen in kantelmodus')
+    for sel in ('#btnPause', '#tSlow', '#tFast'): ok(await a.visible(sel), f'{sel} weg in kantelmodus')
+    r = await a.ev(OVERLAP_JS); ok(not r['o'], f'overlap in kantelmodus {r["o"]}')
+    await a.shot('kantelmodus')
+    # uitzetten in Weergave → knoppen terug, en onthouden na herladen
+    await a.hit('#btnPanel'); await a.hit('label[for=optTilt]'); await a.hit('#btnPanel')
+    ok(await a.visible('#ctrl [data-k=arrowup]'), 'knoppen niet terug na uitzetten')
+    await a.pg.reload(); await a.wait(1800); await a.hit('#modal [data-ac=glider]'); await a.frames(2)
+    ok(not await a.ev('()=>document.getElementById("optTilt").checked'), 'uitzetten niet onthouden')
+
+async def d_tilt_fallback(a):  # geen sensor (desktop-browser op touchscherm, oude telefoon) → na 2,5 s knoppen
+    if not a.touch: return
+    await a.hit('#modal [data-ac=motor]'); await a.wait(3200); await a.frames(2)
+    ok(not await a.ev('()=>document.getElementById("optTilt").checked'), 'kantelen blijft aan zonder sensordata')
+    ok(await a.visible('#ctrl [data-k=arrowup]'), 'geen knoppen zonder sensordata')
+    ok('knoppen' in await a.ev('()=>document.getElementById("tiltNote").textContent'), 'geen uitleg bij terugval naar knoppen')
+
+async def d_tilt_loop_balloon(a):  # Christian: looping door te kantelen; ballon zelfde logica
+    if not a.touch: return
+    await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
+    st = await a.ev('()=>{const v=window.__vfr;for(let k=0;k<3000;k++){const x=v.PLANE.x+(Math.random()-.5)*60,n=v.PLANE.n+(Math.random()-.5)*60;if(v.inNL(x,n)&&!v.featsAt(x,n).some(f=>f.lo<4000)&&!v.featsAt(x+Math.sin(0)*6,n+6).some(f=>f.lo<4000))return {x,n}}return null}')
+    ok(st, 'geen vrije plek gevonden')
+    await a.place(st['x'], st['n'], 2000, 0, paused=False)
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);v.resetTilt()}')
+    ang = await a.v('v.tiltAng()')
+    await a.ev(SEND, orient(0, 0, ang)); await a.ev(SEND, orient(0, 25, ang))
+    ok(not await a.v('!!v.LOOP'), 'looping al bij 25° (moet ver kantelen)')
+    await a.ev(SEND, orient(0, 45, ang)); await a.frames(2)
+    ok(await a.v('!!v.LOOP'), 'geen looping bij ver naar je toe kantelen ' + json.dumps(await a.v('[v.PAUSED,v.NOTICE,v.PLANE.alt,v.TILT,v.MODE,v.ACTYPE]')))
+    for _ in range(80):
+        await a.frames(2)
+        if not await a.v('!!v.LOOP'): break
+    await a.ev(SEND, orient(0, 45, ang)); await a.frames(2)
+    ok(not await a.v('!!v.LOOP'), 'tweede looping zonder eerst terug naar neutraal')
+    # ballon: naar je toe = stijgen, naar voren = dalen, nooit een looping
+    await a.fly('balloon')
+    st = await a.ev('()=>{const v=window.__vfr;for(let k=0;k<3000;k++){const x=v.PLANE.x+(Math.random()-.5)*60,n=v.PLANE.n+(Math.random()-.5)*60;if(v.inNL(x,n)&&!v.featsAt(x,n).some(f=>f.lo<4000))return {x,n}}return null}')
+    ok(st, 'geen vrije plek voor de ballon gevonden')
+    await a.place(st['x'], st['n'], 1000, 0, paused=False)
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);v.resetTilt()}')
+    await a.ev(SEND, orient(0, 0, ang)); await a.ev(SEND, orient(0, 20, ang))
+    alt0 = await a.v('v.PLANE.alt')
+    for _ in range(100):
+        await a.frames(2)
+        if await a.v('v.PLANE.alt') > alt0 + 5: break
+    ok(await a.v('v.PLANE.alt') > alt0, 'ballon stijgt niet bij naar je toe kantelen ' + json.dumps(await a.v('[v.PAUSED,v.NOTICE,v.PLANE.alt,v.keys.tu,v.TILT]')))
+    await a.ev(SEND, orient(0, 50, ang)); await a.frames(2); ok(not await a.v('!!v.LOOP'), 'ballon maakt een looping')
+    await a.ev(SEND, orient(0, -20, ang)); alt1 = await a.v('v.PLANE.alt')
+    for _ in range(100):
+        await a.frames(2)
+        if await a.v('v.PLANE.alt') < alt1 - 5: break
+    ok(await a.v('v.PLANE.alt') < alt1, 'ballon daalt niet bij naar voren kantelen')
+
+async def d_rmz_inside_call(a):  # Christian 14 nov: in RMZ Gilze-Rijen stond 'oproepen' maar je kon niet oproepen
+    await a.hit('#modal [data-ac=glider]'); await weekend(a)
+    act = await a.ev('()=>window.__vfr.LAYERS.find(f=>f.ident==="EHGRRMZ").active')
+    if act is False:
+        ok(not await a.visible('#timeBtn'), 'weekendtijd gekozen maar RMZ Gilze-Rijen niet actief'); return
+    lp = await a.ev('()=>window.__vfr.LAYERS.find(f=>f.ident==="EHGRRMZ").lp')
+    await a.place(lp[0], lp[1], 1000, 0, paused=False); await a.frames(3)
+    ok(await a.visible('#banner [data-rt="open:EHGRRMZ"]'), 'geen knop Oproepen in de RMZ: ' + await a.ev('()=>document.getElementById("banner").innerText'))
+    await a.hit('#banner [data-rt="open:EHGRRMZ"]')
+    good = await a.ev('()=>[...document.querySelectorAll("#banner .rt")].findIndex(b=>b.querySelectorAll("span").length===6&&!/PH-/.test(b.querySelector("span").textContent))')
+    await a.hit(f'#banner .rt >> nth={good}')
+    ok('Opgeroepen' in (await a.v('v.NOTICE') or '') and '132.350' in (await a.v('v.NOTICE') or ''), 'oproep Dutch MIL Info 132.350 niet bevestigd')
+    await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.PAUSED=false;v.hudTick()}'); await a.frames(2)
+    ok('OPGEROEPEN' in await a.ev('()=>document.querySelector("#banner .head").innerText'), 'statusregel toont geen OPGEROEPEN')
+
+async def d_zoom_desktop(a):  # Christian 14 nov: geen manier om in/uit te zoomen op desktop (Shift+scrollen = horizontaal in Chrome)
+    if a.touch: return
+    await a.hit('#modal [data-ac=glider]'); await a.frames(2)
+    await a.pg.mouse.move(640, 420)
+    for dx, dy in ((0, 300), (300, 0)):
+        d0 = await a.v('v.dbg.CAM.dist')
+        await a.pg.keyboard.down('Shift'); await a.pg.mouse.wheel(dx, dy); await a.wait(200); await a.pg.keyboard.up('Shift')
+        ok(abs(await a.v('v.dbg.CAM.dist') - d0) > 0.05, f'Shift+scrollen ({dx},{dy}) zoomt niet')
+
 async def d_ahead_full(a):  # Noor 1: frequentie in de waarschuwingsregel nooit afgekapt
     await a.hit('#modal [data-ac=motor]')
     e = await a.ev(JS_FREE_EDGE, ['EHEH', 1.8, 1000])
@@ -565,7 +664,7 @@ async def d_ahead_full(a):  # Noor 1: frequentie in de waarschuwingsregel nooit 
 async def d_tilt_takeoff(a):  # Daan 3: met kantelen opstijgen na de opstijgmelding
     if not a.touch: return
     await a.hit('#modal [data-ac=motor]')
-    await a.hit('#btnPanel'); await a.hit('label[for=optTilt]'); await a.hit('#btnPanel')
+    await tilt_on(a)
     lp = await a.ev('()=>window.__vfr.LAYERS.find(f=>f.ident==="EHEH").lp')
     await a.place(lp[0], lp[1], 0, 0, paused=False)
     send = '(o)=>window.dispatchEvent(Object.assign(new Event("deviceorientation"),{alpha:0,beta:o.beta,gamma:o.gamma}))'
@@ -621,7 +720,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('opstijgen met kantelen', d_tilt_takeoff)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:

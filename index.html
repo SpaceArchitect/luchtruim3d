@@ -182,6 +182,11 @@
   .banner .ahead{white-space:normal!important}/* S1b Noor: frequentie nooit afkappen */
   .banner .notice [data-rt=close]{position:sticky;bottom:0;box-shadow:0 -4px 8px rgba(11,58,110,.6)}@media (max-height:500px),(max-width:700px){.banner .rtnote{display:none}}
   @media (max-height:500px),(max-width:700px){body.menuopen .banner,body.menuopen #compass{visibility:hidden}}/* één ding tegelijk: menu open = melding even weg (Fatima) */
+  /* S1c: kantelmodus (sensor geeft data): stuurknoppen weg, alleen ⏪ ❚❚ ⏩ in één rij */
+  body.tiltmode #ctrl [data-k],body.tiltmode #btnLoop{display:none!important}
+  body.tiltmode #ctrl{grid-template-rows:46px!important}body.tiltmode #ctrl #tSlow{grid-row:1!important;grid-column:1!important}body.tiltmode #btnPause{grid-row:1!important;grid-column:2!important}body.tiltmode #ctrl #tFast{grid-row:1!important;grid-column:3!important}
+  body.tiltmode #tChip{bottom:66px!important}
+  .banner .nt.mini{display:inline-block;margin:0 4px 0 0;min-height:30px;padding:2px 8px;font-size:12.5px;background:#0b3a6e;color:#fff;vertical-align:middle}
   /* S1: vliegbanner = vaste regels zonder uitklappen (D2) */
   .banner .head,.banner .task,.banner .ahead{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.banner:not(.open):not(.noticeonly) .head::after{content:none!important}
   @media (max-width:520px){.banner .task .q{display:none}}
@@ -1270,8 +1275,8 @@ document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
   const off=()=>{keys[k]=false;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);});
 function setTempo(i){TI=Math.max(0,Math.min(TEMPOS.length-1,i));$('tempo').value=TI;$('tempoVal').textContent='×'+TEMPO();$('tChip').textContent='×'+TEMPO();}
-function togglePause(){PAUSED=!PAUSED;if(!PAUSED)NOTICE='';}
-let wheelAcc=0;renderer.domElement.addEventListener('wheel',e=>{if(MODE!=='fly')return;e.preventDefault();if(e.shiftKey||e.ctrlKey){CAM.dist=Math.max(.35,Math.min(6,CAM.dist*Math.exp(e.deltaY*.0012)));return;}wheelAcc+=e.deltaY;if(Math.abs(wheelAcc)>=60){setTempo(TI+(wheelAcc<0?1:-1));wheelAcc=0;}},{passive:false});// scrollen = tempo (zoals eerst), Shift/Ctrl+scrollen of knijpen = zoomen
+function togglePause(){PAUSED=!PAUSED;if(!PAUSED){NOTICE='';if(TILT)TILT=null;/* ▶ = opnieuw ijken: zo houd je hem nu = rechtuit */}}
+let wheelAcc=0;renderer.domElement.addEventListener('wheel',e=>{if(MODE!=='fly')return;e.preventDefault();if(e.shiftKey||e.ctrlKey){const dz=e.deltaY||e.deltaX;/* Chrome/Windows maakt van Shift+scrollen horizontaal scrollen (deltaX): zoomen werkte niet (Christian 14 nov) */CAM.dist=Math.max(.35,Math.min(6,CAM.dist*Math.exp(dz*.0012)));return;}wheelAcc+=e.deltaY;if(Math.abs(wheelAcc)>=60){setTempo(TI+(wheelAcc<0?1:-1));wheelAcc=0;}},{passive:false});// scrollen = tempo (zoals eerst), Shift/Ctrl+scrollen of knijpen = zoomen
 $('btnLoop').onclick=()=>startLoop();
 // ---------- kantelsturing (Boyd): links/rechts kantelen = draaien, voorover = dalen, achterover = stijgen ----------
 let TILT=null,tiltSeen=false;const tiltNote=t=>{const n=$('tiltNote');n.style.display=t?'':'none';n.textContent=t||'';};
@@ -1280,14 +1285,21 @@ function tiltAngles(beta,gamma,ang){// S1-fix: via de zwaartekrachtrichting i.p.
   const b=beta*Math.PI/180,g=gamma*Math.PI/180,ux=-Math.sin(g)*Math.cos(b),uy=Math.sin(b),uz=Math.cos(g)*Math.cos(b);
   let sx=ux,sy=uy;if(ang===90){sx=-uy;sy=ux;}else if(ang===270){sx=uy;sy=-ux;}else if(ang===180){sx=-ux;sy=-uy;}
   return {t:Math.asin(Math.max(-1,Math.min(1,-sx)))*180/Math.PI,p:Math.atan2(sy,uz)*180/Math.PI};}// t = rol (rechts +), p = stand (rechtop = 90)
-function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite(e.beta))return;tiltSeen=true;const ang=tiltAng();const {t,p}=tiltAngles(e.beta,e.gamma,ang);
-  if(!isFinite(t)||!isFinite(p))return;if(!TILT||TILT.ang!==ang)TILT={p0:p,ang};// na draaien opnieuw ijken
-  const b=((p-TILT.p0+540)%360)-180,DZ=8;// achterover (bovenkant van je af, scherm meer naar boven) = stijgen, voorover = dalen (zoals oorspronkelijk; Boyd)
-  keys['tl']=t<-DZ;keys['tr']=t>DZ;keys['tu']=b<-DZ;keys['td']=b>DZ;if(!keys['tu'])TO_WAIT=false;}/* opstijgmelding: eerst terug naar neutraal, dan opnieuw achterover = opstijgen (ook als dat tussen twee hudTicks gebeurt) */
+function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite(e.beta))return;tiltSeen=true;const ang=tiltAng();let {t,p}=tiltAngles(e.beta,e.gamma,ang);
+  if(!isFinite(t)||!isFinite(p))return;if(!TILT||TILT.ang!==ang)TILT={p0:p,t0:Math.abs(t)<25?t:0,ang};/* S1c panel 3: ook de rol ijken (zo houd je hem = rechtuit), behalve bij een duidelijke bocht */// na draaien opnieuw ijken
+  t-=TILT.t0;const b=((p-TILT.p0+540)%360)-180,DZ=8;// Christian 14 nov: naar je toe kantelen (bovenkant naar je toe) = stijgen, naar voren = dalen; ballon idem
+  keys['tl']=t<-DZ;keys['tr']=t>DZ;keys['tu']=b>DZ;keys['td']=b<-DZ;if(!keys['tu'])TO_WAIT=false;
+  if(!document.body.classList.contains('tiltmode')){document.body.classList.add('tiltmode');}
+  /* looping: ver naar je toe kantelen (PI S5-ontwerp) */if(b>TILT_LOOP&&!TILT.looped){TILT.looped=true;if(MODE==='fly'&&!PAUSED&&ACTYPE!=='balloon')startLoop();}if(b<15)TILT.looped=false;}
+const TILT_LOOP=40;/* opstijgmelding: eerst terug naar neutraal, dan opnieuw achterover = opstijgen (ook als dat tussen twee hudTicks gebeurt) */
 $('optTilt').onchange=async e=>{if(e.target.checked){try{if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission){const r=await DeviceOrientationEvent.requestPermission();if(r==='denied')throw 0;/* S1: nieuwere Chrome geeft 'prompt' terug; alleen 'denied' is echt nee (kantelen deed niks) */}}catch(_){e.target.checked=false;tiltNote('Geen toestemming voor de bewegingssensor.');return;}
-    TILT=null;tiltSeen=false;addEventListener('deviceorientation',onTilt);tiltNote('Houd de telefoon zoals je hem nu vasthoudt: dat is "rechtuit".');
-    setTimeout(()=>{if(!tiltSeen&&$('optTilt').checked){tiltNote('Deze pagina krijgt geen sensorgegevens. Op claude.ai is dat geblokkeerd; op luchtruim3d.nl werkt het wel (op een telefoon).');}},2500);}
-  else{removeEventListener('deviceorientation',onTilt);keys['tl']=keys['tr']=keys['tu']=keys['td']=false;tiltNote('');}};$('tSlow').onclick=()=>setTempo(TI-1);$('tFast').onclick=()=>setTempo(TI+1);
+    TILT=null;tiltSeen=false;removeEventListener('deviceorientation',onTilt);addEventListener('deviceorientation',onTilt);tiltNote('Houd de telefoon zoals je wilt en tik ▶: dat is "rechtuit". Naar je toe = stijgen, van je af = dalen, opzij = draaien, ver naar je toe = looping.');
+    try{localStorage.setItem('vfr3d_tilt','1');}catch(_){}
+    setTimeout(()=>{if(!tiltSeen&&$('optTilt').checked){$('optTilt').checked=false;removeEventListener('deviceorientation',onTilt);document.body.classList.remove('tiltmode');tiltNote('Geen sensorgegevens: je stuurt met de knoppen.');}},2500);}
+  else{removeEventListener('deviceorientation',onTilt);keys['tl']=keys['tr']=keys['tu']=keys['td']=false;document.body.classList.remove('tiltmode');if(e.isTrusted!==false){try{localStorage.setItem('vfr3d_tilt','0');}catch(_){}}tiltNote('');}};
+function autoTilt(){/* S1c (Christian): op telefoon/tablet standaard kantelen, knoppen weg; geen sensor = knoppen terug; uitzetten in Weergave wordt onthouden */
+  let pref=null;try{pref=localStorage.getItem('vfr3d_tilt');}catch(_){}
+  if(!matchMedia('(pointer:coarse)').matches||pref==='0'||$('optTilt').checked)return;$('optTilt').checked=true;$('optTilt').onchange({target:$('optTilt')});}$('tSlow').onclick=()=>setTempo(TI-1);$('tFast').onclick=()=>setTempo(TI+1);
 $('tempo').oninput=e=>setTempo(+e.target.value);
 
 const models={};
@@ -1517,7 +1529,7 @@ $('btnAc')&&($('btnAc').onclick=openChooser);
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{setMode('map');setView(b.dataset.view);});
 $('btnPause').onclick=togglePause;
 function openChooser(){oneMenu('modal');$('modal').style.display='flex';}
-document.querySelectorAll('[data-ac]').forEach(b=>b.onclick=()=>{$('modal').style.display='none';document.body.classList.remove('welcome');$('btnMode').style.visibility='visible';$('panel').classList.add('hidden');let a=b.dataset.ac;if(a!=='map'){const want=$('relaxBox').checked;if(want!==RELAX)setTimeout(()=>setRelax(want),0);}
+document.querySelectorAll('[data-ac]').forEach(b=>b.onclick=()=>{if(b.dataset.ac!=='map')autoTilt();$('modal').style.display='none';document.body.classList.remove('welcome');$('btnMode').style.visibility='visible';$('panel').classList.add('hidden');let a=b.dataset.ac;if(a!=='map'){const want=$('relaxBox').checked;if(want!==RELAX)setTimeout(()=>setRelax(want),0);}
   if(a==='map'){setMode('map');setView('schuin');showProbe();return;}
   let task=null;MIS=-1;if(typeof setCirc==='function')setCirc(false);if(a!=='map'&&!PROBE.user){const st=randomStart(a);task=st.task;GOAL=task&&!$('relaxBox').checked?{...LASTGOAL}:null;FAILS.clear();CLR.clear();Object.assign(PLANE,{x:st.x,n:st.n,alt:st.alt,hdg:st.hdg,bank:0,pitch:0});FIRST_WARN_DONE=false;WARNED.clear();}
   TASK=task&&!$('relaxBox').checked?task:'';PAUSED=true;NOTICE=(task&&!$('relaxBox').checked?`🎯 ${task}<br>`:'')+'<small>▶ = start</small>';setMode('fly',a);});
@@ -1585,7 +1597,7 @@ function status(inside,x,n){
   else{tags.push(tag('ok','✓ VRIJ'));head=where;}
   if(has('R')){cls=cls==='ok'?'warn':cls;tags.push(tag('warn','BEPERKT'));}
   if(has('TRA')||has('TSA')){cls=cls==='ok'?'warn':cls;tags.push(tag('warn','MIL · ALS ACTIEF VERBODEN'));}
-  const rzl=inside.find(rmzLive);if(rzl){if(cleared(rzl))tags.push(tag('ok','✓ OPGEROEPEN'));else{cls=cls==='ok'?'clr':cls;tags.push(tag('clr','📻 OPROEPEN'));}tags.push(tag('warn','RMZ'));}
+  const rzl=inside.find(rmzLive);if(rzl){if(cleared(rzl))tags.push(tag('ok','✓ OPGEROEPEN'));else{cls=cls==='ok'?'clr':cls;tags.push(RELAX?tag('clr','📻 OPROEPEN'):`<button class="nt mini" data-rt="open:${rzl.ident}">📻 Oproepen</button>`);/* S1c (Christian): in de RMZ altijd kunnen oproepen */}tags.push(tag('warn','RMZ'));}
   if(has('TMZ')){cls=cls==='ok'?'warn':cls;tags.push(tag('warn','TMZ'));sub.push('📡 Transponder aan · sqk 7000');}
   if(has('D'))tags.push(tag('warn','GEVAAR'));
   if(has('PJA')){cls=cls==='ok'?'warn':cls;tags.push(tag('warn','PARA'));}
@@ -1718,7 +1730,7 @@ let last=performance.now(),acc=0;
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={CLR,tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+window.__vfr={CLR,get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 // ---------- voorbeeldcircuit Eindhoven (AIP EHEH AD 2.22: 1000 ft AMSL, RWY 03 links, RWY 21 rechts → beide aan de NW-kant) ----------
 var CIRC_RW='03';
