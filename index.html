@@ -176,7 +176,7 @@
   <div class="flysec"><h3>Vliegen</h3>
   <div class="row"><input type="range" id="tempo" min="0" max="6" step="1" value="2"><span class="val" id="tempoVal"></span></div>
   <p class="note">Tempo: ×1 is echte snelheid. Ook met scrollen of + en −.</p>
-  <p class="note">Camera: slepen = rondkijken (loslaten = terug achter het toestel). Shift+scrollen of knijpen = zoomen. <b>C</b> of 🎥 = camera terug. <b>L</b> = looping.</p>
+  <p class="note">Camera: slepen = rondkijken (loslaten = terug achter het toestel). Shift+scrollen of knijpen = zoomen. <b>C</b> = camera terug (zoom ook). <b>L</b> = looping.</p>
   <div class="row"><input type="checkbox" id="optTilt"><label for="optTilt">📱 Sturen door de telefoon te kantelen</label></div><p class="note" id="tiltNote" style="display:none"></p>
   <button id="btnAc">Ander toestel kiezen</button></div>
   <h3>Hulpmiddelen</h3>
@@ -217,7 +217,6 @@
   <button data-k="arrowdown" title="Dalen (↓ of S)">▼</button>
   <button id="btnLoop" title="Looping (L)" aria-label="Looping">🔄<small>looping</small></button>
 </div>
-<button id="btnCam" title="Camera terug achter het toestel (toets C)" aria-label="Camera resetten">🎥 Camera<small>reset · C</small></button>
 <div id="modal"><div class="box">
   <h2>Luchtruim in 3D</h2>
   <p class="disc">⚠ <b>Alleen voor educatie.</b> De AIP van LVNL is leidend.</p>
@@ -1251,7 +1250,7 @@ function onTilt(e){if(e.gamma==null)return;tiltSeen=true;if(!TILT)TILT={b0:e.bet
 $('optTilt').onchange=async e=>{if(e.target.checked){try{if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission){const r=await DeviceOrientationEvent.requestPermission();if(r!=='granted')throw 0;}}catch(_){e.target.checked=false;tiltNote('Geen toestemming voor de bewegingssensor.');return;}
     TILT=null;tiltSeen=false;addEventListener('deviceorientation',onTilt);tiltNote('Houd de telefoon zoals je hem nu vasthoudt: dat is "rechtuit".');
     setTimeout(()=>{if(!tiltSeen&&$('optTilt').checked){tiltNote('Deze pagina krijgt geen sensorgegevens. Op claude.ai is dat geblokkeerd; op luchtruim3d.nl werkt het wel (op een telefoon).');}},2500);}
-  else{removeEventListener('deviceorientation',onTilt);keys['tl']=keys['tr']=keys['tu']=keys['td']=false;tiltNote('');}};$('btnCam').onclick=()=>camReset();$('tSlow').onclick=()=>setTempo(TI-1);$('tFast').onclick=()=>setTempo(TI+1);
+  else{removeEventListener('deviceorientation',onTilt);keys['tl']=keys['tr']=keys['tu']=keys['td']=false;tiltNote('');}};$('tSlow').onclick=()=>setTempo(TI-1);$('tFast').onclick=()=>setTempo(TI+1);
 $('tempo').oninput=e=>setTempo(+e.target.value);
 
 const models={};
@@ -1452,6 +1451,7 @@ function setMode(m,ac){
   document.body.classList.toggle('looking',m!=='fly');document.body.classList.toggle('balloon',ACTYPE==='balloon');
   $('btnMode').innerHTML=m==='fly'?'→ Kaart':'→ Vliegen';
   $('tape').classList.toggle('off',m==='fly'?!$('optTape').checked:false);
+  if(m==='fly'&&prev!=='fly')camReset();// elke vlucht begint met de camera achter het toestel
   if(m==='fly'&&prev!=='fly'&&PROBE.user){TASK='';GOAL=null;PLANE.x=PROBE.x;PLANE.n=PROBE.n;if(SLICE>0&&ACTYPE!=='balloon')PLANE.alt=SLICE;PROBE.user=false;WARNED.clear();}
   if(m==='fly'){$('info').style.display='none';if(prev!=='fly')chase(0,true);}
   else{
