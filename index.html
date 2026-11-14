@@ -1286,7 +1286,12 @@ function tiltAngles(beta,gamma,ang){// S1-fix: via de zwaartekrachtrichting i.p.
   let sx=ux,sy=uy;if(ang===90){sx=-uy;sy=ux;}else if(ang===270){sx=uy;sy=-ux;}else if(ang===180){sx=-ux;sy=-uy;}
   return {t:Math.asin(Math.max(-1,Math.min(1,-sx)))*180/Math.PI,p:Math.atan2(sy,uz)*180/Math.PI};}// t = rol (rechts +), p = stand (rechtop = 90)
 function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite(e.beta))return;tiltSeen=true;const ang=tiltAng();let {t,p}=tiltAngles(e.beta,e.gamma,ang);
-  if(!isFinite(t)||!isFinite(p))return;if(!TILT||TILT.ang!==ang)TILT={p0:p,t0:Math.abs(t)<25?t:0,ang};/* S1c panel 3: ook de rol ijken (zo houd je hem = rechtuit), behalve bij een duidelijke bocht */// na draaien opnieuw ijken
+  if(!isFinite(t)||!isFinite(p))return;const now=performance.now();
+  /* S1d (Christian): na draaien staand↔liggend werd geijkt op een stand midden in de draai → blijvende bocht. Nu na draaien eerst wachten tot de telefoon 0,35 s stil ligt. */
+  if(TILT&&TILT.ang!==ang)TILT={ang,pend:true,t,p,ts:now};
+  if(TILT&&TILT.pend){if(Math.abs(t-TILT.t)>3||Math.abs(p-TILT.p)>3){TILT.t=t;TILT.p=p;TILT.ts=now;}
+    if(now-TILT.ts<350){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;return;}TILT=null;}
+  if(!TILT)TILT={p0:p,t0:Math.abs(t)<25?t:0,ang};/* ook de rol ijken (zo houd je hem = rechtuit), behalve bij een duidelijke bocht */
   t-=TILT.t0;const b=((p-TILT.p0+540)%360)-180,DZ=8;// Christian 14 nov: naar je toe kantelen (bovenkant naar je toe) = stijgen, naar voren = dalen; ballon idem
   keys['tl']=t<-DZ;keys['tr']=t>DZ;keys['tu']=b>DZ;keys['td']=b<-DZ;if(!keys['tu'])TO_WAIT=false;
   if(!document.body.classList.contains('tiltmode')){document.body.classList.add('tiltmode');}

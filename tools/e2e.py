@@ -568,6 +568,35 @@ async def d_probe_task(a):  # panel ronde 2 (Fatima): vanaf de sonde vliegen = o
         await a.hit('#btnMode')
     ok(got >= 2, f'vanaf de sonde vaak geen opdracht ({got}/3)')
 
+async def d_tilt_rotate(a):  # Christian 14 nov avond: na staand→liggend→staand bleef het toestel een bocht maken (geijkt midden in de draai)
+    if not a.touch: return
+    await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
+    st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2000, 0, paused=False)
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident)}')
+    keys = '[v.keys.tl,v.keys.tr,v.keys.tu,v.keys.td]'
+    cdp = await a.ctx.new_cdp_session(a.pg); vw = a.pg.viewport_size
+    W, H = min(vw['width'], vw['height']), max(vw['width'], vw['height'])
+    async def stream(turn, back, ang, ms, p0=60):
+        t_end = ms / 1000
+        import time as _t
+        t0 = _t.time()
+        while _t.time() - t0 < t_end:
+            await a.ev(SEND, orient(turn, back, ang, p0)); await a.wait(40)
+    prev = 0
+    await stream(0, 0, 0, 300)
+    for typ, angle in (('landscapePrimary', 90), ('portraitPrimary', 0), ('landscapeSecondary', 270), ('portraitPrimary', 0)):
+        w, h = (H, W) if angle else (W, H)
+        # tijdens het draaien: rare tussenstanden (nog in de oude stand gemeten, scheef)
+        await stream(22, 12, prev, 150)
+        await cdp.send('Emulation.setDeviceMetricsOverride', {'width': w, 'height': h, 'deviceScaleFactor': 1, 'mobile': True, 'screenOrientation': {'type': typ, 'angle': angle}})
+        await stream(-20, -15, angle, 120)  # nog bewegend
+        await stream(0, 0, angle, 700)      # telefoon ligt weer stil in de nieuwe stand
+        k = await a.v(keys); ok(k == [False] * 4, f'na draaien naar {angle}°: blijft sturen {k}')
+        await stream(15, 0, angle, 120); ok((await a.v(keys))[1], f'na draaien naar {angle}°: rechts kantelen werkt niet')
+        await stream(0, 0, angle, 120); ok(await a.v(keys) == [False] * 4, f'na draaien naar {angle}°: niet terug naar rechtuit')
+        prev = angle
+    await cdp.send('Emulation.clearDeviceMetricsOverride'); await a.sane()
+
 async def d_tilt_default(a):  # S1c (Christian): op telefoon standaard kantelen + knoppen weg; geen sensor = knoppen terug; uitzetten onthouden
     await a.hit('#modal [data-ac=glider]'); await a.frames(2)
     on = await a.ev('()=>document.getElementById("optTilt").checked')
@@ -605,9 +634,10 @@ async def d_tilt_loop_balloon(a):  # Christian: looping door te kantelen; ballon
     ok(not await a.v('!!v.LOOP'), 'looping al bij 25° (moet ver kantelen)')
     await a.ev(SEND, orient(0, 45, ang)); await a.frames(2)
     ok(await a.v('!!v.LOOP'), 'geen looping bij ver naar je toe kantelen ' + json.dumps(await a.v('[v.PAUSED,v.NOTICE,v.PLANE.alt,v.TILT,v.MODE,v.ACTYPE]')))
-    for _ in range(80):
+    for _ in range(400):
         await a.frames(2)
         if not await a.v('!!v.LOOP'): break
+    ok(not await a.v('!!v.LOOP'), 'looping eindigt niet')
     await a.ev(SEND, orient(0, 45, ang)); await a.frames(2)
     ok(not await a.v('!!v.LOOP'), 'tweede looping zonder eerst terug naar neutraal')
     # ballon: naar je toe = stijgen, naar voren = dalen, nooit een looping
@@ -720,7 +750,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:
