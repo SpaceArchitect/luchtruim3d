@@ -191,6 +191,7 @@ async def t_rotate(a):
 
 # ---------------- deterministisch (D2) ----------------
 JS_FIND = '''(ident)=>{const v=window.__vfr;const f=v.LAYERS.find(g=>g.ident===ident);return f?{lp:f.lp,lo:f.lo,hi:f.hi,layer:f.layer}:null}'''
+JS_FREE_EDGE = '''([ident,out,alt])=>{const v=window.__vfr,f=v.LAYERS.find(g=>g.ident===ident);for(let h=0;h<360;h+=5){const a=h*Math.PI/180;for(let d=0;d<40;d+=.05){const x=f.lp[0]+Math.sin(a)*d,n=f.lp[1]+Math.cos(a)*d;if(!v.featsAt(x,n).includes(f)){let ok=true;for(let k=.2;k<=out+.5;k+=.2){const fs=v.featsAt(x+Math.sin(a)*k,n+Math.cos(a)*k).filter(g=>g.lo<=alt&&g.hi>alt&&g.active!==false&&["CTR","TMA","CTA","P","R","RMZ","PJA","UAS","TRA","TSA"].includes(g.layer));if(fs.length){ok=false;break}}if(ok)return [x+Math.sin(a)*out,n+Math.cos(a)*out,(h+180)%360];break}}}return null}'''
 JS_EDGE = '''([ident,hdg,alt])=>{const v=window.__vfr,f=v.LAYERS.find(g=>g.ident===ident),h=hdg*Math.PI/180;let x=f.lp[0],n=f.lp[1];
   for(let d=0;d<40;d+=.05){const ax=f.lp[0]+Math.sin(h)*d,an=f.lp[1]+Math.cos(h)*d;if(!v.featsAt(ax,an).includes(f))return [ax,an]}return null}'''
 
@@ -203,6 +204,22 @@ async def d_task_text(a):
     if await a.v('!!v.TASK'):
         h = await a.ev('()=>{const t=document.querySelector("#banner .task");return t?[t.scrollHeight,parseFloat(getComputedStyle(t).lineHeight)||16,t.innerText]:null}')
         ok(h and h[0] <= h[1] * 1.6 + 2, f'opdrachtregel niet één regel: {h}')
+
+async def d_balloon_reachable(a):  # Christian 14 nov: ballonmissie onmogelijk door windrichting
+    r = await a.ev('''()=>{const v=window.__vfr,bad=[];let n=0;for(let k=0;k<300&&n<40;k++){const x=v.PLANE.x+(Math.random()-.5)*50,y=v.PLANE.n+(Math.random()-.5)*50,h=(v.windAt(800).from+180)%360;const t=v.pickTask(x,y,h,"balloon");if(!t)continue;n++;const g=window.__vfr.GOAL;}return n}''')
+    ok(r > 5, f'te weinig ballonopdrachten gevonden ({r})')
+    bad = await a.ev('''()=>{const v=window.__vfr,bad=[];for(let k=0;k<300;k++){const x=v.PLANE.x+(Math.random()-.5)*50,y=v.PLANE.n+(Math.random()-.5)*50,h=(v.windAt(800).from+180)%360;const t=v.pickTask(x,y,h,"balloon");if(!t)continue;const L=v.LASTGOAL;const b=(Math.atan2(L.x-x,L.n-y)*180/Math.PI+360)%360;if(!v.balloonReach(b))bad.push([t,b])}return bad.slice(0,3)}''')
+    ok(not bad, f'onbereikbare ballondoelen: {bad}')
+
+async def d_foreign_ctr(a):  # Christian 14 nov: Kleine-Brogel "klaring nodig" zonder frequentie of uitleg
+    await a.hit('#modal [data-ac=glider]')
+    e = await a.ev(JS_FREE_EDGE, ['EBBL2', 1.2, 1000]); ok(e, 'vrije rand Kleine-Brogel niet gevonden')
+    await a.place(e[0], e[1], 1000, e[2], paused=False)
+    n = ''
+    for _ in range(150):
+        await a.frames(2); n = await a.v('v.NOTICE') or ''
+        if n: break
+    ok('Kleine-Brogel' in n and '📻' in n, f'melding Kleine-Brogel zonder radio-info: {n[:100]!r}')
 
 async def d_banner_rmz(a):
     await a.hit('#modal [data-ac=glider]')
@@ -229,8 +246,8 @@ async def d_refused(a):
     await a.hit('#modal [data-ac=motor]')
     ctr = await a.ev('()=>{const v=window.__vfr;const f=v.LAYERS.find(g=>g.layer==="CTR"&&g.ident==="EHEH");return f&&f.ident}')
     ok(ctr, 'geen CTR')
-    e = await a.ev(JS_EDGE, [ctr, 90, 1000]); ok(e, 'rand CTR niet gevonden')
-    await a.place(e[0] + 1.6, e[1], 1000, 270, paused=True)  # 1,6 km buiten de rand, koers erheen
+    e = await a.ev(JS_FREE_EDGE, [ctr, 1.6, 1000]); ok(e, 'vrije rand CTR niet gevonden')
+    await a.place(e[0], e[1], 1000, e[2], paused=True)  # 1,6 km buiten de rand in vrij luchtruim, koers erheen
     await a.ev('(id)=>window.__vfr.RTOUT.set(id,{t:performance.now(),o:"traffic"})', ctr)  # ATC weigert
     await a.hit('#btnPause')
     n = ''
@@ -253,10 +270,9 @@ async def d_refused(a):
 
 async def d_adjacent_clearance(a):  # Christian 14 nov: klaring Eindhoven, De Peel in → "mislukt zonder klaring" zonder melding
     await a.hit('#modal [data-ac=glider]')
-    e = await a.ev(JS_EDGE, ['EHDP', 270, 1000]); ok(e, 'rand De Peel niet gevonden')
-    inEH = await a.ev('(p)=>window.__vfr.featsAt(p[0]-0.3,p[1]).some(f=>f.ident==="EHEH")', e)
-    ok(inEH, 'testopzet: west van De Peel ligt niet in Eindhoven CTR')
-    await a.place(e[0] - 0.6, e[1], 1000, 90, paused=False)
+    r = await a.ev('''()=>{const v=window.__vfr,f=v.LAYERS.find(g=>g.ident==="EHDP");for(let h=0;h<360;h+=5){const a=h*Math.PI/180;for(let d=0;d<30;d+=.05){const x=f.lp[0]+Math.sin(a)*d,n=f.lp[1]+Math.cos(a)*d;if(!v.featsAt(x,n).includes(f)){const x2=x+Math.sin(a)*.6,n2=n+Math.cos(a)*.6;if(v.featsAt(x2,n2).some(g=>g.ident==="EHEH"))return [x2,n2,(h+180)%360];break}}}return null}''')
+    ok(r, 'testopzet: geen grens De Peel–Eindhoven gevonden')
+    await a.place(r[0], r[1], 1000, r[2], paused=False)
     await a.ev('()=>{const v=window.__vfr;v.CLR.add("EHEH");v.GOAL={x:v.PLANE.x+3,n:v.PLANE.n,name:"Test"}}')
     for _ in range(60):
         await a.frames(2)
@@ -265,21 +281,60 @@ async def d_adjacent_clearance(a):  # Christian 14 nov: klaring Eindhoven, De Pe
     f = await a.ev('()=>[...window.__vfr.FAILS.values()]')
     ok(not any('Peel' in x for x in f), f'De Peel telt als zonder klaring terwijl Eindhoven TWR klaring gaf: {f}')
 
-async def d_warn_lead(a):  # Christian 14 nov: minstens ~2 s reactietijd, niet te vroeg
+async def d_warn_lead(a):  # Christian 14 nov: minstens ~2 s reactietijd, niet te vroeg (≤ 20 s), bij elk tempo
     await a.hit('#modal [data-ac=motor]')
-    e = await a.ev(JS_EDGE, ['EHEH', 90, 1000])
-    await a.place(e[0] + 25, e[1], 1000, 270, paused=False)
-    await a.ev('()=>window.__vfr.setTempo(6)')
-    t0 = None
-    for _ in range(400):
-        await a.frames(1)
-        n = await a.v('v.NOTICE')
-        if n: break
-    ok(n and 'klaring' in n, f'geen klaringsmelding: {n!r}')
-    r = await a.ev('(id)=>{const v=window.__vfr;const h=v.PLANE.hdg*Math.PI/180;let d=0;while(d<40&&!v.featsAt(v.PLANE.x+Math.sin(h)*d,v.PLANE.n+Math.cos(h)*d).some(f=>f.ident===id))d+=.05;return [d,v.AC.motor.kt*1.852/3600*v.TEMPO]}', 'EHEH')
-    secs = r[0] / r[1]
-    ok(secs >= 2, f'melding te laat: {secs:.1f} s voor de grens')
-    ok(secs <= 20, f'melding te vroeg: {secs:.1f} s voor de grens')
+    for ti, out in ((0, 1.0), (4, 12)):
+        e = await a.ev(JS_FREE_EDGE, ['EHEH', out, 1000]); ok(e, 'vrije rand niet gevonden')
+        await a.place(e[0], e[1], 1000, e[2], paused=False)
+        await a.ev(f'()=>window.__vfr.setTempo({ti})')
+        n = ''
+        for _ in range(400):
+            await a.frames(1); n = await a.v('v.NOTICE') or ''
+            if n: break
+        ok('klaring' in n, f'tempo {ti}: geen klaringsmelding: {n!r}')
+        r = await a.ev('(id)=>{const v=window.__vfr;const h=v.PLANE.hdg*Math.PI/180;let d=0;while(d<40&&!v.featsAt(v.PLANE.x+Math.sin(h)*d,v.PLANE.n+Math.cos(h)*d).some(f=>f.ident===id))d+=.02;return [d,v.AC.motor.kt*1.852/3600*v.TEMPO]}', 'EHEH')
+        secs = r[0] / r[1]
+        ok(2 <= secs <= 20, f'tempo {ti}: melding {secs:.1f} s voor de grens (moet 2–20 s)')
+
+async def weekend(a):
+    if await a.visible('#timeBtn'):
+        await a.hit('#timeBtn'); await a.hit('#timePop [data-tm=weekend]')
+        if await a.visible('#timePop'): await a.hit('#timeBtn')
+
+async def d_rmz_call(a):  # Christian 14 nov + AIP ENR 2.1/2.2: Volkel CTR dicht → RMZ H24 in het weekend, eerst Dutch MIL Info 132.350
+    await a.hit('#modal [data-ac=glider]'); await weekend(a)
+    st = await a.ev('()=>{const v=window.__vfr,f=v.LAYERS.find(g=>g.ident==="EHVK"),r=v.LAYERS.find(g=>g.ident==="EHVKRMZ");return [f.active,!!f.viaRmz,r.active,f.edges.length?f.edges[0].material.opacity:null,f.label?f.label.el.innerText:""]}')
+    if st[0] is not False:
+        ok(not await a.visible('#timeBtn'), f'weekendtijd gekozen maar Volkel niet dicht: {st}')
+        return  # toren open op dit tijdstip: niets te testen (weekendknop niet bereikbaar)
+    ok(st[1] and st[2], f'Volkel dicht maar RMZ niet actief/gekoppeld: {st}')
+    ok(st[3] is None or st[3] > 0.2, f'Volkel CTR vervaagd terwijl de RMZ geldt: {st}')
+    ok('132.350' in st[4] and 'dicht' not in st[4], f'label Volkel: {st[4]!r}')
+    for call in (True, False):
+        e = await a.ev(JS_EDGE, ['EHVKRMZ', 270, 1000])
+        await a.place(e[0] - 1.2, e[1], 1000, 90, paused=False)
+        await a.ev('()=>{const v=window.__vfr;v.GOAL={x:v.PLANE.x+6,n:v.PLANE.n,name:"Test"}}')
+        n = ''
+        for _ in range(120):
+            await a.frames(2); n = await a.v('v.NOTICE') or ''
+            if n: break
+        ok('eerst oproepen' in n and '132.350' in n, f'geen oproep-melding voor RMZ Volkel: {n[:90]!r}')
+        if call:
+            await a.hit('#banner [data-rt^=open]')
+            good = await a.ev('()=>[...document.querySelectorAll("#banner .rt")].findIndex(b=>b.querySelectorAll("span").length===6&&!/PH-/.test(b.querySelector("span").textContent))')
+            await a.hit(f'#banner .rt >> nth={good}')
+            ok('Opgeroepen' in (await a.v('v.NOTICE') or ''), 'oproep niet bevestigd')
+            await a.hit('#banner [data-rt=close]') if await a.visible('#banner [data-rt=close]') else None
+        await a.ev('()=>{window.__vfr.NOTICE="";window.__vfr.PAUSED=false}')
+        for _ in range(120):
+            await a.frames(2)
+            if await a.ev('()=>{const v=window.__vfr;return v.featsAt(v.PLANE.x,v.PLANE.n).some(f=>f.ident==="EHVKRMZ")}'): break
+        await a.ev('()=>window.__vfr.hudTick()')
+        f = await a.ev('()=>[...window.__vfr.FAILS.values()]')
+        bad = any('oproep' in x for x in f)
+        ok(bad != call, f'RMZ {"met" if call else "zonder"} oproep: FAILS={f}')
+        head = await a.ev('()=>document.querySelector("#banner .head")?.innerText||""')
+        ok(('OPGEROEPEN' in head) == call, f'statusregel na {"wel" if call else "geen"} oproep: {head!r}')
 
 async def d_goal_line(a):
     await a.hit('#modal [data-ac=glider]')
@@ -296,14 +351,14 @@ async def d_balloon_past(a):
     await a.hit('#modal [data-ac=balloon]')
     st = await a.v('v.PLANE')
     await a.place(st['x'], st['n'], 800, st['hdg'], paused=False)
-    await a.ev('()=>{const v=window.__vfr;v.GOAL={x:v.PLANE.x-0.1,n:v.PLANE.n-4.2,name:"Testdoel",min:1.7};v.TASK="Drijf naar Testdoel";v.hudTick()}')
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);v.GOAL={x:v.PLANE.x-0.1,n:v.PLANE.n-4.2,name:"Testdoel",min:1.7};v.TASK="Drijf naar Testdoel";v.hudTick()}')
     n = await a.v('v.NOTICE') or ''
     ok('Missie mislukt' in n and 'ballon' in n, f'ballon voorbij doel geen "mislukt": {n[:80]!r}')
     ok(await a.v('v.GOAL') is None, 'doel blijft staan na mislukt')
     await a.fly('glider')
     st = await a.v('v.PLANE')
     await a.place(st['x'], st['n'], 1500, st['hdg'], paused=False)
-    await a.ev('()=>{const v=window.__vfr;v.GOAL={x:v.PLANE.x,n:v.PLANE.n-4.2,name:"Testdoel",min:1.7};v.hudTick()}')
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);v.GOAL={x:v.PLANE.x,n:v.PLANE.n-4.2,name:"Testdoel",min:1.7};v.hudTick()}')  # andere meldingen uit: alleen 'doel gemist' testen
     n = await a.v('v.NOTICE') or ''
     ok('Doel gemist' in n, f'zweefvliegtuig voorbij doel: {n[:60]!r}')
 
@@ -436,7 +491,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:
