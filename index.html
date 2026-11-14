@@ -1367,7 +1367,8 @@ function tweenCam(p1,t1,ms=800){if(matchMedia('(prefers-reduced-motion: reduce)'
 function chase(dt,instant){
   const h=PLANE.hdg*Math.PI/180+camYaw,py=PLANE.alt*FT*EXAG,D0=(ACTYPE==='balloon'?7.5:6.5)*CAM.dist,H0=(ACTYPE==='balloon'?2.8:2.4)*CAM.dist;
   // klimmen voelbaar (Boyd): camera zakt iets achter en onder het toestel als je stijgt, komt erboven als je daalt
-  const vz=LOOP?0:VZ_S,el=Math.atan2(H0,D0)+CAM.pitch-vz*.22,R=Math.hypot(D0,H0),D=Math.cos(el)*R,H=Math.sin(el)*R;
+  const vz=(LOOP||ACTYPE==="balloon")?0:VZ_S,// ballon: camera kantelt niet mee bij stijgen/dalen (Christian 14 nov)
+  el=Math.atan2(H0,D0)+CAM.pitch-vz*.22,R=Math.hypot(D0,H0),D=Math.cos(el)*R,H=Math.sin(el)*R;
   camTarget.set(PLANE.x+CAM.panX-Math.sin(h)*D,Math.max(.35,py+H),-(PLANE.n+CAM.panN-Math.cos(h)*D));
   camTween=null;if(instant||camera.position.distanceTo(camTarget)>4*Math.max(1,CAM.dist))camera.position.copy(camTarget);else camera.position.lerp(camTarget,Math.min(1,dt*3.5));// direct achter het toestel bij start/sprong; in bochten sneller meedraaien (bug 13 nov)
   const hh=PLANE.hdg*Math.PI/180,lk=dragging?0:3*Math.min(1,CAM.dist);// tijdens rondkijken kijkt de camera naar het toestel zelf
