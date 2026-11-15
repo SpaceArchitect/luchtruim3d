@@ -50,7 +50,7 @@
   .banner .head{font-size:14.5px;font-weight:700;margin-top:2px}
   .banner .ahead{color:#1c2024!important;font-weight:700;border:2px solid #1c2024;border-radius:6px;padding:3px 7px;margin-top:6px;background:#fff8d6}
   .banner .above{color:#1c2024!important}
-  .banner .notice{background:#0b3a6e;color:#fff;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:14px}#a11y{position:absolute;z-index:40;top:56px;right:110px;background:#fff;border:2px solid #1c2024;border-radius:10px;padding:10px 12px;font-size:16px;box-shadow:0 4px 14px rgba(0,0,0,.25)}#a11y.hidden{display:none}#a11y label{display:flex;gap:8px;align-items:center;padding:6px 0}#a11y input{width:22px;height:22px}/* S2: verre luchtruimlabels: alleen achtergrond, schaduw en randkleur vervagen (tekst blijft 100%, WCAG 1.4.3) */.lbl.far{background:rgba(255,255,255,calc(.9*var(--lo)))!important;box-shadow:none!important;border-left-color:rgba(120,120,120,var(--lo))!important;font-weight:500}.lbl.far b{font-weight:550}#tiltChip{display:none;position:absolute;top:104px;left:50%;transform:translateX(-50%);background:#0b3a6e;color:#fff;border-radius:14px;padding:5px 14px;font-size:15px;pointer-events:none;z-index:6}#relaxChip{display:none;position:absolute;top:104px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.85);border-radius:14px;padding:4px 12px;font-size:13px;pointer-events:none;z-index:5}body.hc .lbl{background:#000!important;color:#fff!important;border:2px solid #fff!important;font-weight:700}body.hc .lbl .lim{color:#ffd23f!important}
+  .banner .notice{background:#0b3a6e;color:#fff;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:14px}#a11y{position:absolute;z-index:40;top:56px;right:110px;background:#fff;border:2px solid #1c2024;border-radius:10px;padding:10px 12px;font-size:16px;box-shadow:0 4px 14px rgba(0,0,0,.25)}#a11y.hidden{display:none}#a11y label{display:flex;gap:8px;align-items:center;padding:6px 0}#a11y input{width:22px;height:22px}#relaxChip{display:none;position:absolute;top:104px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.85);border-radius:14px;padding:4px 12px;font-size:13px;pointer-events:none;z-index:5}body.hc .lbl{background:#000!important;color:#fff!important;border:2px solid #fff!important;font-weight:700}body.hc .lbl .lim{color:#ffd23f!important}
   .banner .rt{display:block;width:100%;text-align:left;margin-top:6px;padding:8px 10px;border-radius:8px;border:2px solid #fff;background:rgba(255,255,255,.12);color:#fff;font:600 14px/1.5 system-ui,sans-serif;cursor:pointer}.banner .rt span{white-space:normal;background:rgba(255,255,255,.14);border-radius:4px;padding:0 4px}.banner .rt i{font-style:normal;opacity:.7;margin:0 3px}.banner .rtnote{display:block;font-size:13px;margin-top:6px;color:#dfe9f7}.banner .rt:hover{background:rgba(255,255,255,.25)}
   .banner .nt{display:block;margin-top:6px;min-height:40px;padding:6px 12px;border-radius:8px;border:0;background:#fff;color:#0b3a6e;font-weight:700;font-size:14px;cursor:pointer}
   body.looking .flysec{display:none}
@@ -235,7 +235,7 @@
 </div>
 <div id="info"></div>
 <canvas id="compass"></canvas><div id="north" title="Noorden" style="position:absolute;right:14px;bottom:20px;width:44px;height:44px;border-radius:50%;transform:scale(var(--ns,1));transform-origin:bottom right;background:rgba(255,255,255,.92);box-shadow:0 1px 6px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;pointer-events:none;z-index:6"><div id="northIn" style="font:800 13px system-ui;color:#c62828;text-align:center;line-height:1">▲<br><span style="color:#222">N</span></div></div>
-<div id="banner" class="banner ok"></div><div id="tiltChip" role="status" aria-live="polite"></div><div id="relaxChip">🌤️ Relaxmodus: luchtruim verborgen · ⚙ Weergave om terug te gaan</div><div id="a11y" class="hidden" role="dialog" aria-label="Toegankelijkheid"><label><input type="checkbox" id="a11yBig"> Grote letters</label><label><input type="checkbox" id="a11yHC"> Hoog contrast</label></div>
+<div id="banner" class="banner ok"></div><div id="relaxChip">🌤️ Relaxmodus: luchtruim verborgen · ⚙ Weergave om terug te gaan</div><div id="a11y" class="hidden" role="dialog" aria-label="Toegankelijkheid"><label><input type="checkbox" id="a11yBig"> Grote letters</label><label><input type="checkbox" id="a11yHC"> Hoog contrast</label></div>
 <canvas id="tape" class="off"></canvas>
 <div id="miniwrap"><canvas id="mini" class="off"></canvas><div id="loc"></div></div>
 <div id="flash"></div><div id="tChip">×5</div>
@@ -714,7 +714,7 @@ const GROUPS=[
   {id:'prd',label:'Verboden / beperkt (P, R, D) · gearceerd',layers:['P','R','D'],on:true,color:'#cc79a7'},
   {id:'pja',label:'Parachutespringen (paradrop)',layers:['PJA'],on:true,color:'#d6409f'},
   {id:'uas',label:'Dronegebied (RPAS / UAS)',layers:['UAS'],on:true,color:'#6e56cf'},
-  {id:'mil',label:'Militair (TRA / TSA)',layers:['TRA','TSA'],on:true,color:'#a1745a'},
+  {id:'mil',label:'Militair (TRA / TSA)',layers:['TRA','TSA'],on:false,color:'#a1745a'},
   {id:'gld',label:'Zweefvlieg- en klimgebied',layers:['GLD','CLIMB'],on:true,color:'#009e73'},
   {id:'zone',label:'RMZ / TMZ (radio / transponder)',layers:['RMZ','TMZ'],on:false,color:'#1c2024',outline:true},
   {id:'lfa',label:'Militair laagvlieggebied',layers:['LFA'],on:false,color:'#8b8d98'},
@@ -816,7 +816,7 @@ function build(){
       const geo=new THREE.ExtrudeGeometry(shape,{depth,bevelEnabled:false,steps:1,curveSegments:1});
       geo.rotateX(-Math.PI/2);geo.translate(0,f.lo*FT,0);
       if(!f.group.outline){
-        const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:col,map:f.hatch?HATCH:null,transparent:true,opacity:f.layer==='P'?.07:['TRA','TSA'].includes(f.layer)?.08:.16,depthWrite:false,side:THREE.DoubleSide}));
+        const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:col,map:f.hatch?HATCH:null,transparent:true,opacity:f.layer==='P'?.07:.16,depthWrite:false,side:THREE.DoubleSide}));
         m.userData.f=f;m.renderOrder=f.order;airGroup.add(m);f.meshes.push(m);
       } else {
         const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({visible:false}));m.userData.f=f;airGroup.add(m);f.meshes.push(m);
@@ -880,15 +880,6 @@ for(const [ic,n,lo,la,g] of FIELDS){const [x,y]=proj(lo,la);addLabel((g?'zweefve
 const sliceLbl=addLabel('','tick key',()=>new THREE.Vector3(gx1,SLICE*FT*EXAG,-gn0),0);sliceLbl.isSlice=true;
 const tickLabels=TICKS.map(t=>{const L=addLabel(t[2]||t[0]+' ft','tick'+(t[1]?' key':''),()=>new THREE.Vector3(gx0+1.4,t[0]*FT*EXAG,-gn0),0);L.tickFt=t[0];return L;});
 
-// S2 decluttering (Christian 14 nov): labels vervagen geleidelijk op afstand i.p.v. ineens te verdwijnen.
-// Luchtruimlabels (kaartmodus): t.o.v. de kijkafstand (camera→doelpunt), zodat in- en uitzoomen hetzelfde voelt;
-// gevaren (prio ≤3: CTR/TMA/ATZ/P/R/D) blijven het langst staan. Overige labels met een afstandsgrens: laatste 30% vervaagt.
-// Hoog contrast: geen vervaging (WCAG 1.4.3/1.4.11), alleen aan/uit. Onder LBL_MIN_OP verdwijnt een label helemaal.
-const LBL_MIN_OP=0.6,LBL_HAZ=['CTR','TMA','CTA','ATZ','P','R','D','TRA','TSA','PJA','UAS'];// panel S2 (Noor 9: contrast 1.4.3; Daan/Pieter: gevaren vervagen het laatst)
-function labelFade(L,CD){if(document.body.classList.contains('hc'))return 1;
-  const FLY=typeof MODE!=='undefined'&&MODE==='fly';
-  if(L.isAir&&!FLY){const [a,b]=LBL_HAZ.includes(L.ref.layer)?[1.0,1.75]:[0.7,1.15];const r=L.d/CD;return r<=a?1:Math.max(0,1-(r-a)/(b-a));}
-    return 1;}
 const v=new THREE.Vector3();
 function placeLabels(){lmMinSize();
   const W=innerWidth,H=innerHeight,placed=[];const cam=camera.position;
@@ -899,25 +890,21 @@ function placeLabels(){lmMinSize();
     if(L.ref&&typeof MODE!=='undefined'&&MODE==='fly'&&!L.ref.near)return false;
     if(L.isPin&&MODE==='fly')return false;
     if(RELAX&&(L.isPin||L.isAir))return false;
-    L.fm=0;const FLY=typeof MODE!=='undefined'&&MODE==='fly';
-    if(L.isKnp){L.fm=6;if(L.pos3().distanceTo(cam)>6)return false;}
-    if(L.isTown){L.fm=FLY?14:45;if(innerWidth<=600&&!FLY||L.pos3().distanceTo(cam)>L.fm)return false;}
-    if(L.isLake){L.fm=FLY?12:LM_NEAR;if(L.pos3().distanceTo(cam)>L.fm)return false;}
+    if(L.isKnp&&L.pos3().distanceTo(cam)>6)return false;
+    if(L.isTown&&(innerWidth<=600&&MODE!=='fly'||L.pos3().distanceTo(cam)>(typeof MODE!=='undefined'&&MODE==='fly'?14:45)))return false;
+    if(L.isLake&&L.pos3().distanceTo(cam)>(typeof MODE!=='undefined'&&MODE==='fly'?12:LM_NEAR))return false;
     if(L.isCirc&&(L.dead||!circGroup.visible||L.rw!==CIRC_RW))return false;
-    if(L.isVrp){L.fm=FLY?20:40;if(RELAX||L.pos3().distanceTo(cam)>L.fm)return false;}
-    if(L.isLm){if(!FLY)L.fm=LM_NEAR*(L.prev?1.15:1);if(!LM_ON||(!FLY&&L.pos3().distanceTo(cam)>L.fm))return false;}
+    if(L.isVrp&&(RELAX||L.pos3().distanceTo(cam)>(typeof MODE!=='undefined'&&MODE==='fly'?20:40)))return false;
+    if(L.isLm&&(!LM_ON||((typeof MODE==='undefined'||MODE!=='fly')&&L.pos3().distanceTo(cam)>LM_NEAR*(L.prev?1.15:1))))return false;
     if(typeof MODE!=='undefined'&&MODE==='fly'&&(L.tickFt!==undefined||L.isSlice))return false;
     return true;});
   for(const L of labels){L.prev=L.show;L.show=false;}
   for(const L of list){const p=L.pos3();L.d=p.distanceTo(cam);v.copy(p).project(camera);L.sx=(v.x+1)/2*W;L.sy=(1-v.y)/2*H;L.ok=v.z<1&&L.sx>-50&&L.sx<W+50&&L.sy>-20&&L.sy<H+20;}
   list.sort((a,b)=>(a.prio-(a.prev?0.5:0))-(b.prio-(b.prev?0.5:0))||a.idx-b.idx);
-  const CD=camera.position.distanceTo(controls.target)||1;
-  for(const L of list){L.op=labelFade(L,CD);if(L.op<LBL_MIN_OP)L.ok=false;}
   for(const L of list){if(!L.ok)continue;if(!L.w){L.w=L.el.offsetWidth||80;L.h=L.el.offsetHeight||16;}
     const isTick=L.tickFt!==undefined;const x0=isTick?L.sx:L.sx-L.w/2,y0=L.sy-L.h/2;const r=[x0-2,y0-2,x0+L.w+2,y0+L.h+2];
     if(placed.some(q=>r[0]<q[2]&&r[2]>q[0]&&r[1]<q[3]&&r[3]>q[1]))continue;
     if(L.prio>=9&&L.d>140)continue;
-    const o=L.op>=0.99?'':String(Math.round(L.op*100)/100);if(L.el.dataset.lo!==o){L.el.dataset.lo=o;if(o)L.el.style.setProperty('--lo',o);else L.el.style.removeProperty('--lo');L.el.classList.toggle('far',!!o);}
     placed.push(r);L.show=true;L.el.style.transform=`translate(${Math.round(x0)}px,${Math.round(y0)}px)`;}
   for(const L of labels){const disp=L.show?'block':'none';if(L.el.style.display!==disp)L.el.style.display=disp;}
 }
@@ -1288,32 +1275,23 @@ document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
   const off=()=>{keys[k]=false;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);});
 function setTempo(i){TI=Math.max(0,Math.min(TEMPOS.length-1,i));$('tempo').value=TI;$('tempoVal').textContent='×'+TEMPO();$('tChip').textContent='×'+TEMPO();}
-let TILT_MANUAL=false;function togglePause(){PAUSED=!PAUSED;if(!PAUSED){NOTICE='';if(TILT){const n=performance.now();TILT={ang:tiltAng(),pend:true,t:1e9,p:1e9,ts:n,chg:n-1e4,start:n,manual:true,asked:true};}/* ▶ = opnieuw ijken: zo houd je hem nu = rechtuit */}}
+function togglePause(){PAUSED=!PAUSED;if(!PAUSED){NOTICE='';if(TILT)TILT=null;/* ▶ = opnieuw ijken: zo houd je hem nu = rechtuit */}}
 let wheelAcc=0;renderer.domElement.addEventListener('wheel',e=>{if(MODE!=='fly')return;e.preventDefault();if(e.shiftKey||e.ctrlKey){const dz=e.deltaY||e.deltaX;/* Chrome/Windows maakt van Shift+scrollen horizontaal scrollen (deltaX): zoomen werkte niet (Christian 14 nov) */CAM.dist=Math.max(.35,Math.min(6,CAM.dist*Math.exp(dz*.0012)));return;}wheelAcc+=e.deltaY;if(Math.abs(wheelAcc)>=60){setTempo(TI+(wheelAcc<0?1:-1));wheelAcc=0;}},{passive:false});// scrollen = tempo (zoals eerst), Shift/Ctrl+scrollen of knijpen = zoomen
 $('btnLoop').onclick=()=>startLoop();
 // ---------- kantelsturing (Boyd): links/rechts kantelen = draaien, voorover = dalen, achterover = stijgen ----------
-let TILT=null,tiltSeen=false;const tiltChip=t=>{const n=$('tiltChip');if(n.textContent!==(t||'')){n.textContent=t||'';n.style.display=t?'block':'none';}};const tiltNote=t=>{const n=$('tiltNote');n.style.display=t?'':'none';n.textContent=t||'';};
+let TILT=null,tiltSeen=false;const tiltNote=t=>{const n=$('tiltNote');n.style.display=t?'':'none';n.textContent=t||'';};
 function tiltAng(){const a=(screen.orientation&&typeof screen.orientation.angle==='number')?screen.orientation.angle:(+window.orientation||0);return ((a%360)+360)%360;}
 function tiltAngles(beta,gamma,ang){// S1-fix: via de zwaartekrachtrichting i.p.v. Euler-hoeken (liggend sprong beta ±180° → ongewenste bocht bij achterover kantelen)
   const b=beta*Math.PI/180,g=gamma*Math.PI/180,ux=-Math.sin(g)*Math.cos(b),uy=Math.sin(b),uz=Math.cos(g)*Math.cos(b);
   let sx=ux,sy=uy;if(ang===90){sx=-uy;sy=ux;}else if(ang===270){sx=uy;sy=-ux;}else if(ang===180){sx=-ux;sy=-uy;}
-  return {t:Math.asin(Math.max(-1,Math.min(1,-sx)))*180/Math.PI,p:Math.atan2(sy,uz)*180/Math.PI,r:Math.atan2(sx,sy)*180/Math.PI,m:Math.hypot(sx,sy)};}// t = rol (rechts +), p = stand (rechtop = 90)
-function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite(e.beta))return;tiltSeen=true;const ang=tiltAng();let {t,p,r,m}=tiltAngles(e.beta,e.gamma,ang);
+  return {t:Math.asin(Math.max(-1,Math.min(1,-sx)))*180/Math.PI,p:Math.atan2(sy,uz)*180/Math.PI};}// t = rol (rechts +), p = stand (rechtop = 90)
+function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite(e.beta))return;tiltSeen=true;const ang=tiltAng();let {t,p}=tiltAngles(e.beta,e.gamma,ang);
   if(!isFinite(t)||!isFinite(p))return;const now=performance.now();
   /* S1d (Christian): na draaien staand↔liggend werd geijkt op een stand midden in de draai → blijvende bocht. Nu na draaien eerst wachten tot de telefoon 0,35 s stil ligt. */
-  /* S2 (Christian 15 nov: "iets langer wachten met ijken"): Android meldt de nieuwe schermstand pas 0,5–1 s na de fysieke draai.
-     (1) Zwaartekracht in het schermvlak > 60° gedraaid t.o.v. rechtuit = de telefoon wordt gedraaid (nooit sturen; ook niet als de schermstand nog niet gewisseld is).
-     (2) Na een draai pas ijken als de schermstand ≥ 0,8 s geleden wisselde én de telefoon 0,6 s stil ligt (spreiding < 4°, trillende hand mag).
-     (3) Na 3 s nog niet stil of nog scheef: pauze + "tik ▶" (▶ ijkt altijd betrouwbaar). */
-  if(TILT&&!TILT.pend&&m>0.5&&TILT.r0!==undefined&&Math.abs(((r-TILT.r0+540)%360)-180)>60)TILT={ang:TILT.ang,pend:true,t,p,ts:now,chg:now-1e4,start:now};
-  if(TILT&&TILT.ang!==ang)TILT={ang,pend:true,t,p,ts:now,chg:now,start:TILT.pend?TILT.start:now};
-  if(TILT&&TILT.pend){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;
-    if(Math.abs(t-TILT.t)>4||Math.abs(p-TILT.p)>4){TILT.t=t;TILT.p=p;TILT.ts=now;}
-    const still=now-TILT.ts>=600&&now-TILT.chg>=800&&(TILT.manual||!(m>0.5&&Math.abs(r)>60));if(still&&TILT.manual)TILT_MANUAL=true;
-    if(now-TILT.start>300&&!TILT.asked)tiltChip('📱 Even stilhouden…');
-    if(!still){if(now-TILT.start>3000&&!TILT.asked&&MODE==='fly'&&!PAUSED){TILT.asked=true;PAUSED=true;tiltChip('');NOTICE='📱 Houd de telefoon zoals je wilt en tik ▶ om verder te vliegen.';}return;}
-    TILT=null;tiltChip('');}
-  if(!TILT)TILT={p0:p,t0:Math.abs(t)<25||TILT_MANUAL?t:0,ang,r0:m>0.5?r:undefined};TILT_MANUAL=false;/* ook de rol ijken (zo houd je hem = rechtuit), behalve bij een duidelijke bocht */
+  if(TILT&&TILT.ang!==ang)TILT={ang,pend:true,t,p,ts:now};
+  if(TILT&&TILT.pend){if(Math.abs(t-TILT.t)>3||Math.abs(p-TILT.p)>3){TILT.t=t;TILT.p=p;TILT.ts=now;}
+    if(now-TILT.ts<350){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;return;}TILT=null;}
+  if(!TILT)TILT={p0:p,t0:Math.abs(t)<25?t:0,ang};/* ook de rol ijken (zo houd je hem = rechtuit), behalve bij een duidelijke bocht */
   t-=TILT.t0;const b=((p-TILT.p0+540)%360)-180,DZ=8;// Christian 14 nov: naar je toe kantelen (bovenkant naar je toe) = stijgen, naar voren = dalen; ballon idem
   keys['tl']=t<-DZ;keys['tr']=t>DZ;keys['tu']=b>DZ;keys['td']=b<-DZ;if(!keys['tu'])TO_WAIT=false;
   if(!document.body.classList.contains('tiltmode')){document.body.classList.add('tiltmode');}
