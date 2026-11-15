@@ -11,7 +11,7 @@ from playwright.async_api import async_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 THREE = os.environ.get('THREE_DIR', '/home/claude/h/node_modules/three')
-PORT = 8766
+PORT = int(os.environ.get('E2E_PORT', 8766))
 ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist']
 
 def serve():
@@ -588,9 +588,22 @@ async def d_tilt_rotate(a):  # Christian 14 nov avond: na staand→liggend→sta
         w, h = (H, W) if angle else (W, H)
         # tijdens het draaien: rare tussenstanden (nog in de oude stand gemeten, scheef)
         await stream(22, 12, prev, 150)
+        # S2 (Christian 15 nov: ijken na draaien nog niet goed): Android meldt de nieuwe schermstand pas 0,5–1 s ná de fysieke draai.
+        # In die tijd houdt de vlieger de telefoon al stil in de nieuwe houding, maar de app leest nog met de oude assen.
+        import time as _t
+        t0 = _t.time(); bad = []; loops0 = await a.v('v.LOOP?1:0')
+        while _t.time() - t0 < 0.8:
+            await a.ev(SEND, orient(0, 0, angle)); await a.wait(40)
+            k = await a.v(keys)
+            if any(k): bad.append(k)
+        ok(not bad, f'draai naar {angle}°: stuurt al tijdens de vertraagde schermstandwissel {bad[:3]}')
+        ok(not await a.v('v.LOOP'), f'draai naar {angle}°: looping tijdens de draai')
         await cdp.send('Emulation.setDeviceMetricsOverride', {'width': w, 'height': h, 'deviceScaleFactor': 1, 'mobile': True, 'screenOrientation': {'type': typ, 'angle': angle}})
-        await stream(-20, -15, angle, 120)  # nog bewegend
-        await stream(0, 0, angle, 700)      # telefoon ligt weer stil in de nieuwe stand
+        await stream(-20, -15, angle, 120)  # nog bewegend (greep aanpassen)
+        t0 = _t.time(); j = 0                # daarna stil, met een licht trillende hand (±1,5°)
+        while _t.time() - t0 < 1.4:
+            j += 1; await a.ev(SEND, orient(1.5 * math.sin(j * 1.7), 1.5 * math.cos(j * 2.3), angle)); await a.wait(40)
+        await stream(0, 0, angle, 200)
         k = await a.v(keys); ok(k == [False] * 4, f'na draaien naar {angle}°: blijft sturen {k}')
         await stream(15, 0, angle, 120); ok((await a.v(keys))[1], f'na draaien naar {angle}°: rechts kantelen werkt niet')
         await stream(0, 0, angle, 120); ok(await a.v(keys) == [False] * 4, f'na draaien naar {angle}°: niet terug naar rechtuit')
@@ -710,6 +723,54 @@ async def d_tilt_takeoff(a):  # Daan 3: met kantelen opstijgen na de opstijgmeld
         if await a.v('v.PLANE.alt') > 0: break
     ok(await a.v('v.PLANE.alt') > 0, 'met kantelen kom je niet van de grond na de opstijgmelding')
 
+async def d_tilt_locked(a):  # panel S2 (Daan/Sanne): schermstand vergrendeld, telefoon plat
+    if not a.touch: return
+    await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
+    st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2000, 0, paused=False)
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident)}')
+    keys = '[v.keys.tl,v.keys.tr,v.keys.tu,v.keys.td]'; ang = await a.v('v.tiltAng()')
+    import time as _t
+    for _ in range(8): await a.ev(SEND, orient(0, 0, ang)); await a.wait(40)
+    phys = (ang + 90) % 360  # fysiek gedraaid, scherm blijft (vergrendeld)
+    t0 = _t.time(); bad = []
+    while _t.time() - t0 < 3.6:
+        await a.ev(SEND, orient(0, 0, phys)); await a.wait(50)
+        k = await a.v(keys)
+        if any(k): bad.append(k)
+    ok(not bad, f'vergrendeld: stuurt terwijl de telefoon gedraaid is {bad[:3]}')
+    ok(await a.v('v.PAUSED') and 'tik ▶' in (await a.v('v.NOTICE') or ''), f'vergrendeld: geen pauze met "tik ▶" na 3 s ({await a.v("v.NOTICE")!r})')
+    await a.hit('#btnPause'); ok(not await a.v('v.PAUSED'), '▶ hervat niet')
+    for _ in range(8): await a.ev(SEND, orient(0, 0, phys)); await a.wait(40)
+    ok(await a.v(keys) == [False] * 4, f'na ▶ in gedraaide houding: niet rechtuit {await a.v(keys)}')
+    # plat op tafel: geen vastloper, geen pauze
+    await a.ev('()=>window.__vfr.resetTilt()')
+    t0 = _t.time()
+    while _t.time() - t0 < 3.5:
+        await a.ev(SEND, {'beta': 0.3, 'gamma': -0.2}); await a.wait(50)
+    ok(not await a.v('v.PAUSED'), 'plat op tafel: onterecht gepauzeerd')
+
+JS_AIRLBL = '()=>window.__vfr.LAYERS.filter(f=>f.label&&f.label.el.style.display==="block").map(f=>[f.ident,f.layer,+(f.label.el.style.opacity||1),f.label.d])'
+async def d_label_fade(a):  # S2 (Christian 14 nov): gevaren standaard aan; labels vervagen geleidelijk op afstand; hoog contrast niet
+    await a.hit('#modal [data-ac=map]'); await a.frames(4)
+    L = await a.ev(JS_AIRLBL)
+    ok(any(l[1] in ('TRA', 'TSA') for l in L), f'TRA/TSA (gevaar) niet standaard zichtbaar: {[l[0] for l in L]}')
+    ok(all(l[2] >= 0.6 for l in L), f'zichtbaar label te vaag (<0.6, contrast 1.4.3): {L}')
+    HAZ = ('CTR', 'TMA', 'CTA', 'ATZ', 'P', 'R', 'D', 'TRA', 'TSA', 'PJA', 'UAS')
+    for h in L:  # panel S2: gevaren vervagen nooit eerder dan overige labels op gelijke of grotere afstand
+        for o in L:
+            if h[1] in HAZ and o[1] not in HAZ and h[3] <= o[3]: ok(h[2] >= o[2] - 0.01, f'gevaar {h[0]} {h[2]} vager dan {o[0]} {o[2]}')
+    ok(any(l[2] < 0.99 for l in L), f'geen enkel ver label vervaagt: {L}')
+    ok(any(l[1] in ('CTR',) and l[2] >= 0.99 for l in L), 'geen CTR-label volledig zichtbaar')
+    if not a.touch:  # uitzoomen met echt scrollen: invarianten blijven gelden
+        await a.pg.mouse.move(640, 500)
+        for _ in range(4): await a.pg.mouse.wheel(0, 250); await a.wait(120)
+        await a.wait(600); await a.frames(4)
+        L2 = await a.ev(JS_AIRLBL)
+        ok(L2 and all(l[2] >= 0.6 for l in L2), f'na uitzoomen: {L2}')
+    await a.hit('#btnBig'); await a.hit('#a11yHC'); await a.frames(4)
+    L3 = await a.ev(JS_AIRLBL)
+    ok(L3 and all(l[2] >= 0.99 for l in L3), f'hoog contrast: labels vervaagd {L3}')
+
 # ---------------- stochastisch ----------------
 async def fuzz(a, seed, steps):
     rnd = random.Random(seed)
@@ -745,18 +806,19 @@ async def fuzz(a, seed, steps):
 
 async def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--seed', type=int, default=None); ap.add_argument('--forms', default='desk,p7,p7l,se')
-    ap.add_argument('--only', default=''); ap.add_argument('--steps', type=int, default=40)
+    ap.add_argument('--only', default=''); ap.add_argument('--steps', type=int, default=40); ap.add_argument('--test', default='')
     o = ap.parse_args(); forms = o.forms.split(',')
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('gevaren aan + labels vervagen', d_label_fade), ('kantelen: vergrendeld en plat', d_tilt_locked)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:
             for layer, tests in (('smoke', smoke), ('det', det)):
                 if o.only and o.only != layer: continue
                 for name, fn in tests:
+                    if o.test and o.test not in fn.__name__: continue
                     a = await new_app(p, b, form, url); await run(layer, name, form, fn, a); await a.ctx.close()
             if not o.only or o.only == 'fuzz':
                 for k in range(2):
