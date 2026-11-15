@@ -50,7 +50,7 @@
   .banner .head{font-size:14.5px;font-weight:700;margin-top:2px}
   .banner .ahead{color:#1c2024!important;font-weight:700;border:2px solid #1c2024;border-radius:6px;padding:3px 7px;margin-top:6px;background:#fff8d6}
   .banner .above{color:#1c2024!important}
-  .banner .notice{background:#0b3a6e;color:#fff;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:14px}#a11y{position:absolute;z-index:40;top:56px;right:110px;background:#fff;border:2px solid #1c2024;border-radius:10px;padding:10px 12px;font-size:16px;box-shadow:0 4px 14px rgba(0,0,0,.25)}#a11y.hidden{display:none}#a11y label{display:flex;gap:8px;align-items:center;padding:6px 0}#a11y input{width:22px;height:22px}/* S2: verre luchtruimlabels: alleen achtergrond, schaduw en randkleur vervagen (tekst blijft 100%, WCAG 1.4.3) */.lbl.far{background:rgba(255,255,255,calc(.9*var(--lo)))!important;box-shadow:none!important;border-left-color:rgba(120,120,120,var(--lo))!important;font-weight:500}.lbl.far b{font-weight:550}#tiltChip{display:none;position:absolute;top:104px;left:50%;transform:translateX(-50%);background:#0b3a6e;color:#fff;border-radius:14px;padding:5px 14px;font-size:15px;pointer-events:none;z-index:6}#relaxChip{display:none;position:absolute;top:104px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.85);border-radius:14px;padding:4px 12px;font-size:13px;pointer-events:none;z-index:5}body.hc .lbl{background:#000!important;color:#fff!important;border:2px solid #fff!important;font-weight:700}body.hc .lbl .lim{color:#ffd23f!important}
+  .banner .notice{background:#0b3a6e;color:#fff;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:14px}#a11y{position:absolute;z-index:40;top:56px;right:110px;background:#fff;border:2px solid #1c2024;border-radius:10px;padding:10px 12px;font-size:16px;box-shadow:0 4px 14px rgba(0,0,0,.25)}#a11y.hidden{display:none}#a11y label{display:flex;gap:8px;align-items:center;padding:6px 0}#a11y input{width:22px;height:22px}#tiltChip{display:none;position:absolute;top:104px;left:50%;transform:translateX(-50%);background:#0b3a6e;color:#fff;border-radius:14px;padding:5px 14px;font-size:15px;pointer-events:none;z-index:6}#relaxChip{display:none;position:absolute;top:104px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.85);border-radius:14px;padding:4px 12px;font-size:13px;pointer-events:none;z-index:5}body.hc .lbl{background:#000!important;color:#fff!important;border:2px solid #fff!important;font-weight:700}body.hc .lbl .lim{color:#ffd23f!important}
   .banner .rt{display:block;width:100%;text-align:left;margin-top:6px;padding:8px 10px;border-radius:8px;border:2px solid #fff;background:rgba(255,255,255,.12);color:#fff;font:600 14px/1.5 system-ui,sans-serif;cursor:pointer}.banner .rt span{white-space:normal;background:rgba(255,255,255,.14);border-radius:4px;padding:0 4px}.banner .rt i{font-style:normal;opacity:.7;margin:0 3px}.banner .rtnote{display:block;font-size:13px;margin-top:6px;color:#dfe9f7}.banner .rt:hover{background:rgba(255,255,255,.25)}
   .banner .nt{display:block;margin-top:6px;min-height:40px;padding:6px 12px;border-radius:8px;border:0;background:#fff;color:#0b3a6e;font-weight:700;font-size:14px;cursor:pointer}
   body.looking .flysec{display:none}
@@ -716,8 +716,8 @@ const GROUPS=[
   {id:'uas',label:'Dronegebied (RPAS / UAS)',layers:['UAS'],on:true,color:'#6e56cf'},
   {id:'mil',label:'Militair (TRA / TSA)',layers:['TRA','TSA'],on:true,color:'#a1745a'},
   {id:'gld',label:'Zweefvlieg- en klimgebied',layers:['GLD','CLIMB'],on:true,color:'#009e73'},
-  {id:'zone',label:'RMZ / TMZ (radio / transponder)',layers:['RMZ','TMZ'],on:false,color:'#1c2024',outline:true},
-  {id:'lfa',label:'Militair laagvlieggebied',layers:['LFA'],on:false,color:'#8b8d98'},
+  {id:'zone',label:'RMZ / TMZ (radio / transponder)',layers:['RMZ','TMZ'],on:true,color:'#1c2024',outline:true},
+  {id:'lfa',label:'Militair laagvlieggebied',layers:['LFA'],on:true,color:'#8b8d98'},
 ];
 const groupOf=f=>GROUPS.find(g=>g.layers.includes(f.layer));
 const colorOf=f=>{const g=groupOf(f);return g.colorBy==='cls'?(CLS[f.cls]||'#888'):g.color;};
@@ -880,15 +880,10 @@ for(const [ic,n,lo,la,g] of FIELDS){const [x,y]=proj(lo,la);addLabel((g?'zweefve
 const sliceLbl=addLabel('','tick key',()=>new THREE.Vector3(gx1,SLICE*FT*EXAG,-gn0),0);sliceLbl.isSlice=true;
 const tickLabels=TICKS.map(t=>{const L=addLabel(t[2]||t[0]+' ft','tick'+(t[1]?' key':''),()=>new THREE.Vector3(gx0+1.4,t[0]*FT*EXAG,-gn0),0);L.tickFt=t[0];return L;});
 
-// S2 decluttering (Christian 14 nov): labels vervagen geleidelijk op afstand i.p.v. ineens te verdwijnen.
-// Luchtruimlabels (kaartmodus): t.o.v. de kijkafstand (camera→doelpunt), zodat in- en uitzoomen hetzelfde voelt;
-// gevaren (prio ≤3: CTR/TMA/ATZ/P/R/D) blijven het langst staan. Overige labels met een afstandsgrens: laatste 30% vervaagt.
-// Hoog contrast: geen vervaging (WCAG 1.4.3/1.4.11), alleen aan/uit. Onder LBL_MIN_OP verdwijnt een label helemaal.
-const LBL_MIN_OP=0.6,LBL_HAZ=['CTR','TMA','CTA','ATZ','P','R','D','TRA','TSA','PJA','UAS'];// panel S2 (Noor 9: contrast 1.4.3; Daan/Pieter: gevaren vervagen het laatst)
-function labelFade(L,CD){if(document.body.classList.contains('hc'))return 1;
-  const FLY=typeof MODE!=='undefined'&&MODE==='fly';
-  if(L.isAir&&!FLY){const [a,b]=LBL_HAZ.includes(L.ref.layer)?[1.0,1.75]:[0.7,1.15];const r=L.d/CD;return r<=a?1:Math.max(0,1-(r-a)/(b-a));}
-    return 1;}
+// S2 decluttering (Christian 15 nov): een label is er óf wel óf niet — geen vervaging. Luchtruimlabels (kaartmodus) verdwijnen
+// voorbij een afstand t.o.v. de kijkafstand (camera→doelpunt); gevaren blijven verder zichtbaar dan overige labels.
+const LBL_HAZ=['CTR','TMA','CTA','ATZ','P','R','D','TRA','TSA','PJA','UAS','LFA'],LBL_CUT=[1.5,1.0];
+function labelOn(L,CD){if(!L.isAir||(typeof MODE!=='undefined'&&MODE==='fly'))return true;return L.d/CD<=(LBL_HAZ.includes(L.ref.layer)?LBL_CUT[0]:LBL_CUT[1]);}
 const v=new THREE.Vector3();
 function placeLabels(){lmMinSize();
   const W=innerWidth,H=innerHeight,placed=[];const cam=camera.position;
@@ -912,12 +907,11 @@ function placeLabels(){lmMinSize();
   for(const L of list){const p=L.pos3();L.d=p.distanceTo(cam);v.copy(p).project(camera);L.sx=(v.x+1)/2*W;L.sy=(1-v.y)/2*H;L.ok=v.z<1&&L.sx>-50&&L.sx<W+50&&L.sy>-20&&L.sy<H+20;}
   list.sort((a,b)=>(a.prio-(a.prev?0.5:0))-(b.prio-(b.prev?0.5:0))||a.idx-b.idx);
   const CD=camera.position.distanceTo(controls.target)||1;
-  for(const L of list){L.op=labelFade(L,CD);if(L.op<LBL_MIN_OP)L.ok=false;}
+  for(const L of list){if(L.ok&&!labelOn(L,CD))L.ok=false;}
   for(const L of list){if(!L.ok)continue;if(!L.w){L.w=L.el.offsetWidth||80;L.h=L.el.offsetHeight||16;}
     const isTick=L.tickFt!==undefined;const x0=isTick?L.sx:L.sx-L.w/2,y0=L.sy-L.h/2;const r=[x0-2,y0-2,x0+L.w+2,y0+L.h+2];
     if(placed.some(q=>r[0]<q[2]&&r[2]>q[0]&&r[1]<q[3]&&r[3]>q[1]))continue;
     if(L.prio>=9&&L.d>140)continue;
-    const o=L.op>=0.99?'':String(Math.round(L.op*100)/100);if(L.el.dataset.lo!==o){L.el.dataset.lo=o;if(o)L.el.style.setProperty('--lo',o);else L.el.style.removeProperty('--lo');L.el.classList.toggle('far',!!o);}
     placed.push(r);L.show=true;L.el.style.transform=`translate(${Math.round(x0)}px,${Math.round(y0)}px)`;}
   for(const L of labels){const disp=L.show?'block':'none';if(L.el.style.display!==disp)L.el.style.display=disp;}
 }

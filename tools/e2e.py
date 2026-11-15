@@ -761,27 +761,24 @@ async def d_tilt_locked(a):  # panel S2 (Daan/Sanne): schermstand vergrendeld, t
         await a.ev(SEND, {'beta': 0.3, 'gamma': -0.2}); await a.wait(50)
     ok(not await a.v('v.PAUSED'), 'plat op tafel: onterecht gepauzeerd')
 
-JS_AIRLBL = '()=>window.__vfr.LAYERS.filter(f=>f.label&&f.label.el.style.display==="block").map(f=>[f.ident,f.layer,+(f.label.el.style.getPropertyValue("--lo")||1),f.label.d])'
-async def d_label_fade(a):  # S2 (Christian 14 nov): gevaren standaard aan; labels vervagen geleidelijk op afstand; hoog contrast niet
+JS_AIRLBL = '()=>window.__vfr.LAYERS.filter(f=>f.label&&f.label.el.style.display==="block").map(f=>[f.ident,f.layer,+(1),f.label.d])'
+async def d_label_fade(a):  # S2 (Christian 15 nov): alles standaard aan; labels óf wel óf niet (geen vervaging), ver weg verdwijnen
     await a.hit('#modal [data-ac=map]'); await a.frames(4)
+    off = await a.ev('()=>[...document.querySelectorAll("input[id^=g_]")].filter(i=>!i.checked).map(i=>i.id)')
+    ok(not off, f'luchtruimgroepen niet standaard aan: {off}')
     L = await a.ev(JS_AIRLBL)
-    ok(any(l[1] in ('TRA', 'TSA') for l in L), f'TRA/TSA (gevaar) niet standaard zichtbaar: {[l[0] for l in L]}')
-    ok(all(l[2] >= 0.6 for l in L), f'zichtbaar label te vaag (<0.6, contrast 1.4.3): {L}')
-    HAZ = ('CTR', 'TMA', 'CTA', 'ATZ', 'P', 'R', 'D', 'TRA', 'TSA', 'PJA', 'UAS')
-    for h in L:  # panel S2: gevaren vervagen nooit eerder dan overige labels op gelijke of grotere afstand
-        for o in L:
-            if h[1] in HAZ and o[1] not in HAZ and h[3] <= o[3]: ok(h[2] >= o[2] - 0.01, f'gevaar {h[0]} {h[2]} vager dan {o[0]} {o[2]}')
-    ok(any(l[2] < 0.99 for l in L), f'geen enkel ver label vervaagt: {L}')
-    ok(any(l[1] in ('CTR',) and l[2] >= 0.99 for l in L), 'geen CTR-label volledig zichtbaar')
-    if not a.touch:  # uitzoomen met echt scrollen: invarianten blijven gelden
+    ok(any(l[1] in ('TRA', 'TSA') for l in L), f'TRA/TSA niet zichtbaar: {[l[0] for l in L]}')
+    vague = await a.ev('()=>[...document.querySelectorAll("#labels .lbl")].filter(e=>e.style.display==="block"&&(+getComputedStyle(e).opacity<1)).length')
+    ok(vague == 0, f'{vague} zichtbare labels zijn vervaagd')
+    HAZ = ('CTR', 'TMA', 'CTA', 'ATZ', 'P', 'R', 'D', 'TRA', 'TSA', 'PJA', 'UAS', 'LFA')
+    cd = await a.ev('()=>{const v=window.__vfr;return v.camera.position.distanceTo(v.controls.target)}')
+    for l in L: ok(l[3] / cd <= (1.5 if l[1] in HAZ else 1.0) + 1e-6, f'label {l[0]} zichtbaar voorbij de afstandsgrens ({l[3]/cd:.2f}×)')
+    ok(any(l[1] == 'CTR' for l in L), 'geen CTR-label zichtbaar')
+    if not a.touch:  # uitzoomen met echt scrollen: nog steeds labels, niets vervaagd
         await a.pg.mouse.move(640, 500)
         for _ in range(4): await a.pg.mouse.wheel(0, 250); await a.wait(120)
         await a.wait(600); await a.frames(4)
-        L2 = await a.ev(JS_AIRLBL)
-        ok(L2 and all(l[2] >= 0.6 for l in L2), f'na uitzoomen: {L2}')
-    await a.hit('#btnBig'); await a.hit('#a11yHC'); await a.frames(4)
-    L3 = await a.ev(JS_AIRLBL)
-    ok(L3 and all(l[2] >= 0.99 for l in L3), f'hoog contrast: labels vervaagd {L3}')
+        ok(await a.ev(JS_AIRLBL), 'na uitzoomen geen enkel luchtruimlabel')
 
 # ---------------- stochastisch ----------------
 async def fuzz(a, seed, steps):
@@ -823,7 +820,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('gevaren aan + labels vervagen', d_label_fade), ('kantelen: vergrendeld en plat', d_tilt_locked)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit op afstand', d_label_fade), ('kantelen: vergrendeld en plat', d_tilt_locked)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:
