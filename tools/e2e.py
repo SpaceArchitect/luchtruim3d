@@ -449,6 +449,7 @@ def orient(turn, back, ang, p0=60):
     sx, sy, sz = -math.sin(t), math.cos(t) * math.sin(p), math.cos(t) * math.cos(p)
     if ang == 90: ux, uy = sy, -sx
     elif ang == 270: ux, uy = -sy, sx
+    elif ang == 180: ux, uy = -sx, -sy
     else: ux, uy = sx, sy
     uz = sz if abs(sz) > 1e-6 else 1e-6
     g = math.atan(-ux / uz); b = math.atan2(uy, uz / math.cos(g))
@@ -740,8 +741,19 @@ async def d_tilt_locked(a):  # panel S2 (Daan/Sanne): schermstand vergrendeld, t
     ok(not bad, f'vergrendeld: stuurt terwijl de telefoon gedraaid is {bad[:3]}')
     ok(await a.v('v.PAUSED') and 'tik ▶' in (await a.v('v.NOTICE') or ''), f'vergrendeld: geen pauze met "tik ▶" na 3 s ({await a.v("v.NOTICE")!r})')
     await a.hit('#btnPause'); ok(not await a.v('v.PAUSED'), '▶ hervat niet')
-    for _ in range(8): await a.ev(SEND, orient(0, 0, phys)); await a.wait(40)
-    ok(await a.v(keys) == [False] * 4, f'na ▶ in gedraaide houding: niet rechtuit {await a.v(keys)}')
+    for j in range(6): await a.ev(SEND, orient(25 * (-1) ** j, 15, phys)); await a.wait(40)  # wiebelen direct na ▶: niet ijken
+    ok(await a.v(keys) == [False] * 4 and (await a.v('v.TILT') or {}).get('pend'), 'na ▶ meteen geijkt op een wiebelende houding')
+    for _ in range(22): await a.ev(SEND, orient(0, 0, phys)); await a.wait(40)
+    ok(await a.v(keys) == [False] * 4 and not (await a.v('v.TILT') or {}).get('pend'), f'na ▶ + stil: niet rechtuit {await a.v(keys)}')
+    ok(not await a.v('v.PAUSED'), 'na ▶ in vergrendelde houding opnieuw gepauzeerd')
+    # 180° (ondersteboven, meeste telefoons wisselen dan niet van schermstand)
+    await a.ev('()=>window.__vfr.resetTilt()')
+    for _ in range(8): await a.ev(SEND, orient(0, 0, ang)); await a.wait(40)
+    t0 = _t.time(); bad = []
+    while _t.time() - t0 < 1.5:
+        await a.ev(SEND, orient(0, 0, (ang + 180) % 360)); await a.wait(50)
+        if any(await a.v(keys)): bad.append(1)
+    ok(not bad, 'ondersteboven: stuurt')
     # plat op tafel: geen vastloper, geen pauze
     await a.ev('()=>window.__vfr.resetTilt()')
     t0 = _t.time()
@@ -749,7 +761,7 @@ async def d_tilt_locked(a):  # panel S2 (Daan/Sanne): schermstand vergrendeld, t
         await a.ev(SEND, {'beta': 0.3, 'gamma': -0.2}); await a.wait(50)
     ok(not await a.v('v.PAUSED'), 'plat op tafel: onterecht gepauzeerd')
 
-JS_AIRLBL = '()=>window.__vfr.LAYERS.filter(f=>f.label&&f.label.el.style.display==="block").map(f=>[f.ident,f.layer,+(f.label.el.style.opacity||1),f.label.d])'
+JS_AIRLBL = '()=>window.__vfr.LAYERS.filter(f=>f.label&&f.label.el.style.display==="block").map(f=>[f.ident,f.layer,+(f.label.el.style.getPropertyValue("--lo")||1),f.label.d])'
 async def d_label_fade(a):  # S2 (Christian 14 nov): gevaren standaard aan; labels vervagen geleidelijk op afstand; hoog contrast niet
     await a.hit('#modal [data-ac=map]'); await a.frames(4)
     L = await a.ev(JS_AIRLBL)
