@@ -1,6 +1,6 @@
 # Status — lees dit eerst
 
-*Bijgewerkt: 21 nov 2026, 01:00 (cloudsessie).*
+*Bijgewerkt: 21 nov 2026, 01:00 (cloudsessie 20→21 nov).*
 
 ## Live
 - https://luchtruim3d.nl = `main` = inhoud van 14 nov (053d823), teruggedraaid op 15 nov.
@@ -20,15 +20,20 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 - Toestel wisselen: tik op het toesteltje onderin (Fleur) (`d_ac_switch`).
 - Landen in de bebouwde kom krijgt een eigen tekst; missietekst zonder dubbel "verboden" (`d_land_city`).
 - Tests draaien op een vast tijdstip (di 10:00): de uitslag hing af van de klok (RMZ 's nachts actief).
+- Kantelen geleidelijk: dode zone 8°, lineair tot vol bij 35° (bocht) / 30° (klim) (`d_tilt_analog`, ±5° ruis).
+- 7 missies rond echte conflicten (`MISSIONS` in index.html): start berekend uit de data, keerpunten, les + ⭐ achteraf; ballon met hoogteplan-solver en eigen wind (`d_missions`).
+- Doelbaken: lichtbundel, draaiende ruit, uitdijende ring. Kaart liggend: tijduitleg verborgen.
 
 ## Top 5 (de noordster: conflicten zien)
-1. **Publiceren** van het bovenstaande na Christians mobiele check.
-2. **Kantelen na draaien staand↔liggend:** eerst Christian laten testen op live (053d823) wat er nog misgaat. Daarna pas een fix, met realistische ruis.
-3. **Gevarenlagen LVNL** (Parajump, Miscellaneous, Obstacles) + één klik naar de juiste eAIP-plek. **Pc-sessie nodig.**
-4. **Kaartmodus op telefoon liggend + sonde** (Fleur: "onoverzichtelijk").
-5. **Minimale vlieghoogtes** (SERA.5005(f)) als waarschuwing; eerst ENR 1.2 lezen (pc).
+1. **Publiceren** van het bovenstaande na Christians mobiele check (missies + kantelgevoel). Push naar `main` vraagt zijn expliciete "ok, live".
+2. **Data uit index.html** naar `data/luchtruim.json` + `data/regio-*.json`, één ophaalscript (LVNL via Chrome op de pc). Fundament voor uitbreiding.
+3. **Arnhem–Nijmegen** (pc-sessie): Malden, Deelen, Terlet, Nieuw Milligen TMA, SUP 03/2022, 3 regiomissies, link `#arnhem`.
+4. **"Heel Nederland-week" met de full reset (±3–6 dec, vóór 10 dec):** luchtruim landelijk in één keer; landschap per regio (Randstad → Noord → Zeeland/Limburg); alle data binnen vóór Mexico.
+5. Kantelen na draaien staand↔liggend: eerst Christians ervaring met de nieuwe geleidelijke besturing afwachten.
 
 ## Daarna
+- Gevarenlagen LVNL (Parajump, Miscellaneous, Obstacles), één klik naar de eAIP-plek, minimale vlieghoogtes SERA.5005(f) (pc).
+- Kaart liggend: sonde als smalle lade rechts.
 - AIP-correctheid: TRA-status zonder NOTAM, Nieuw Milligen TMA D "klasse E", één klik naar de AIP-plek.
 - Uitbreiden naar Arnhem–Nijmegen, daarna heel NL.
 
