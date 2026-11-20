@@ -714,7 +714,7 @@ async def d_goal_marker(a):  # Boyd 14 nov: kon de A67 niet vinden → doel als 
     hdg = (math.degrees(math.atan2(pos[0]-st['x'], pos[1]-st['n'])) + 360) % 360
     await a.place(st['x'], st['n'], st['alt'] or 1500, hdg, paused=True)
     await a.ev('(g)=>{window.__vfr.GOAL=g}', g); await a.wait(400); await a.frames(4)
-    on = await a.ev('''()=>{const v=window.__vfr,p=v.goalViz.children.find(c=>c.geometry.type==='SphereGeometry').position.clone().project(v.camera);return [p.x,p.y,p.z]}''')
+    on = await a.ev('''()=>{const v=window.__vfr,p=v.goalViz.children.find(c=>c.geometry.type==='OctahedronGeometry').position.clone().project(v.camera);return [p.x,p.y,p.z]}''')
     ok(abs(on[0]) < 1 and abs(on[1]) < 1 and on[2] < 1, f'baken niet in beeld bij koers naar het doel: {on}')
     await a.shot('goal_marker')
     await a.ev('()=>window.__vfr.setMode("map")'); await a.frames(2)

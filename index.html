@@ -1792,14 +1792,15 @@ if(ONLY_MAP){$('ok').onclick=()=>{$('modal').style.display='none';showProbe();};
 // ---------- missiedoel in de wereld (Boyd 14 nov: "kon de A67 niet vinden") ----------
 const goalViz=new THREE.Group();goalViz.visible=false;scene.add(goalViz);let GVK=null;
 const GOLD=0xffb000,gMat=o=>new THREE.MeshBasicMaterial({color:GOLD,transparent:true,opacity:o,depthWrite:false,fog:false,side:THREE.DoubleSide});
-const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,1,20,1,true).translate(0,.5,0),gMat(.55));
+const BEAMTX=(()=>{const c=document.createElement('canvas');c.width=4;c.height=128;const g=c.getContext('2d'),gr=g.createLinearGradient(0,0,0,128);gr.addColorStop(0,'rgba(255,176,0,0)');gr.addColorStop(.55,'rgba(255,196,60,.45)');gr.addColorStop(1,'rgba(255,176,0,.95)');g.fillStyle=gr;g.fillRect(0,0,4,128);return new THREE.CanvasTexture(c);})();
+const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.14,.32,1,24,1,true).translate(0,.5,0),new THREE.MeshBasicMaterial({map:BEAMTX,transparent:true,depthWrite:false,fog:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));beacon.renderOrder=3;
 const ring=new THREE.Mesh(new THREE.RingGeometry(.9,1.25,40).rotateX(-Math.PI/2),gMat(.8));ring.position.y=.07;
-const cap=new THREE.Mesh(new THREE.SphereGeometry(.45,16,10),gMat(.95));
+const cap=new THREE.Mesh(new THREE.OctahedronGeometry(.45,0).scale(1,1.6,1),new THREE.MeshBasicMaterial({color:GOLD,fog:false}));const ripple=new THREE.Mesh(new THREE.RingGeometry(1.1,1.25,48).rotateX(-Math.PI/2),gMat(.7));ripple.position.y=.08;
 const goalLbl=addLabel('','goal',()=>cap.position.clone().add(new THREE.Vector3(0,.9*cap.scale.y,0)),0);goalLbl.isGoal=true;
 function nearestOn(pts,x,n){let b=null,bd=1e9;for(let i=0;i+1<pts.length;i++){const [ax,an]=pts[i],[bx,bn]=pts[i+1],dx=bx-ax,dn=bn-an,L=dx*dx+dn*dn||1;let t=((x-ax)*dx+(n-an)*dn)/L;t=Math.max(0,Math.min(1,t));const px=ax+t*dx,pn=an+t*dn,d=Math.hypot(px-x,pn-n);if(d<bd){bd=d;b=[px,pn];}}return b||pts[0];}
 function goalVizTick(t){const g=MODE==='fly'&&GOAL&&!RELAX?GOAL:null;
   if(g!==GVK){GVK=g;for(const c of [...goalViz.children]){goalViz.remove(c);if(c.userData.own){c.geometry.dispose();c.material.dispose();}}
-    if(g){goalViz.add(beacon,ring,cap);
+    if(g){goalViz.add(beacon,ring,cap,ripple);
       if(g.pts){const pos=[],W=.22;for(let i=0;i+1<g.pts.length;i++){const [ax,an]=g.pts[i],[bx,bn]=g.pts[i+1],L=Math.hypot(bx-ax,bn-an)||1,ox=-(bn-an)/L*W,on=(bx-ax)/L*W,y=.06;
           pos.push(ax+ox,y,-(an+on),bx+ox,y,-(bn+on),bx-ox,y,-(bn-on), ax+ox,y,-(an+on),bx-ox,y,-(bn-on),ax-ox,y,-(an-on));}
         const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));const rib=new THREE.Mesh(geo,gMat(.85));rib.userData.own=true;rib.renderOrder=2;goalViz.add(rib);}}}
@@ -1807,8 +1808,8 @@ function goalVizTick(t){const g=MODE==='fly'&&GOAL&&!RELAX?GOAL:null;
   const [gx,gn]=g.pts?nearestOn(g.pts,PLANE.x,PLANE.n):[g.x,g.n],H=Math.max(1.2,(Math.max(PLANE.alt,0)+800)*FT*EXAG);// top net boven je eigen hoogte: op de horizon zichtbaar
   beacon.position.set(gx,0,-gn);beacon.scale.y=H;ring.position.x=gx;ring.position.z=-gn;cap.position.set(gx,H,-gn);
   {const d=Math.hypot(gx-PLANE.x,gn-PLANE.n).toFixed(1).replace('.',',');const h=`🎯 ${g.name.replace(/^de /,'')} · ${d} km`;if(goalLbl.el.textContent!==h){goalLbl.el.textContent=h;goalLbl.w=0;}}
-  const k=.5+.5*Math.sin(t/350);beacon.material.opacity=.5+.35*k;ring.scale.setScalar(1+.25*k);
-  const dc=camera.position.distanceTo(cap.position),sc=Math.max(1,dc/25);cap.scale.setScalar(sc);beacon.scale.x=beacon.scale.z=Math.max(1,dc/40);}
+  const k=.5+.5*Math.sin(t/350);beacon.material.opacity=.75+.25*k;ring.scale.setScalar(1);const ph=(t/1600)%1;ripple.position.x=gx;ripple.position.z=-gn;ripple.scale.setScalar(1+ph*2.2);ripple.material.opacity=.7*(1-ph);cap.rotation.y=t/700;
+  const dc=camera.position.distanceTo(cap.position),sc=Math.max(.8,dc/40);cap.scale.setScalar(sc);beacon.scale.x=beacon.scale.z=Math.max(1,dc/40);}
 let last=performance.now(),acc=0;
 (function loop(){requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(.1,(now-last)/1000);last=now;
   if(camTween){const k=Math.min(1,(now-camTween.st)/camTween.ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;camera.position.lerpVectors(camTween.p0,camTween.p1,e);controls.target.lerpVectors(camTween.t0,camTween.t1,e);if(k>=1)camTween=null;}
