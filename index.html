@@ -1300,15 +1300,18 @@ function tiltAngles(beta,gamma,ang){// S1-fix: via de zwaartekrachtrichting i.p.
   const b=beta*Math.PI/180,g=gamma*Math.PI/180,ux=-Math.sin(g)*Math.cos(b),uy=Math.sin(b),uz=Math.cos(g)*Math.cos(b);
   let sx=ux,sy=uy;if(ang===90){sx=-uy;sy=ux;}else if(ang===270){sx=uy;sy=-ux;}else if(ang===180){sx=-ux;sy=-uy;}
   return {t:Math.asin(Math.max(-1,Math.min(1,-sx)))*180/Math.PI,p:Math.atan2(sy,uz)*180/Math.PI};}// t = rol (rechts +), p = stand (rechtop = 90)
+const TAX={r:0,p:0};// analoge kantelstand −1…1 (rol, pitch)
 function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite(e.beta))return;tiltSeen=true;const ang=tiltAng();let {t,p}=tiltAngles(e.beta,e.gamma,ang);
   if(!isFinite(t)||!isFinite(p))return;const now=performance.now();
   /* S1d (Christian): na draaien staand↔liggend werd geijkt op een stand midden in de draai → blijvende bocht. Nu na draaien eerst wachten tot de telefoon 0,35 s stil ligt. */
   if(TILT&&TILT.ang!==ang)TILT={ang,pend:true,t,p,ts:now};
   if(TILT&&TILT.pend){if(Math.abs(t-TILT.t)>3||Math.abs(p-TILT.p)>3){TILT.t=t;TILT.p=p;TILT.ts=now;}
-    if(now-TILT.ts<350){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;return;}TILT=null;}
+    if(now-TILT.ts<350){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;return;}TILT=null;}
   if(!TILT)TILT={p0:p,t0:Math.abs(t)<25?t:0,ang};/* ook de rol ijken (zo houd je hem = rechtuit), behalve bij een duidelijke bocht */
   t-=TILT.t0;const b=((p-TILT.p0+540)%360)-180,DZ=8;// Christian 14 nov: naar je toe kantelen (bovenkant naar je toe) = stijgen, naar voren = dalen; ballon idem
   keys['tl']=t<-DZ;keys['tr']=t>DZ;keys['tu']=b>DZ;keys['td']=b<-DZ;if(!keys['tu'])TO_WAIT=false;
+  /* Christian 21 nov: geleidelijk i.p.v. aan/uit. Dode zone 8°, daarna lineair tot vol bij 35° (bocht) / 30° (klim-daal). */
+  const sh=(x,F)=>{const m=Math.min(1,Math.max(0,(Math.abs(x)-DZ)/(F-DZ)));return Math.abs(x)<=DZ?0:Math.sign(x)*(.15+.85*m);};TAX.r=sh(t,35);TAX.p=sh(b,30);
   if(!document.body.classList.contains('tiltmode')){document.body.classList.add('tiltmode');}
   /* looping: ver naar je toe kantelen (PI S5-ontwerp) */if(b>TILT_LOOP&&!TILT.looped){TILT.looped=true;if(MODE==='fly'&&!PAUSED&&ACTYPE!=='balloon')startLoop();}if(b<15)TILT.looped=false;}
 const TILT_LOOP=40;/* opstijgmelding: eerst terug naar neutraal, dan opnieuw achterover = opstijgen (ook als dat tussen twee hudTicks gebeurt) */
@@ -1316,7 +1319,7 @@ $('optTilt').onchange=async e=>{if(e.target.checked){try{if(typeof DeviceOrienta
     TILT=null;tiltSeen=false;removeEventListener('deviceorientation',onTilt);addEventListener('deviceorientation',onTilt);tiltNote('Houd de telefoon zoals je wilt en tik ▶: dat is "rechtuit". Naar je toe = stijgen, van je af = dalen, opzij = draaien, ver naar je toe = looping.');
     try{localStorage.setItem('vfr3d_tilt','1');}catch(_){}
     setTimeout(()=>{if(!tiltSeen&&$('optTilt').checked){$('optTilt').checked=false;removeEventListener('deviceorientation',onTilt);document.body.classList.remove('tiltmode');tiltNote('Geen sensorgegevens: je stuurt met de knoppen.');}},2500);}
-  else{removeEventListener('deviceorientation',onTilt);keys['tl']=keys['tr']=keys['tu']=keys['td']=false;document.body.classList.remove('tiltmode');if(e.isTrusted!==false){try{localStorage.setItem('vfr3d_tilt','0');}catch(_){}}tiltNote('');}};
+  else{removeEventListener('deviceorientation',onTilt);keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;document.body.classList.remove('tiltmode');if(e.isTrusted!==false){try{localStorage.setItem('vfr3d_tilt','0');}catch(_){}}tiltNote('');}};
 function autoTilt(){/* S1c (Christian): op telefoon/tablet standaard kantelen, knoppen weg; geen sensor = knoppen terug; uitzetten in Weergave wordt onthouden */
   let pref=null;try{pref=localStorage.getItem('vfr3d_tilt');}catch(_){}
   if(!matchMedia('(pointer:coarse)').matches||pref==='0'||$('optTilt').checked)return;$('optTilt').checked=true;$('optTilt').onchange({target:$('optTilt')});}$('tSlow').onclick=()=>setTempo(TI-1);$('tFast').onclick=()=>setTempo(TI+1);
@@ -1392,8 +1395,9 @@ function loopStep(dt){const k=Math.min(1,(LOOP.t+=dt)/3),th=k*2*Math.PI,R=300,h=
 let LOOPS=0;
 function sim(dt){
   const ac=AC[ACTYPE],T=TEMPO();
-  const turn=ac.turn?(keys['arrowright']||keys['d']||keys['tr']?1:0)-(keys['arrowleft']||keys['a']||keys['tl']?1:0):0;
-  const climb=(keys['arrowup']||keys['w']||keys['tu']?1:0)-(keys['arrowdown']||keys['s']||keys['td']?1:0);
+  const kT=(keys['arrowright']||keys['d']?1:0)-(keys['arrowleft']||keys['a']?1:0),kC=(keys['arrowup']||keys['w']?1:0)-(keys['arrowdown']||keys['s']?1:0);
+  const turn=ac.turn?(kT||((keys['tr']||keys['tl'])?TAX.r:0)):0;// knoppen/toetsen = vol, kantelen = geleidelijk
+  const climb=kC||((keys['tu']||keys['td'])?TAX.p:0);
   let kt=ac.kt;
   if(ACTYPE==='balloon'){const w=windAt(PLANE.alt);PLANE.hdg+=(((w.from+180)%360-PLANE.hdg+540)%360-180)*Math.min(1,dt*1.5);PLANE.hdg=(PLANE.hdg+360)%360;kt=w.kt;}
   else PLANE.hdg=(PLANE.hdg+turn*ac.turn*dt+360)%360;
@@ -1771,7 +1775,7 @@ let last=performance.now(),acc=0;
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   goalVizTick(now);renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+window.__vfr={TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 // ---------- voorbeeldcircuit Eindhoven (AIP EHEH AD 2.22: 1000 ft AMSL, RWY 03 links, RWY 21 rechts → beide aan de NW-kant) ----------
 var CIRC_RW='03';

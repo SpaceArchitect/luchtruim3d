@@ -755,6 +755,35 @@ async def d_land_city(a):  # Christian 15 nov: 'Buitenlanding … (in een weilan
         if bu: ok('weiland' not in t and 'bebouwde kom' in t, f'tekst boven de stad: {t[:90]}')
     ok(any(not bu for bu, _ in r), 'geen buitengebied gevonden voor de controle')
 
+async def d_tilt_analog(a):  # Christian 21 nov: geleidelijke bocht/klim i.p.v. aan/uit, met dode zone; realistische ruis
+    if not a.touch: return
+    await a.hit('#modal [data-ac=glider]')
+    await tilt_on(a)
+    st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2000, 0, paused=False)
+    send = '(o)=>window.dispatchEvent(Object.assign(new Event("deviceorientation"),{alpha:0,beta:o.beta,gamma:o.gamma}))'
+    ang = await a.v('v.tiltAng()'); p0 = 45
+    await a.ev('()=>window.__vfr.resetTilt()'); await a.ev(send, orient(0, 0, ang, p0)); await a.ev(send, orient(0, 0, ang, p0))
+    rng = random.Random(7)
+    for _ in range(30):  # trillende hand ±5° rond neutraal: niets
+        await a.ev(send, orient(rng.uniform(-5, 5), rng.uniform(-5, 5), ang, p0))
+        t = await a.v('[v.TAX.r,v.TAX.p]'); ok(t == [0, 0], f'ruis ±5° stuurt: {t}')
+    prev = 0
+    for d in (12, 20, 28, 35, 50):
+        await a.ev(send, orient(d, 0, ang, p0)); r = await a.v('v.TAX.r')
+        ok(r > prev, f'bocht niet geleidelijk: {d}° → {r:.2f} (vorige {prev:.2f})' if d < 35 else f'{d}°: {r}'); prev = r if d < 35 else prev
+        if d >= 35: ok(abs(r - 1) < 1e-6, f'{d}° geeft geen volle bocht: {r}')
+    await a.ev(send, orient(-20, 0, ang, p0)); ok(await a.v('v.TAX.r') < 0, 'links kantelen geeft geen negatieve rol')
+    prev = 0
+    for d in (12, 20, 30):
+        await a.ev(send, orient(0, d, ang, p0)); q = await a.v('v.TAX.p'); ok(q > prev, f'klimmen niet geleidelijk: {d}° → {q:.2f}'); prev = q
+    # hoe ver kantelen = hoe snel draaien (echte sim)
+    rates = []
+    for d in (14, 34):
+        await a.place(st['x'], st['n'], 2000, 0, paused=False); await a.ev(send, orient(d, 0, ang, p0))
+        h0 = await a.v('v.PLANE.hdg'); await a.wait(1200); h1 = await a.v('v.PLANE.hdg')
+        rates.append(((h1 - h0 + 540) % 360) - 180)
+    ok(0 < rates[0] < rates[1] * 0.7, f'draaisnelheid niet evenredig: 14°→{rates[0]:.1f}°, 34°→{rates[1]:.1f}°')
+
 async def d_ahead_full(a):  # Noor 1: frequentie in de waarschuwingsregel nooit afgekapt
     await a.hit('#modal [data-ac=motor]')
     e = await a.ev(JS_FREE_EDGE, ['EHEH', 1.8, 1000])
@@ -826,7 +855,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:
