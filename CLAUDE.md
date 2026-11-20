@@ -125,6 +125,12 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
 - Feedback van hem of van gebruikers (Fleur, Boyd, Karen, …) verwerk je direct:
   in STATUS, als test, of als fix.
 - Na 22:00 vraag je hem niets meer. Doorwerken op de achtergrond mag wel.
+- **Testen door Christian:** vraag het gericht, met wat hij moet doen, op welk apparaat
+  (mobiel/desktop) en via welke link. Een preview van een werkbranch zonder te publiceren:
+  `https://raw.githack.com/SpaceArchitect/luchtruim3d/<branch>/index.html`.
+- **Zuinig met context:** zeg het als een nieuwe chat goedkoper is (lange chat, ander
+  onderwerp) of als een kleiner model volstaat (bv. Sonnet voor teksten, data of
+  routinefixes; Opus voor ontwerp, lastige bugs en de briefing).
 
 ## 🧠 Lessen die we al betaald hebben
 

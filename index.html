@@ -12,6 +12,7 @@
   canvas{display:block;touch-action:none}
   #labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
   .lbl{position:absolute;left:0;top:0;white-space:nowrap;font-size:12.5px;line-height:1.25;padding:3px 7px 3px 6px;border-radius:5px;background:rgba(255,255,255,.9);border-left:4px solid #999;box-shadow:0 1px 3px rgba(0,0,0,.15);will-change:transform}
+  .lbl.goal{background:#ffb000;color:#1c2024;font-weight:700;border-left-color:#1c2024}
   .lbl b{font-weight:650}
   .lbl .lim{color:var(--muted);font-variant-numeric:tabular-nums}
   .lbl.city{background:none;box-shadow:none;border:none;color:#2b2f33;font-size:12px;font-weight:600;text-shadow:0 0 3px #fff,0 0 3px #fff;padding:0}
@@ -892,6 +893,7 @@ function placeLabels(){lmMinSize();
     if(L.isAir&&L.ref&&(typeof MODE==='undefined'||MODE!=='fly')&&!L.ref.forceShow){// kaart: label aan/uit op afstand (geen vervaging); gevaren reiken verder
       const vd=camera.position.distanceTo(controls.target),far=vd*(HAZ.has(L.ref.layer)?1.6:1.0)*(L.prev?1.1:1);if(L.pos3().distanceTo(cam)>Math.max(far,25))return false;}
     if(L.isPin&&MODE==='fly')return false;
+    if(L.isGoal&&!goalViz.visible)return false;
     if(RELAX&&(L.isPin||L.isAir))return false;
     if(L.isKnp&&L.pos3().distanceTo(cam)>6)return false;
     if(L.isTown&&(innerWidth<=600&&MODE!=='fly'||L.pos3().distanceTo(cam)>(typeof MODE!=='undefined'&&MODE==='fly'?14:45)))return false;
@@ -1196,7 +1198,7 @@ const AIPINFO={
 };
 const HRS_TXT={eh:'open 07:00–24:00',mil:'open ma–vr 08:00–16:45 (niet op feestdagen)',be:'tijden: zie AIP België',de:'tijden: zie AIP Duitsland',h24:'H24',
   ehoff:'actief 00:00–07:00 (als Eindhoven Tower dicht is)',miloff:'actief buiten ma–vr 08:00–16:45 (als de toren dicht is)'};
-let TIMEMODE='now';
+let TIMEMODE=(E2E&&(/[?&]t=(wkday|weekend)/.exec(location.search)||[])[1])||'now';// testharnas: vast tijdstip, anders hangt de uitslag van de klok af
 let CUSTOM={dow:6,min:14*60};const DAYS=['zo','ma','di','wo','do','vr','za'];
 function utcOffsetMin(){const d=new Date();const p=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d).map(x=>[x.type,x.value]));let o=((+p.hour%24)*60+(+p.minute))-(d.getUTCHours()*60+d.getUTCMinutes());if(o<-720)o+=1440;if(o>720)o-=1440;return o;}
 const hm=m=>String(Math.floor(((m%1440)+1440)%1440/60)).padStart(2,'0')+':'+String(((m%60)+60)%60).padStart(2,'0');
@@ -1732,13 +1734,33 @@ $('timeBtn').onclick=()=>{if($('timePop').classList.contains('hidden'))oneMenu('
 document.querySelectorAll('[data-tm]').forEach(b=>b.onclick=()=>setTimeMode(b.dataset.tm));
 const fromUI=()=>{CUSTOM={dow:+$('tDay').value,min:+$('tSlide').value*15,hol:$('tHol').checked};$('tClock').textContent=hm(CUSTOM.min);TIMEMODE='custom';applyTime();hudTick();if(MODE==='map'&&$('info').style.display==='block')showProbe();};$('tSlide').oninput=fromUI;$('tDay').onchange=fromUI;$('tHol').onchange=fromUI;setInterval(()=>{if(TIMEMODE==='now'){applyTime();}},60000);setTempo(TI);setMode(ONLY_FLY?'fly':'map','init');$('info').style.display='none';
 if(ONLY_MAP){$('ok').onclick=()=>{$('modal').style.display='none';showProbe();};}
+// ---------- missiedoel in de wereld (Boyd 14 nov: "kon de A67 niet vinden") ----------
+const goalViz=new THREE.Group();goalViz.visible=false;scene.add(goalViz);let GVK=null;
+const GOLD=0xffb000,gMat=o=>new THREE.MeshBasicMaterial({color:GOLD,transparent:true,opacity:o,depthWrite:false,fog:false,side:THREE.DoubleSide});
+const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,1,20,1,true).translate(0,.5,0),gMat(.55));
+const ring=new THREE.Mesh(new THREE.RingGeometry(.9,1.25,40).rotateX(-Math.PI/2),gMat(.8));ring.position.y=.07;
+const cap=new THREE.Mesh(new THREE.SphereGeometry(.45,16,10),gMat(.95));
+const goalLbl=addLabel('','goal',()=>cap.position.clone().add(new THREE.Vector3(0,.9*cap.scale.y,0)),0);goalLbl.isGoal=true;
+function nearestOn(pts,x,n){let b=null,bd=1e9;for(let i=0;i+1<pts.length;i++){const [ax,an]=pts[i],[bx,bn]=pts[i+1],dx=bx-ax,dn=bn-an,L=dx*dx+dn*dn||1;let t=((x-ax)*dx+(n-an)*dn)/L;t=Math.max(0,Math.min(1,t));const px=ax+t*dx,pn=an+t*dn,d=Math.hypot(px-x,pn-n);if(d<bd){bd=d;b=[px,pn];}}return b||pts[0];}
+function goalVizTick(t){const g=MODE==='fly'&&GOAL&&!RELAX?GOAL:null;
+  if(g!==GVK){GVK=g;for(const c of [...goalViz.children]){goalViz.remove(c);if(c.userData.own){c.geometry.dispose();c.material.dispose();}}
+    if(g){goalViz.add(beacon,ring,cap);
+      if(g.pts){const pos=[],W=.22;for(let i=0;i+1<g.pts.length;i++){const [ax,an]=g.pts[i],[bx,bn]=g.pts[i+1],L=Math.hypot(bx-ax,bn-an)||1,ox=-(bn-an)/L*W,on=(bx-ax)/L*W,y=.06;
+          pos.push(ax+ox,y,-(an+on),bx+ox,y,-(bn+on),bx-ox,y,-(bn-on), ax+ox,y,-(an+on),bx-ox,y,-(bn-on),ax-ox,y,-(an-on));}
+        const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));const rib=new THREE.Mesh(geo,gMat(.85));rib.userData.own=true;rib.renderOrder=2;goalViz.add(rib);}}}
+  goalViz.visible=!!g;if(!g)return;
+  const [gx,gn]=g.pts?nearestOn(g.pts,PLANE.x,PLANE.n):[g.x,g.n],H=Math.max(1.2,(Math.max(PLANE.alt,0)+800)*FT*EXAG);// top net boven je eigen hoogte: op de horizon zichtbaar
+  beacon.position.set(gx,0,-gn);beacon.scale.y=H;ring.position.x=gx;ring.position.z=-gn;cap.position.set(gx,H,-gn);
+  {const d=Math.hypot(gx-PLANE.x,gn-PLANE.n).toFixed(1).replace('.',',');const h=`🎯 ${g.name.replace(/^de /,'')} · ${d} km`;if(goalLbl.el.textContent!==h){goalLbl.el.textContent=h;goalLbl.w=0;}}
+  const k=.5+.5*Math.sin(t/350);beacon.material.opacity=.5+.35*k;ring.scale.setScalar(1+.25*k);
+  const dc=camera.position.distanceTo(cap.position),sc=Math.max(1,dc/25);cap.scale.setScalar(sc);beacon.scale.x=beacon.scale.z=Math.max(1,dc/40);}
 let last=performance.now(),acc=0;
 (function loop(){requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(.1,(now-last)/1000);last=now;
   if(camTween){const k=Math.min(1,(now-camTween.st)/camTween.ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;camera.position.lerpVectors(camTween.p0,camTween.p1,e);controls.target.lerpVectors(camTween.t0,camTween.t1,e);if(k>=1)camTween=null;}
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
-  renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={CLR,labels,vis,get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+  goalVizTick(now);renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
+window.__vfr={CLR,labels,vis,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 // ---------- voorbeeldcircuit Eindhoven (AIP EHEH AD 2.22: 1000 ft AMSL, RWY 03 links, RWY 21 rechts → beide aan de NW-kant) ----------
 var CIRC_RW='03';
