@@ -9,6 +9,9 @@ Educatieve webtool die het Nederlandse VFR-luchtruim (regio Eindhoven) in 3D laa
 - Techniek: één statische pagina (`index.html`) met three.js 0.160 via jsDelivr.
 
 ## Ontwikkelen
-- `index.html` is de hele site.
-- `tools/shot.py`: headless test (Playwright + lokale three.js op poort 8765).
-- `docs/`: sprintverslagen.
+```bash
+python tools/setup.py        # three.js + Playwright, eenmalig (Linux én Windows)
+python tools/e2e.py --quick  # snelle check; zonder --quick de volledige suite
+```
+- `index.html` is de hele site; `main` staat live op https://luchtruim3d.nl.
+- `CLAUDE.md`: werkafspraken; `docs/STATUS.md`: stand van zaken.

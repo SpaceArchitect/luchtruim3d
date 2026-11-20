@@ -10,16 +10,18 @@ import asyncio, json, math, os, random, shutil, sys, tempfile, threading, http.s
 from playwright.async_api import async_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-THREE = os.environ.get('THREE_DIR', '/home/claude/h/node_modules/three')
-PORT = 8766
+THREE = os.environ.get('THREE_DIR') or os.path.join(ROOT, '.devenv', 'node_modules', 'three')  # tools/setup.py installeert dit
+PORT = int(os.environ.get('E2E_PORT', '8766'))
 ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist']
 
 def serve():
     d = tempfile.mkdtemp()
+    if not os.path.isdir(THREE): sys.exit(f'three.js niet gevonden in {THREE} — draai eerst: python tools/setup.py')
     html = open(os.environ.get('E2E_INDEX', os.path.join(ROOT, 'index.html')), encoding='utf-8').read()
     html = html.replace('https://cdn.jsdelivr.net/npm/three@0.160.0/', '/three/')
     open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(html)
-    os.symlink(THREE, os.path.join(d, 'three'))
+    try: os.symlink(THREE, os.path.join(d, 'three'))
+    except OSError: shutil.copytree(THREE, os.path.join(d, 'three'))  # Windows zonder symlinkrecht
     class Q(http.server.SimpleHTTPRequestHandler):
         def log_message(self, *a): pass
     h = functools.partial(Q, directory=d)
@@ -746,7 +748,11 @@ async def fuzz(a, seed, steps):
 async def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--seed', type=int, default=None); ap.add_argument('--forms', default='desk,p7,p7l,se')
     ap.add_argument('--only', default=''); ap.add_argument('--steps', type=int, default=40)
-    o = ap.parse_args(); forms = o.forms.split(',')
+    ap.add_argument('-k', default='', help='alleen tests waarvan de naam deze tekst bevat')
+    ap.add_argument('--quick', action='store_true', help='smoke op desk+p7 (snelle check per commit)')
+    o = ap.parse_args()
+    if o.quick: o.only, o.forms = 'smoke', 'desk,p7'
+    forms = o.forms.split(',')
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
@@ -757,8 +763,9 @@ async def main():
             for layer, tests in (('smoke', smoke), ('det', det)):
                 if o.only and o.only != layer: continue
                 for name, fn in tests:
+                    if o.k and o.k.lower() not in name.lower() and o.k not in fn.__name__: continue
                     a = await new_app(p, b, form, url); await run(layer, name, form, fn, a); await a.ctx.close()
-            if not o.only or o.only == 'fuzz':
+            if (not o.only or o.only == 'fuzz') and not o.k:
                 for k in range(2):
                     s = seed + k; a = await new_app(p, b, form, url)
                     await run('fuzz', f'monkey seed {s}', form, lambda a, s=s: fuzz(a, s, o.steps), a); await a.ctx.close()
