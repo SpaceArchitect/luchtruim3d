@@ -12,6 +12,8 @@
   canvas{display:block;touch-action:none}
   #labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
   .lbl{position:absolute;left:0;top:0;white-space:nowrap;font-size:12.5px;line-height:1.25;padding:3px 7px 3px 6px;border-radius:5px;background:rgba(255,255,255,.9);border-left:4px solid #999;box-shadow:0 1px 3px rgba(0,0,0,.15);will-change:transform}
+  @media (max-width:360px){#loc .pz{display:none}}/* klein scherm: pauze zie je al aan ▶; ruimte voor de toestelknop */
+  #loc .acsw{pointer-events:auto;display:inline-flex;align-items:center;gap:1px;min-width:40px;height:24px;min-height:0;margin:-6px 1px -6px -6px;padding:0 4px;justify-content:center;vertical-align:-6px;border:1px solid #c9ced6;border-radius:7px;background:#fff;cursor:pointer;vertical-align:middle}#loc .acsw svg{display:block}
   .banner .notice{pointer-events:auto;cursor:pointer}/* Fleur 14 nov: tik op melding = verder; viel eerst door naar de 3D-scène */
   .lbl.goal{background:#ffb000;color:#1c2024;font-weight:700;border-left-color:#1c2024}
   .lbl b{font-weight:650}
@@ -1539,6 +1541,7 @@ function setMode(m,ac){
 }
 $('btnMode').onclick=()=>{if(MODE==='fly')setMode('map');else if(CHOSEN){PAUSED=false;setMode('fly');}else openChooser();};
 $('btnAc')&&($('btnAc').onclick=openChooser);
+$('loc').addEventListener('click',e=>{if(e.target.closest('.acsw')){e.stopPropagation();PAUSED=true;openChooser();}});// Fleur 14 nov: toestel wisselen was onvindbaar → tik op het toesteltje
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{setMode('map');setView(b.dataset.view);});
 $('btnPause').onclick=togglePause;
 function openChooser(){oneMenu('modal');$('modal').style.display='flex';}
@@ -1675,7 +1678,7 @@ function hudTick(){document.body.classList.toggle('menuopen',!$('panel').classLi
      
      (AT_EDGE?'<div class="ahead">Rand van het kaartgebied: draai om.</div>':'');
     if(b.__html!==b.__last){b.__last=b.__html;b.innerHTML=b.__html;}// alleen herbouwen bij wijziging: anders vallen klikken op knoppen weg (bug 13 nov)
-    setHTML($('loc'),`${SVG[ACTYPE]} <b>${fmtAlt(PLANE.alt)}</b>${VZ&&!PAUSED?` <b class="vario ${VZ>0?'up':'dn'}">${VZ>0?'↑':'↓'} ${AC[ACTYPE].fpm} ft/min</b>`:''}${ACTYPE==='balloon'?(()=>{const w=windAt(PLANE.alt);return ` · wind <span style="display:inline-block;transform:rotate(${Math.round(w.from+180)}deg)">⬆</span> ${Math.round(w.kt)} kt`;})():''}<span class="mh"> · ${ACTYPE==='balloon'&&PLANE.alt<1?'<b>geland</b>':(ACTYPE==='balloon'?'drift':'koers')+' '+String(Math.round(PLANE.hdg)%360).padStart(3,'0')+'°'} · tempo ×${TEMPO()}</span> · ${whereText(PLANE.x,PLANE.n)}<span class="mh">${extraWhere(PLANE.x,PLANE.n)}</span>${PAUSED?' · <b>PAUZE</b>':''}<span class="mh"> · ${TIMELABEL}</span>`);
+    setHTML($('loc'),`<button class="acsw" aria-label="Ander toestel kiezen" title="Ander toestel">${SVG[ACTYPE]}</button> <b>${fmtAlt(PLANE.alt)}</b>${VZ&&!PAUSED?` <b class="vario ${VZ>0?'up':'dn'}">${VZ>0?'↑':'↓'} ${AC[ACTYPE].fpm} ft/min</b>`:''}${ACTYPE==='balloon'?(()=>{const w=windAt(PLANE.alt);return ` · wind <span style="display:inline-block;transform:rotate(${Math.round(w.from+180)}deg)">⬆</span> ${Math.round(w.kt)} kt`;})():''}<span class="mh"> · ${ACTYPE==='balloon'&&PLANE.alt<1?'<b>geland</b>':(ACTYPE==='balloon'?'drift':'koers')+' '+String(Math.round(PLANE.hdg)%360).padStart(3,'0')+'°'} · tempo ×${TEMPO()}</span> · ${whereText(PLANE.x,PLANE.n)}<span class="mh">${extraWhere(PLANE.x,PLANE.n)}</span>${PAUSED?'<span class="pz"> · <b>PAUZE</b></span>':''}<span class="mh"> · ${TIMELABEL}</span>`);
     $('btnPause').innerHTML=PAUSED?'▶<small>Start</small>':'❚❚<small>Pauze</small>';
     SLICE=Math.floor(PLANE.alt/50)*50;
     {const up=document.querySelector('#ctrl [data-k="arrowup"]');if(up){const lab=PLANE.alt<=0?(ACTYPE==='glider'?'▲<small>lierstart</small>':'▲<small>opstijgen</small>'):'▲';if(up.innerHTML!==lab)up.innerHTML=lab;}}
