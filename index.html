@@ -714,10 +714,10 @@ const GROUPS=[
   {id:'prd',label:'Verboden / beperkt (P, R, D) · gearceerd',layers:['P','R','D'],on:true,color:'#cc79a7'},
   {id:'pja',label:'Parachutespringen (paradrop)',layers:['PJA'],on:true,color:'#d6409f'},
   {id:'uas',label:'Dronegebied (RPAS / UAS)',layers:['UAS'],on:true,color:'#6e56cf'},
-  {id:'mil',label:'Militair (TRA / TSA)',layers:['TRA','TSA'],on:false,color:'#a1745a'},
+  {id:'mil',label:'Militair (TRA / TSA)',layers:['TRA','TSA'],on:true,color:'#a1745a'},
   {id:'gld',label:'Zweefvlieg- en klimgebied',layers:['GLD','CLIMB'],on:true,color:'#009e73'},
-  {id:'zone',label:'RMZ / TMZ (radio / transponder)',layers:['RMZ','TMZ'],on:false,color:'#1c2024',outline:true},
-  {id:'lfa',label:'Militair laagvlieggebied',layers:['LFA'],on:false,color:'#8b8d98'},
+  {id:'zone',label:'RMZ / TMZ (radio / transponder)',layers:['RMZ','TMZ'],on:true,color:'#1c2024',outline:true},
+  {id:'lfa',label:'Militair laagvlieggebied',layers:['LFA'],on:true,color:'#8b8d98'},
 ];
 const groupOf=f=>GROUPS.find(g=>g.layers.includes(f.layer));
 const colorOf=f=>{const g=groupOf(f);return g.colorBy==='cls'?(CLS[f.cls]||'#888'):g.color;};
@@ -880,6 +880,7 @@ for(const [ic,n,lo,la,g] of FIELDS){const [x,y]=proj(lo,la);addLabel((g?'zweefve
 const sliceLbl=addLabel('','tick key',()=>new THREE.Vector3(gx1,SLICE*FT*EXAG,-gn0),0);sliceLbl.isSlice=true;
 const tickLabels=TICKS.map(t=>{const L=addLabel(t[2]||t[0]+' ft','tick'+(t[1]?' key':''),()=>new THREE.Vector3(gx0+1.4,t[0]*FT*EXAG,-gn0),0);L.tickFt=t[0];return L;});
 
+const HAZ=new Set(['CTR','TMA','CTA','ATZ','P','R','D','TRA','TSA','PJA','UAS','LFA']);
 const v=new THREE.Vector3();
 function placeLabels(){lmMinSize();
   const W=innerWidth,H=innerHeight,placed=[];const cam=camera.position;
@@ -888,6 +889,8 @@ function placeLabels(){lmMinSize();
     if(L.tickFt!==undefined&&L.tickFt>CAP)return false;
     if(L.isSlice&&!SLICE_ON)return false;
     if(L.ref&&typeof MODE!=='undefined'&&MODE==='fly'&&!L.ref.near)return false;
+    if(L.isAir&&L.ref&&(typeof MODE==='undefined'||MODE!=='fly')&&!L.ref.forceShow){// kaart: label aan/uit op afstand (geen vervaging); gevaren reiken verder
+      const vd=camera.position.distanceTo(controls.target),far=vd*(HAZ.has(L.ref.layer)?1.6:1.0)*(L.prev?1.1:1);if(L.pos3().distanceTo(cam)>Math.max(far,25))return false;}
     if(L.isPin&&MODE==='fly')return false;
     if(RELAX&&(L.isPin||L.isAir))return false;
     if(L.isKnp&&L.pos3().distanceTo(cam)>6)return false;
@@ -1735,7 +1738,7 @@ let last=performance.now(),acc=0;
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={CLR,get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+window.__vfr={CLR,labels,vis,get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 // ---------- voorbeeldcircuit Eindhoven (AIP EHEH AD 2.22: 1000 ft AMSL, RWY 03 links, RWY 21 rechts → beide aan de NW-kant) ----------
 var CIRC_RW='03';

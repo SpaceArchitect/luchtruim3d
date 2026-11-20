@@ -685,6 +685,21 @@ async def d_zoom_desktop(a):  # Christian 14 nov: geen manier om in/uit te zoome
         await a.pg.keyboard.down('Shift'); await a.pg.mouse.wheel(dx, dy); await a.wait(200); await a.pg.keyboard.up('Shift')
         ok(abs(await a.v('v.dbg.CAM.dist') - d0) > 0.05, f'Shift+scrollen ({dx},{dy}) zoomt niet')
 
+async def d_defaults_labels(a):  # Christian 15 nov: alle groepen standaard aan; labels óf zichtbaar óf weg, gevaren reiken verder
+    await a.hit('#modal [data-ac=map]'); await a.frames(4)
+    off = await a.ev('()=>Object.entries(window.__vfr.vis).filter(([k,v])=>!v).map(([k])=>k)')
+    ok(not off, f'groepen standaard uit: {off}')
+    r = await a.ev('''()=>{const v=window.__vfr,cam=v.camera.position;const out=[];
+      for(const L of v.labels){if(!L.isAir||L.el.style.display==='none')continue;const cs=getComputedStyle(L.el);
+        out.push([L.ref.layer,+cs.opacity,L.pos3().distanceTo(cam)]);}return out}''')
+    ok(r, 'geen luchtruimlabels zichtbaar in kaartmodus')
+    ok(all(o >= 0.99 for _, o, _ in r), f'vervaagd label: {[x for x in r if x[1] < .99][:3]}')
+    haz = {'CTR','TMA','CTA','ATZ','P','R','D','TRA','TSA','PJA','UAS','LFA'}
+    ok(any(l == 'CTR' for l, _, _ in r), 'geen CTR-label zichtbaar')
+    far_haz = max([d for l, _, d in r if l in haz] or [0]); far_oth = max([d for l, _, d in r if l not in haz] or [0])
+    ok(far_oth <= far_haz + 1e-6 or far_haz == 0, f'overig label verder zichtbaar ({far_oth:.0f}) dan gevaar ({far_haz:.0f})')
+    await a.shot('defaults_labels')
+
 async def d_ahead_full(a):  # Noor 1: frequentie in de waarschuwingsregel nooit afgekapt
     await a.hit('#modal [data-ac=motor]')
     e = await a.ev(JS_FREE_EDGE, ['EHEH', 1.8, 1000])
@@ -756,7 +771,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:
