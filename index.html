@@ -97,6 +97,8 @@
   #timePop.hidden{display:none}#timePop>button{flex:1 1 45%}#timePop>button.wide{flex:1 1 100%}#timePop>button.on{background:#1f4e8c;color:#fff}#timePop select{font-size:15px;min-height:40px}#timePop .hol{display:flex;align-items:center;gap:5px;font-weight:700}#timePop .hol input{width:20px;height:20px}#tSlide{width:100%;height:32px;accent-color:#1f4e8c}#tSlide::-webkit-slider-thumb{width:26px;height:26px}#timePop .ticks{position:relative;width:100%;height:14px;font-size:11px;color:#555;margin-top:-6px}#timePop .ticks span{position:absolute;transform:translateX(-50%)}#popWhat{width:100%;background:#f3f5f7;border-radius:8px;padding:6px 8px;line-height:1.45}
   #gtoast{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);display:none;align-items:center;gap:6px;background:#3d2c00;color:#fff;font-weight:800;font-size:16px;padding:8px 14px;border-radius:10px;pointer-events:none;z-index:4}
   body:not(.looking) #timeWhat{display:none}
+  @media (max-height:500px){#info .note{display:none}}
+  @media (max-height:500px){#timeWhat{display:none}}/* Fleur 14 nov: liggend onoverzichtelijk; uitleg staat ook in het tijdmenu */
   @media (max-width:700px){#timeWhat{display:none}header .title{display:none}#timeBtn{font-size:13px}body.looking #tape{top:112px!important;height:28vh!important;transform:none!important}}
   body.big .lbl{font-size:16px}body.big .lbl.city{font-size:15px}body.big .lbl.road{font-size:14px}body.big #panel,body.big #info,body.big .banner,body.big #loc{font-size:17px}body.big .note{font-size:15px!important}
   .val{font-variant-numeric:tabular-nums;font-weight:650;min-width:64px;text-align:right}
