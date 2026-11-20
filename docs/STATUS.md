@@ -32,3 +32,9 @@
 - www-doorverwijzing + automatische verlenging domein (OVH).
 - Claude-browserpane op de pc één keer inloggen op claude.ai, zodat de weeklimiet zelf af te lezen is.
 - Mexico 15 dec – 9 jan: vóór vertrek samen alle LVNL/OSM-data voor heel NL downloaden.
+
+## Ideeënbak (uit de oude backlog, nog niet beoordeeld)
+- Koers voor na Eindhoven: korte scenario-missies met een replay en de AIP-regel erbij; data los van de app (`data/airac-*.json` voor heel NL).
+- Doorsnede langs een lijn (A→B verticaal profiel). IFR-naderingsgebieden. Grensstrook DE (squawk + luisterfrequentie per TMZ, bv. Niederrhein).
+- Spelplezier: reeks opdrachten met sterren, dagelijkse uitdaging, herkenningspunten "vinden".
+- Volledige oude backlog: claude.ai-project `claude/06-backlog.md`.

@@ -43,6 +43,22 @@ Is iets in deze briefing in de weg voor de noordster? Pas de briefing dan aan en
    achter de pc, dan werk je alleen op de achtergrond: geen vensters, geen meldingen.
    Bij twijfel werk je in de cloud.
 
+## 🎨 Smaak (ontwerpprincipes die zich bewezen hebben)
+
+- **Minimaal, intuïtief, immersief.** Elke knop moet zich bewijzen. Er is altijd maar één
+  menu tegelijk open, en het landschap blijft zichtbaar: UI ≤ ⅓ van het scherm
+  (klein staand ≤ 38%).
+- **Geen papieren kaart als ondergrond.** We tonen neutraal terrein met herkenningspunten
+  die je vanuit de lucht ziet (snelwegen, rivieren, steden, velden, hoge bouwwerken).
+- **Labels staan rechtop, zijn scherp en hebben een vaste grootte.** Inhoud:
+  `naam · klasse · ondergrens–bovengrens`. Een label is er óf niet. Gevaren reiken verder.
+- **Kleur = betekenis.** Okabe-Ito, kleur per klasse of type, arcering voor P/R/D, en
+  tekst als tweede kanaal naast de kleur (kleurenblind).
+- **Leren, niet verbieden.** Naderen = melding + pauze, ▶ = toch verder.
+  Missie geslaagd/mislukt met de reden erbij. Grond raken = leermoment, geen explosie.
+- **Alles standaard aan.** Elke groep kan uit in ⚙ Weergave.
+- **Toegankelijk:** WCAG 2.2 AA waar het kan, knoppen ≥ 44 px, "minder beweging" respecteren.
+
 ## 🧰 Omgeving: overal hetzelfde
 
 De repo is het hele project. Of je nu in de cloud (Linux) werkt of op Christians pc
@@ -86,7 +102,10 @@ Start dan een subagent met een duidelijke rol. Dat is gereedschap, geen verplich
 ## ⛽ Budget
 
 Christian geeft een plafond per sessie of per week op (bijv. "tot ±60% van de weeklimiet").
-Kun je de meter aflezen, doe dat dan bij de start en af en toe tussendoor. Kun je dat niet,
+Kun je de meter aflezen, doe dat dan bij de start en af en toe tussendoor
+(https://claude.ai/settings/usage; in de pagina:
+`[...document.querySelectorAll('[aria-valuenow]')].map(m=>m.getAttribute('aria-valuenow'))`,
+de 2e waarde = sessie, de 3e = week). Kun je dat niet,
 schat dan voorzichtig, stop ruim op tijd en meld je schatting. De volledige suite en
 browser-screenshots zijn het duurst: gebruik ze bewust.
 
@@ -113,8 +132,6 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
 - Een sensorsimulatie zonder ruis bewijst niets (kantel-bug 15 nov).
 - Een fix ná de laatste test is een ongeteste fix.
 - Christian is opdrachtgever, geen bugjager. Vindt hij een open-deur-bug, dan is ons proces stuk.
-- Minimale interface: elke knop moet zich bewijzen. Het landschap blijft zichtbaar
-  (UI ≤ ⅓ van het scherm). Er is altijd maar één menu tegelijk open.
-- Labels zijn er óf niet: niet vervagen.
+- Christian vindt een idee goed als hij het ziet, niet als hij het leest: laat het hem zien (screenshot of preview).
 
 *Vliegen is: de juiste beslissing op tijd nemen. Bouwen ook. Veel plezier!* ✈️
