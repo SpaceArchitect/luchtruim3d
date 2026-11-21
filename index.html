@@ -14,6 +14,7 @@
   .lbl{position:absolute;left:0;top:0;white-space:nowrap;font-size:12.5px;line-height:1.25;padding:3px 7px 3px 6px;border-radius:5px;background:rgba(255,255,255,.9);border-left:4px solid #999;box-shadow:0 1px 3px rgba(0,0,0,.15);will-change:transform}
   @media (max-width:360px){#loc .pz{display:none}}/* klein scherm: pauze zie je al aan ▶; ruimte voor de toestelknop */
   #loc .acsw{pointer-events:auto;display:inline-flex;align-items:center;gap:1px;min-width:40px;height:24px;min-height:0;margin:-6px 1px -6px -6px;padding:0 4px;justify-content:center;vertical-align:-6px;border:1px solid #c9ced6;border-radius:7px;background:#fff;cursor:pointer;vertical-align:middle}#loc .acsw svg{display:block}
+  .lbl.hg{border-left-color:#7a3ea8;font-style:normal}.hgnote{margin:6px 0;padding:5px 8px;border-left:4px solid #7a3ea8;background:#f5eefa;border-radius:4px;font-size:13px}
   .banner .notice{pointer-events:auto;cursor:pointer}/* Fleur 14 nov: tik op melding = verder; viel eerst door naar de 3D-scène */
   .lbl.goal{background:#ffb000;color:#1c2024;font-weight:700;border-left-color:#1c2024}
   .lbl b{font-weight:650}
@@ -63,7 +64,7 @@
   body.hc .lbl,body.hc .lbl *{text-shadow:none!important;box-shadow:none!important;filter:none!important}body.hc .lbl{padding:2px 6px!important;border-radius:3px}
   .lbl.city.town{font-size:11px;font-weight:500;color:#3a3f45}body.big .lbl.city.town{font-size:13px}body.hc .banner,body.hc #loc,body.hc #panel,body.hc button{background:#fff!important;color:#000!important;border:2px solid #000!important}body.hc .banner .notice{background:#000!important;color:#fff!important}.relaxpick{grid-column:1/-1;display:flex;gap:8px;align-items:center;font-size:15px;padding:6px 2px}.relaxpick input{width:20px;height:20px}.disc{background:#fff4d6;border:2px solid #d6a700;border-radius:8px;padding:8px 10px;font-size:14px;margin:0 0 10px}.banner .task{font-size:12px;font-weight:600;color:#0b3a6e;margin-bottom:3px}.banner .task .q{font-weight:500;color:#3a4a5e}#btnMode,#btnBig,#btnPanel,#timebar{position:relative;z-index:35}@media (max-width:600px){#timeTxt{white-space:nowrap;font-size:13px}#timeTxt .utc{display:none}.note.kb{display:none}}@media (min-width:601px){.note.touch{display:none}}.banner .tap{display:none}@media (max-width:600px){.banner{pointer-events:auto;cursor:pointer}.banner:not(.open):not(.noticeonly) .extra,.banner:not(.open):not(.noticeonly) .above{display:none}.banner:not(.open):not(.noticeonly) .head::after{content:' ▾';opacity:.6}#loc .mh{display:none}}.banner.noticeonly{border-left-color:#0b3a6e!important;padding:4px}.banner.noticeonly .notice{margin:0;font-size:15px;line-height:1.4}.banner .notice small{opacity:.8}.banner .notice a{color:#ffd23f;pointer-events:auto;text-decoration:underline}.banner button{pointer-events:auto}
   #info .close{min-width:44px;min-height:44px;font-size:18px}
-  #info.mini>:not(.ptitle):not(.free):not(.close){display:none}#info .more{display:inline-block;margin-left:6px;min-height:32px;padding:2px 10px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;font:600 13px system-ui;cursor:pointer}#info.mini .free{cursor:pointer}
+  #info.mini>:not(.ptitle):not(.free):not(.close):not(.hgnote){display:none}#info .more{display:inline-block;margin-left:6px;min-height:32px;padding:2px 10px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;font:600 13px system-ui;cursor:pointer}#info.mini .free{cursor:pointer}
   #info .ptitle{margin:4px 0 6px;font-size:16px}
   #info details.item{border-left:6px solid #999;padding:6px 0 6px 10px;margin:6px 0;background:#fafbfc;border-radius:4px}
   #info details summary{cursor:pointer;font-weight:650;list-style:none;font-size:14px}
@@ -721,7 +722,7 @@ const GROUPS=[
   {id:'pja',label:'Parachutespringen (paradrop)',layers:['PJA'],on:true,color:'#d6409f'},
   {id:'uas',label:'Dronegebied (RPAS / UAS)',layers:['UAS'],on:true,color:'#6e56cf'},
   {id:'mil',label:'Militair (TRA / TSA)',layers:['TRA','TSA'],on:true,color:'#a1745a'},
-  {id:'gld',label:'Zweefvlieg- en klimgebied',layers:['GLD','CLIMB'],on:true,color:'#009e73'},
+  {id:'gld',label:'Zweefvliegen, klimgebied, lierterreinen',layers:['GLD','CLIMB'],on:true,color:'#009e73'},
   {id:'zone',label:'RMZ / TMZ (radio / transponder)',layers:['RMZ','TMZ'],on:true,color:'#1c2024',outline:true},
   {id:'lfa',label:'Militair laagvlieggebied',layers:['LFA'],on:true,color:'#8b8d98'},
 ];
@@ -899,6 +900,7 @@ function placeLabels(){lmMinSize();
       const vd=camera.position.distanceTo(controls.target),far=vd*(HAZ.has(L.ref.layer)?1.6:1.0)*(L.prev?1.1:1);if(L.pos3().distanceTo(cam)>Math.max(far,25))return false;}
     if(L.isPin&&MODE==='fly')return false;
     if(L.isGoal&&!goalViz.visible)return false;
+    if(L.isHg&&(!vis.gld||RELAX||L.pos3().distanceTo(cam)>(MODE==='fly'?15:60)))return false;
     if(RELAX&&(L.isPin||L.isAir))return false;
     if(L.isKnp&&L.pos3().distanceTo(cam)>6)return false;
     if(L.isTown&&(innerWidth<=600&&MODE!=='fly'||L.pos3().distanceTo(cam)>(typeof MODE!=='undefined'&&MODE==='fly'?14:45)))return false;
@@ -920,7 +922,7 @@ function placeLabels(){lmMinSize();
 }
 
 // ---------- update ----------
-function update(){
+function update(){try{hgGroup.visible=vis.gld&&!RELAX;}catch(_){/* nog niet gemaakt */}
   airGroup.scale.y=EXAG;rulerGroup.scale.y=EXAG;
   for(const c of sliceGroup.children){c.position.y=SLICE*FT*EXAG+(c.userData.plate?0:0.01);}
   for(const f of LAYERS){if(f.hidden)continue;
@@ -1644,7 +1646,7 @@ function showProbe(){if(MODE!=='map')return;oneMenu('info');const col=featsAt(PR
   const ovl=[];for(let a=0;a<CAP;a+=500){const c=applies(col,a).filter(f=>CTRL.includes(f.layer));if(c.length>1){const g=governing(c);ovl.push(`${fmtAlt(a)}: ${c.map(f=>f.name+' ('+f.cls+')').join(' + ')} → hier telt ${g.name}`);}}
   const box=$('info');
   box.innerHTML=`<button class="close" aria-label="Sluiten">✕</button><h4 class="ptitle">Sonde: ${PROBE.name}</h4>
-   <div class="free ${fl.cls}">${fl.txt}</div>
+   <div class="free ${fl.cls}">${fl.txt}</div>${(()=>{const h=hgNear(PROBE.x,PROBE.n,2)[0];return h?`<div class="hgnote">🪁 Lierterrein ${h.nm} dichtbij: scherm- en deltavliegers met lierkabels (kabelhoogte: AIP ENR 5.5).</div>`:''})()}
    <div class="note">Alle luchtruimen boven deze plek, van laag naar hoog. Hoogtes in ft AMSL; FL bij 1013 hPa. Tik op een regel voor uitleg.</div>`+
    (col.length?col.map(f=>`<details class="item" style="border-left-color:${f.color}"><summary><span class="lim">${f.loTxt} – ${f.hiTxt}</span> ${f.name}${f.cls?' · klasse '+f.cls:''}</summary><p>${TYPE_TXT[f.layer]||''}${CLS_TXT[f.cls]&&CTRL.includes(f.layer)?' '+CLS_TXT[f.cls]:''}</p>${radioLine(f)?'<p>'+radioLine(f)+'</p>':''}${EXCL[f.ident]&&col.some(g=>EXCL[f.ident].includes(g.ident))?'<p><b>Geldt hier niet overal:</b> volgens de AIP is het deel dat overlapt met '+col.filter(g=>EXCL[f.ident].includes(g.ident)).map(g=>g.name).join(', ')+' uitgezonderd.</p>':''}</details>`).join(''):(inNL(PROBE.x,PROBE.n)?'<p>Hier ligt geen bijzonder luchtruim: klasse G.</p>':'<p>Buiten Nederland staat de luchtruimindeling (nog) niet in deze app. Kijk in de AIP van dat land.</p>'))+
    (false&&ovl.length?`<details class="ovl"><summary>Overlap: welke geldt?</summary><p>${[...new Set(ovl)].slice(0,4).join('<br>')}</p><p class="note">Vereenvoudigd: een CTR gaat voor, daarna het kleinste (meest lokale) gebied. Check de AIP.</p></details>`:'')+
@@ -1713,6 +1715,7 @@ function hudTick(){document.body.classList.toggle('menuopen',!$('panel').classLi
     if(ahead&&ahead.call&&ahead.d<=WD&&!WARNED.has(ahead.f.ident)&&!PAUSED&&!RELAX){WARNED.add(ahead.f.ident);PAUSED=true;NOTICE=`📻 Over ${ahead.d.toFixed(1).replace('.',',')} km: <b>${short(ahead.f)}</b> · eerst oproepen${rtLine(AIPINFO[ahead.f.ident])}<br><small>▶ = verder</small>${rtButton(ahead.f)}`;}
     // D2: na een geweigerde klaring opnieuw waarschuwen vlak vóór de grens (anders kwam de eerste melding pas als je er al in zat)
     if(ahead&&ahead.clr&&REFUSED.has(ahead.f.ident)&&!cleared(ahead.f)&&ahead.d<=Math.max(1,WD/2)&&!REFW.has(ahead.f.ident)&&!PAUSED&&!RELAX){REFW.add(ahead.f.ident);PAUSED=true;NOTICE=`🚫 <b>Geen klaring</b> voor ${short(ahead.f)} · nog ${ahead.d.toFixed(1).replace('.',',')} km<br>Draai weg${ahead.f.lo>0?` of daal onder ${fmtAlt(ahead.f.lo)}`:''}.<br><small>▶ = verder</small>`;}
+    if(!PAUSED&&!RELAX&&vis.gld&&PLANE.alt>0&&PLANE.alt<2000){for(const h of hgNear(PLANE.x,PLANE.n,1.5)){if(WARNED.has('HG'+h.nm))continue;WARNED.add('HG'+h.nm);PAUSED=true;NOTICE=`🪁 <b>Lierterrein ${h.nm}</b> (scherm- en deltavliegen): pas op voor lierkabels en zwevers, vooral laag.<br><small>Bron LVNL; kabelhoogte niet in de data, zie AIP ENR 5.5 · ▶ = verder</small>`;break;}}
     // opdracht: geslaagd of gefaald (Christian 11 nov): fout = verboden gebied, gecontroleerd luchtruim zonder klaring, para- of dronegebied
     if(GOAL&&!RELAX&&PLANE.alt>0){const gg=governing(INSIDE);for(const f of INSIDE){if(rmzLive(f)&&!cleared(f))FAILS.set(f.ident,short(f)+' zonder oproep');if(f.layer==='P'||f.layer==='PJA'||f.layer==='UAS')FAILS.set(f.ident,{P:'verboden gebied ',PJA:'paradropzone ',UAS:'dronegebied '}[f.layer]+nm(f).replace(/^(verboden|para|drones?)\s+/i,''));/* niet 'verboden gebied Verboden Vught' (Christian) */}
       if(needsClr(gg)&&!cleared(gg))FAILS.set(gg.ident,short(gg)+' zonder klaring');
@@ -1805,6 +1808,14 @@ $('timeBtn').onclick=()=>{if($('timePop').classList.contains('hidden'))oneMenu('
 document.querySelectorAll('[data-tm]').forEach(b=>b.onclick=()=>setTimeMode(b.dataset.tm));
 const fromUI=()=>{CUSTOM={dow:+$('tDay').value,min:+$('tSlide').value*15,hol:$('tHol').checked};$('tClock').textContent=hm(CUSTOM.min);TIMEMODE='custom';applyTime();hudTick();if(MODE==='map'&&$('info').style.display==='block')showProbe();};$('tSlide').oninput=fromUI;$('tDay').onchange=fromUI;$('tHol').onchange=fromUI;setInterval(()=>{if(TIMEMODE==='now'){applyTime();}},60000);setTempo(TI);setMode(ONLY_FLY?'fly':'map','init');$('info').style.display='none';
 if(ONLY_MAP){$('ok').onclick=()=>{$('modal').style.display='none';showProbe();};}
+// ---------- lierterreinen scherm-/deltavliegen (LVNL Geoportaal, laag Aerodrome/Hangglider, CC BY 4.0, ingang 29 okt 2026) ----------
+// Backlog 15 nov: 'schermvlieg-, lier-, ULV-terreinen: nee'. Bron: data/lvnl (tools/fetch_lvnl.py). Kabelhoogte staat niet in de data.
+const HG=[['Terheijden',4.7886,51.6469],['Swolgen',6.1181,51.5064],['Kronenberg',5.9881,51.4239],['Sterksel',5.6369,51.3456],['Griendtsveen',5.925,51.4417],['Groesbeek',5.9511,51.7997],['Vlijmen',5.211,51.6758],['America',5.9633,51.4417],['Veulen',5.9672,51.4756],['Nistelrode',5.5494,51.6833]].map(([nm,lo,la])=>{const [x,n]=proj(lo,la);return {nm,x,n};});
+const hgGroup=new THREE.Group();scene.add(hgGroup);
+{const m=new THREE.MeshBasicMaterial({color:0x7a3ea8,transparent:true,opacity:.55,depthWrite:false,side:THREE.DoubleSide});
+ for(const h of HG){const r=new THREE.Mesh(new THREE.RingGeometry(.85,1,40).rotateX(-Math.PI/2),m);r.position.set(h.x,.05,-h.n);hgGroup.add(r);
+  const L=addLabel('🪁 Lier · '+h.nm,'lm hg',()=>new THREE.Vector3(h.x,.05,-h.n),3);L.isHg=true;}}
+function hgNear(x,n,r){return HG.filter(h=>Math.hypot(h.x-x,h.n-n)<r);}
 // ---------- missiedoel in de wereld (Boyd 14 nov: "kon de A67 niet vinden") ----------
 const goalViz=new THREE.Group();goalViz.visible=false;scene.add(goalViz);let GVK=null;
 const GOLD=0xffb000,gMat=o=>new THREE.MeshBasicMaterial({color:GOLD,transparent:true,opacity:o,depthWrite:false,fog:false,side:THREE.DoubleSide});
@@ -1832,7 +1843,7 @@ let last=performance.now(),acc=0;
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   goalVizTick(now);renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+window.__vfr={HG,hgNear,hgGroup,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 // ---------- voorbeeldcircuit Eindhoven (AIP EHEH AD 2.22: 1000 ft AMSL, RWY 03 links, RWY 21 rechts → beide aan de NW-kant) ----------
 var CIRC_RW='03';

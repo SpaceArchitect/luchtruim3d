@@ -38,6 +38,9 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 6. **"Heel Nederland-week" met de full reset (±3–6 dec, vóór 10 dec):** luchtruim landelijk in één keer; landschap per regio (Randstad → Noord → Zeeland/Limburg); alle data binnen vóór Mexico.
 5. **Draaimoment staand↔liggend:** fix klaar op `wip/draaien` (alle kanteltests groen, ook vergrendelde schermstand via zwaartekracht-assenstelsel). Wacht op Christians telefoontest + "ok" → live.
 
+## Klaar op `wip/gevaren` (bovenop `wip/draaien`, nog niet live)
+- 10 lierterreinen scherm-/deltavliegen in de regio (LVNL Hangglider-laag): paarse ring + label, waarschuwing onder 2000 ft binnen 1,5 km, vermelding in de sonde (`d_winch_sites`). Kabelhoogte staat niet in de data → verwijzing ENR 5.5.
+
 ## Daarna
 - Gevarenlagen LVNL (Parajump, Miscellaneous, Obstacles), één klik naar de eAIP-plek, minimale vlieghoogtes SERA.5005(f) (pc).
 - Kaart liggend: sonde als smalle lade rechts.
