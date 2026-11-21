@@ -43,12 +43,12 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 - Testharnas robuuster: wachten op wandklok i.p.v. frames (panel/looping), `fly()` wacht op het paneel.
 - 10 lierterreinen scherm-/deltavliegen in de regio (LVNL Hangglider-laag): paarse ring + label, waarschuwing onder 2000 ft binnen 1,5 km, vermelding in de sonde (`d_winch_sites`). Kabelhoogte staat niet in de data → verwijzing ENR 5.5.
 
-## Klaar op `wip/arnhem` (bovenop `wip/gevaren`, nog niet live)
+## Klaar op `wip/arnhem` (bovenop `wip/gevaren`, nog niet live) — volledige suite groen 21 nov (28+136+8, seed 2115)
 - **Regio uitgebreid tot 52.15 N**: Arnhem, Nijmegen, Rivierenland, Veluwezoom, Utrecht-zuid. Landschap uit OSM (`tools/build_landscape.py --region arnhem-nijmegen --clip 4.75,51.8,6.15,52.15 --write`), 92 luchtruimvolumes (o.a. Deelen CTR, Terlet GLD, Nieuw Milligen B/E, Schiphol-TMA-delen), velden Deelen/Terlet/Soesterberg, NL-vlak uit de OSM-landsgrens.
 - 2 nieuwe missies: *Naar de Veluwe* (Terlet, les Deelen CTR), *Over de Rijn* (Nijmegen → Arnhem).
 - Deelen: AIP ENR 2.1/2.2 (AIRAC 11-2026) → Tower 129.930, CTR HO (dus altijd als actief getoond + NOTAM-hint), RMZ H24 Dutch MIL Info 132.350.
 - **eAIP-spiegel** draait: `tools/fetch_eaip.py` + workflow → branch `data/eaip` (ENR 1/2/5, GEN 2.1, AD 2 van burgervelden; militaire velden staan niet in AD 2).
-- **Open:** herkenningspunten noord (Waalbrug, John Frostbrug, Eusebiuskerk) nog niet; full suite op 4 vormen nog draaien.
+- **Open:** Eusebiuskerk toegevoegd; bruggen (Waalbrug, John Frostbrug) niet betrouwbaar in OSM-namen → later;
 
 ## Daarna
 - Gevarenlagen LVNL (Parajump, Miscellaneous, Obstacles), één klik naar de eAIP-plek, minimale vlieghoogtes SERA.5005(f) (pc).
