@@ -1305,9 +1305,20 @@ const TAX={r:0,p:0};// analoge kantelstand −1…1 (rol, pitch)
 function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite(e.beta))return;tiltSeen=true;const ang=tiltAng();let {t,p}=tiltAngles(e.beta,e.gamma,ang);
   if(!isFinite(t)||!isFinite(p))return;const now=performance.now();
   /* S1d (Christian): na draaien staand↔liggend werd geijkt op een stand midden in de draai → blijvende bocht. Nu na draaien eerst wachten tot de telefoon 0,35 s stil ligt. */
-  if(TILT&&TILT.ang!==ang)TILT={ang,pend:true,t,p,ts:now};
-  if(TILT&&TILT.pend){if(Math.abs(t-TILT.t)>3||Math.abs(p-TILT.p)>3){TILT.t=t;TILT.p=p;TILT.ts=now;}
-    if(now-TILT.ts<350){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;return;}TILT=null;}
+  /* Christian 21 nov: het draaimoment staand↔liggend moet soepel. Android/iOS melden de nieuwe schermstand pas 0,5–1 s ná de draai;
+     in die tijd lijkt de telefoon in het oude assenstelsel ±90° gerold → zonder deze vangst een harde bocht.
+     (1) Rol > 55° t.o.v. de ijking = geen sturen maar een draai → besturing bevriezen (rechtuit, hoogte houden).
+     (2) Opnieuw ijken zodra de rol in het (nieuwe) scherm weer normaal is (< 35°) én 0,4 s rustig (binnen 9°: trillende hand mag).
+     (3) Schermstand vergrendeld of rare houding: na 2,5 s toch ijken op de huidige stand. Geen pauze, geen doodlopende weg. */
+  if(TILT&&!TILT.pend){const H=TILT.hist||(TILT.hist=[]);H.push([now,t-TILT.t0,PLANE.hdg,PLANE.alt]);while(H.length&&now-H[0][0]>1500)H.shift();}
+  if(TILT&&!TILT.pend&&Math.abs(t-TILT.t0)>55){/* (1b) het begin van de draai leek op een bocht: terug naar koers/hoogte van vlak vóór de draai */
+    const H=TILT.hist||[];let k=H.length-1;while(k>0&&Math.abs(H[k][1])>8)k--;if(H[k]&&now-H[k][0]<1500&&MODE==='fly'&&!LOOP){PLANE.hdg=H[k][2];PLANE.alt=H[k][3];PLANE.bank=0;}
+    TILT={ang,pend:true,t,p,ts:now,start:now};}
+  if(TILT&&TILT.ang!==ang)TILT={ang,pend:true,t,p,ts:now,start:TILT.pend?TILT.start:now};
+  if(TILT&&TILT.pend){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;
+    if(Math.abs(t-TILT.t)>9||Math.abs(p-TILT.p)>9){TILT.t=t;TILT.p=p;TILT.ts=now;}
+    const calm=now-TILT.ts>=400,sane=Math.abs(t)<35,late=now-TILT.start>2500;
+    if(!((calm&&sane)||(late&&calm)||now-TILT.start>4000))return;const force=!sane;TILT=null;if(force){TILT={p0:p,t0:t,ang};}}
   if(!TILT)TILT={p0:p,t0:Math.abs(t)<25?t:0,ang};/* ook de rol ijken (zo houd je hem = rechtuit), behalve bij een duidelijke bocht */
   t-=TILT.t0;const b=((p-TILT.p0+540)%360)-180,DZ=8;// Christian 14 nov: naar je toe kantelen (bovenkant naar je toe) = stijgen, naar voren = dalen; ballon idem
   keys['tl']=t<-DZ;keys['tr']=t>DZ;keys['tu']=b>DZ;keys['td']=b<-DZ;if(!keys['tu'])TO_WAIT=false;
