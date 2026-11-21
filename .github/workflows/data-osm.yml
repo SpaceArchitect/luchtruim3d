@@ -1,0 +1,23 @@
+name: data-osm
+# OpenStreetMap (ODbL) via Overpass → branch data/osm. Akkoord Christian 21 nov. Raakt main/live niet.
+on:
+  push:
+    branches: ['wip/**']
+    paths: ['tools/fetch_osm.py', '.github/workflows/data-osm.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/fetch_osm.py arnhem-nijmegen
+      - name: Naar branch data/osm
+        run: |
+          git config user.name "luchtruim3d-bot"; git config user.email "bot@luchtruim3d.nl"
+          git checkout --orphan data/osm
+          git rm -rq --cached . ; git add -f osm
+          git commit -qm "OSM $(date -u +%F)"
+          git push -f origin HEAD:refs/heads/data/osm
