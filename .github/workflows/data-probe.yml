@@ -1,0 +1,21 @@
+name: data-probe
+on:
+  push:
+    branches: ['wip/**']
+    paths: ['tools/fetch_probe.sh', '.github/workflows/data-probe.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash tools/fetch_probe.sh
+      - name: Resultaat naar branch data/probe (raakt main niet)
+        run: |
+          git config user.name "luchtruim3d-bot"; git config user.email "bot@luchtruim3d.nl"
+          git checkout --orphan data/probe
+          git rm -rq --cached . ; git add -f probe
+          git commit -qm "probe $(date -u +%FT%TZ)"
+          git push -f origin HEAD:refs/heads/data/probe
