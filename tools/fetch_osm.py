@@ -18,6 +18,7 @@ Q = {
     'places': 'node["place"~"^(city|town|village)$"]',
     'border': 'way["boundary"="administrative"]["admin_level"="2"]',
     'rail': 'way["railway"="rail"]["usage"="main"]',
+    'landmarks': 'way["bridge"]["name"~"Waalbrug|John Frostbrug|De Oversteek|Nelson Mandelabrug|Rijnbrug"]; way["building"~"church|cathedral"]["name"~"Eusebius|Stevenskerk"]; node["man_made"="tower"]["name"]',
     'tall': 'node["man_made"~"^(tower|chimney|mast)$"]["height"]',
 }
 ERR = []
