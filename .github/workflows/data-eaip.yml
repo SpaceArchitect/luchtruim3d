@@ -1,0 +1,24 @@
+name: data-eaip
+# eAIP-spiegel (LVNL) → branch data/eaip. Akkoord Christian 21 nov. Raakt main/live niet.
+on:
+  push:
+    branches: ['wip/**']
+    paths: ['tools/fetch_eaip.py', '.github/workflows/data-eaip.yml']
+  workflow_dispatch:
+  schedule:
+    - cron: '41 5 * * 4'   # wekelijks op donderdag (AIRAC-dag)
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/fetch_eaip.py
+      - name: Naar branch data/eaip
+        run: |
+          git config user.name "luchtruim3d-bot"; git config user.email "bot@luchtruim3d.nl"
+          git checkout --orphan data/eaip
+          git rm -rq --cached . ; git add -f eaip
+          git commit -qm "eAIP $(date -u +%F)"
+          git push -f origin HEAD:refs/heads/data/eaip
