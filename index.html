@@ -474,7 +474,8 @@ W|Amsterdam-Rijnkanaal|54514,519063,-75,86,-778,357
 W|Maas-Waalkanaal|58220,518000,-55,55,-94,246,10,53,113,147
 W|Maas|54426,518095,-158,26,-120,91,-87,12,-269,-224
 W|Maas|56530,518021,-121,160,-207,13,-312,102,-321,-25,-98,-88,-84,-22,-216,33,-127,88,-133,24,-82,-27,-72,-122,-76,-39
-W|IJssel|59535,519501,-39,89,64,85,104,43,314,51,122,177,67,26,163,-1,102,52,51,77,108,46,70,1,104,-42,14,-93,90,-77,82,-5,144,34,58,78,100,52,70,150,-44,75,-148,60,-9,77,378,210</script>
+W|IJssel|59535,519501,-39,89,64,85,104,43,314,51,122,177,67,26,163,-1,102,52,51,77,108,46,70,1,104,-42,14,-93,90,-77,82,-5,144,34,58,78,100,52,70,150,-44,75,-148,60,-9,77,378,210
+L|Eusebiuskerk|5.9101|51.9790</script>
 <script id="nl" type="text/plain">63000,519500,0,-1044,-125,10,-36,34,-108,118,-72,51,-108,0,-288,-51,-360,102,-324,152,-324,101,-324,-118,108,-68,396,-236,144,-135,-180,33,-252,34,-324,51,-396,-68,-144,-50,-216,-85,-180,-50,-396,-51,-180,-68,-36,-101,216,-101,144,-203,0,-186,-180,-101,-36,-51,-36,-101,108,-17,288,0,108,-34,252,-101,72,-67,-108,-287,216,-186,684,-186,-144,-219,-36,-136,36,-135,684,-574,396,-287,72,-321,36,-185,-36,-203,-72,-203,0,-185,144,-119,-72,-84,-36,-220,-36,-118,-108,-101,-252,-101,-108,-68,-504,-591,-216,-169,-108,-101,-72,-203,-36,-219,72,-186,252,-84,468,219,252,-51,-72,-33,-252,-119,216,-118,-144,-135,-576,-186,-936,-455,-108,-102,-127,-148,-717,0,-56,13,-45,-13,-1093,0,58,81,72,33,108,-67,72,67,72,68,72,135,-36,51,0,34,-36,67,108,-17,108,17,108,34,72,34,-216,152,36,118,144,84,-36,51,-72,118,-180,17,-324,-51,-108,68,-216,186,-180,50,-108,17,-432,-51,-180,0,-108,51,-72,68,-144,50,-576,119,-144,84,-72,34,-36,219,-72,203,-180,152,-252,84,-216,17,-180,-51,-432,-185,-216,-51,-1152,34,-324,-51,-72,-17,-180,34,0,355,-180,135,-180,17,-396,-17,-144,50,-72,68,-108,219,-36,85,-360,236,-36,102,36,219,108,152,36,169,-216,236,-288,135,-36,17,-144,-17,-72,-67,-36,-101,-73,-119,-144,-152,-252,-202,-252,-152,-216,-34,-360,101,-180,34,-720,17,-216,51,72,135,108,0,432,-118,-72,168,36,152,72,135,-36,152,-72,85,-180,67,-180,51,-144,0,-324,-101,-792,-591,-108,-51,-108,-34,-180,0,-134,21,0,5302;59730,517900,-13730,0,0,3700,17000,0,0,-3536,-1165,761,76,92,-349,135,-383,-35,-145,-92,337,-67,74,-161,225,-81,-4,-209,-655,83,-376,165,-278,-229,-490,-119,-237,62,-180,-134,132,-66,-102,-55,311,-137,-61,-77</script>
 <script id="rwdata" type="text/plain">R||paved|45|||5.3869,51.4612 5.3868,51.4611 5.3864,51.4608 5.3849,51.4594
 R|07/25|concrete||||4.9404,51.3900 4.9441,51.3909 4.9445,51.3910 4.9548,51.3936 4.9655,51.3962 4.9763,51.3989 4.9800,51.3998
@@ -1547,6 +1548,7 @@ const LM={
     const b=new THREE.Mesh(new THREE.BoxGeometry(.18,.014,.025),w);b.position.set(0,.012,-.15);g.add(b);}},
   'Westpoint':{icon:'🏢',build:g=>{// woontoren 142 m, hoogste van Brabant
     const t=new THREE.Mesh(new THREE.BoxGeometry(.035,.142,.035),new THREE.MeshBasicMaterial({color:0x7d8c99}));t.position.y=.071;g.add(t);}},
+  'Eusebiuskerk':{icon:'⛪',build:g=>LM['Grote Kerk Breda'].build(g)},// Arnhem, toren ±93 m (Wikipedia); silhouet van de Grote Kerk Breda (±97 m)
   'Grote Kerk Breda':{icon:'⛪',build:g=>{// toren 97 m
     const m=new THREE.MeshBasicMaterial({color:0xb79b78}),r=new THREE.MeshBasicMaterial({color:0x6d7f7a});
     const nave=new THREE.Mesh(new THREE.BoxGeometry(.03,.025,.09),m);nave.position.set(0,.0125,.06);g.add(nave);
@@ -1942,7 +1944,7 @@ const MISSIONS=[
  {id:'gilze',ac:'motor',title:'Kerktoren van Breda',legs:['Grote Kerk Breda'],les:'EHGR',alt:1000,brief:'Vlieg naar de Grote Kerk in Breda. Gilze-Rijen ligt op de route.'},
  {id:'bvught',ac:'balloon',title:'Ballon over Vught',tip:'Een ballon kan niet sturen, alleen kiezen welke wind hij pakt. Plan je hoogte vóór je bij het verboden gebied bent.',legs:['Sint-Janskathedraal'],les:'EHP29',alt:800,brief:'Drijf naar de Sint-Jan. Hoger waait het meer uit het westen: kies je hoogte zo dat je om het verboden gebied heen drijft.'},
  {id:'terlet',ac:'glider',title:'Naar de Veluwe',legs:['Vliegveld Terlet'],les:'EHDL',alt:1000,brief:'Vlieg naar zweefvliegveld Terlet op de Veluwezoom. Vliegbasis Deelen ligt er pal naast.'},
- {id:'arnhem',ac:'motor',title:'Over de Rijn',legs:['Nijmegen','Arnhem'],les:null,teach:['EHDL'],alt:1000,brief:'Van Nijmegen naar Arnhem, de Waal en de Rijn over. Waar begint de CTR van Deelen?'},
+ {id:'arnhem',ac:'motor',title:'Over de Rijn',legs:['Nijmegen','Eusebiuskerk'],les:null,teach:['EHDL'],alt:1000,brief:'Van Nijmegen naar de Eusebiuskerk in Arnhem, de Waal en de Rijn over. Waar begint de CTR van Deelen?'},
  {id:'boost',ac:'balloon',title:'Oostenwind',legs:['Efteling'],les:null,alt:800,wind:{f0:60,f1:110,k0:6,k1:22},tip:'Met een ballon is hoogte je stuur: hier draait de wind met de hoogte mee van oost naar oost-zuidoost.',brief:'Vandaag waait het uit het oosten. Drijf naar de Efteling: laag drijf je meer naar het zuidwesten, hoog meer naar het westen.'},
 ];
 const MPT=()=>{const L={};for(const f of TASKF)if(f.t==='L')L[f.name]=f.pts[0];for(const c of CITYXY)L[c.nm]=[c.x,c.n];for(const [ic,nm,lo,la,g] of FIELDS)L[(g?'Zweefveld ':'Vliegveld ')+nm]=proj(lo,la);return L;};
