@@ -635,7 +635,7 @@ async def d_tilt_loop_balloon(a):  # Christian: looping door te kantelen; ballon
     st = await a.ev('()=>{const v=window.__vfr;for(let k=0;k<3000;k++){const x=v.PLANE.x+(Math.random()-.5)*60,n=v.PLANE.n+(Math.random()-.5)*60;if(v.inNL(x,n)&&!v.featsAt(x,n).some(f=>f.lo<4000)&&!v.featsAt(x+Math.sin(0)*6,n+6).some(f=>f.lo<4000))return {x,n}}return null}')
     ok(st, 'geen vrije plek gevonden')
     await a.place(st['x'], st['n'], 2000, 0, paused=True)  # eerst alle meldingen 'gezien', dan pas vliegen (race)
-    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.nm);v.NOTICE="";v.PAUSED=false;v.resetTilt()}')
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.NOTICE="";v.PAUSED=false;v.resetTilt()}')
     ang = await a.v('v.tiltAng()')
     await a.ev(SEND, orient(0, 0, ang)); await a.ev(SEND, orient(0, 25, ang))
     ok(not await a.v('!!v.LOOP'), 'looping al bij 25° (moet ver kantelen)')
@@ -875,10 +875,10 @@ async def d_winch_sites(a):  # backlog 15 nov: schermvlieg-/lierterreinen ontbra
     exp = 1500 * 0.0003048 * await a.v('v.EXAG')
     ok(abs(cyl[0] - exp) < 0.05 and abs(cyl[1] - 0.5) < 0.05, f'cilinder Sterksel: top {cyl[0]:.2f} (verwacht {exp:.2f}), breedte {cyl[1]:.2f} km (verwacht 0,5)')
     await a.place(h['x'] - 1.6, h['n'] - .3, 900, 80, paused=True)
-    await a.ev('(h)=>{const v=window.__vfr;v.WARNED.add("HG"+h.nm);for(const f of v.LAYERS)v.WARNED.add(f.ident);v.NOTICE="";v.hudTick()}', h); await a.frames(6)
+    await a.ev('(h)=>{const v=window.__vfr;v.WARNED.add("HG"+h.ident);for(const f of v.LAYERS)v.WARNED.add(f.ident);v.NOTICE="";v.hudTick()}', h); await a.frames(6)
     await a.shot('winch_cylinder')
     await a.place(h['x'] - 3, h['n'], 3000, 90, paused=False)
-    await a.ev('(h)=>{const v=window.__vfr;v.WARNED.delete("HG"+h.nm);Object.assign(v.PLANE,{x:h.x,n:h.n});v.hudTick()}', h)
+    await a.ev('(h)=>{const v=window.__vfr;v.WARNED.delete("HG"+h.ident);Object.assign(v.PLANE,{x:h.x,n:h.n});v.hudTick()}', h)
     ok('Lierterrein' not in (await a.v('v.NOTICE') or ''), 'waarschuwing ook hoog boven het lierterrein (3000 ft)')
     await a.ev('()=>window.__vfr.setMode("map")'); await a.frames(2)
     await a.ev('(h)=>{const v=window.__vfr;v.PROBE.x=h.x;v.PROBE.n=h.n;v.showProbe()}', h); await a.frames(2)
@@ -903,7 +903,7 @@ async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren
     if not a.touch: return
     await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
     st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2500, 0, paused=False)
-    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.nm)}')
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident)}')
     rng = random.Random(int(os.environ.get('TILT_SEED', '2111')))
     import time as _t
     ang0 = await a.v('v.tiltAng()')
@@ -933,7 +933,7 @@ async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren
     await resume_check('erg scheef (32°)', -32, -5)
     await resume_check('rechtop', 0, 0)
     # na een nieuwe opdracht (missie klaar) idem
-    await a.ev('()=>{const v=window.__vfr;v.newTask();for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.nm);v.PLANE.alt=Math.max(v.PLANE.alt,2500)}')
+    await a.ev('()=>{const v=window.__vfr;v.newTask();for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.PLANE.alt=Math.max(v.PLANE.alt,2500)}')
     ok(await a.v('v.PAUSED'), 'nieuwe opdracht start niet in pauze')
     await a.hit('#btnPause')  # was pauze → eerst nog even pauzeren zodat resume_check het patroon volgt
     await resume_check('na nieuwe opdracht', 12, 5)
@@ -956,6 +956,28 @@ async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren
         ok(await a.v('v.TAX.r') == 0, 'vergrendeld: stuurt na ijken')
         await resume_check('vergrendeld liggend', 8, 5, ang=90)
     await a.sane()
+
+async def d_enr55_sites(a):  # 21 nov: alle ENR 5.5-terreinen (lier, lierstart zweefvliegen, modelvliegen, ULV) als cilinder met AIP-bovengrens
+    await a.hit('#modal [data-ac=motor]'); await a.frames(2)
+    hg = await a.v('v.HG'); typs = {h['typ'] for h in hg}
+    ok(typs == {'hg', 'gld', 'uas', 'ulm'}, f'niet alle soorten terreinen: {typs}')
+    ok(await a.v('v.hgCyl.children.filter(c=>c.userData.hg).length') == len(hg), 'niet elk terrein heeft een cilinder')
+    for nm, typ, word, lim in (('Boxtel', 'uas', 'Modelvliegterrein Boxtel', '1020 ft AMSL'), ('Malden', 'gld', 'Zweefvliegveld Malden', '2300 ft AGL')):
+        h = next(x for x in hg if x['nm'] == nm and x['typ'] == typ)
+        await a.place(h['x'] - h['r'] - 0.9, h['n'], 800, 90, paused=True)
+        await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);v.PAUSED=false}')
+        await a.ev('(h)=>{const v=window.__vfr;v.WARNED.delete("HG"+h.ident);v.hudTick()}', h)
+        n = ''
+        for _ in range(150):
+            await a.wait(100); n = await a.v('v.NOTICE') or ''
+            if n: break
+        ok(word in n and lim in n, f'{nm}: verwacht "{word}" en "{lim}": {n[:140]}')
+        if typ == 'gld': ok('123.355' in n, f'Malden: frequentie ontbreekt: {n[:160]}')
+    b = next(x for x in hg if x['nm'] == 'Boxtel')
+    w = await a.ev('(nm)=>{const v=window.__vfr;const c=v.hgCyl.children.find(m=>m.userData.hg===nm&&m.userData.typ==="uas");const b=new v.THREE.Box3().setFromObject(c);return b.max.x-b.min.x}', 'Boxtel')
+    ok(abs(w - 2 * 0.926) < 0.05, f'Boxtel: straal 0,5 NM verwacht, breedte {w:.2f} km')
+    h = next(x for x in hg if x['nm'] == 'Malden' and x['typ'] == 'gld')
+    await a.place(h['x'] - 4, h['n'] - 3, 1500, 55, paused=True); await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.hudTick()}'); await a.frames(6); await a.shot('enr55_malden')
 
 async def d_para_text(a):  # AIP ENR 5.5: elke paradropzone zijn eigen bovengrens en operator (was overal 'FL100 · ENPC')
     await a.hit('#modal [data-ac=glider]'); await a.frames(2)
@@ -1067,7 +1089,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('doorsnede', d_cross_section), ('rondleiding', d_tour)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('doorsnede', d_cross_section), ('rondleiding', d_tour)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:
