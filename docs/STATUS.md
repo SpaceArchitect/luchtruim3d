@@ -3,8 +3,8 @@
 *Bijgewerkt: 21 nov 2026, 01:00 (cloudsessie 20→21 nov).*
 
 ## Live
-- https://luchtruim3d.nl = `main` = inhoud van 14 nov (053d823), teruggedraaid op 15 nov.
-  Vorige live-versies: `release/s1-live-1…4`.
+- https://luchtruim3d.nl = `main` = 170a615 (21 nov 01:30, volledige suite groen: 28 smoke + 128 det + 8 fuzz, seed 2111). Live gecontroleerd via GitHub Actions.
+  Vorige live-versie: `release/2026-11-15` (053d823-inhoud); daarvoor `release/s1-live-1…4`.
 - Regio: Eindhoven (bbox 4.75–6.15 E / 51.2–51.8 N), AIRAC 29 okt 2026.
 
 ## Half af (bewaard, niet live)
@@ -12,7 +12,7 @@
   TRA/TSA aan. Bruikbaar als bron, niet blind mergen. De kantel-fix brak live (te strenge
   stilte-eis); test `d_tilt_start_shaky` staat in de stash op `wip/s2b-15nov`.
 
-## Klaar op `wip/briefing-20nov` (nog niet live; wacht op "ok, live" van Christian)
+## Live sinds 21 nov (was `wip/briefing-20nov`)
 Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/index.html
 - Alle luchtruimgroepen standaard aan; kaartlabels aan/uit op afstand, gevaren 1,6× verder (`d_defaults_labels`).
 - Missiedoel als goudkleurig baken + label "🎯 A67 · x km" (Boyd) (`d_goal_marker`).
@@ -25,7 +25,7 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 - Doelbaken: lichtbundel, draaiende ruit, uitdijende ring. Kaart liggend: tijduitleg verborgen.
 
 ## Top 5 (de noordster: conflicten zien)
-1. **Publiceren** van het bovenstaande na Christians mobiele check (missies + kantelgevoel). Push naar `main` vraagt zijn expliciete "ok, live".
+1. **Draaimoment afmaken** (zie 5) en Christian laten testen op zijn telefoon.
 2. **Data via GitHub Actions** (akkoord Christian 21 nov; `.github/workflows/data-probe.yml` → branch `data/probe`). Bereikbaar vanaf GitHub:
    ✓ **Geoportaal-API** `geoportaal.lvnl.nl/api/search/v1/collections/all/items` → datasets Airspace/Aerodrome/Route/Waypoint/Navaid (Feature Service, WFS, OGC), **licentie CC BY 4.0** ✓.
    ✓ **eAIP** met `curl` + browser-User-Agent (Playwright krijgt Cloudflare-check); edities als `AIRAC AMDT 12-2026_2026_11_26\index.html`.
