@@ -26,6 +26,7 @@
 Zie `docs/OPDRACHT-21nov.md`: tutorial + startflow, MSFS-besturing, sneltoetskaart, Spatie bij keerpunten, herkenningspunten-audit, ballonrealisme.
 
 ## Wacht op Christian
+- **Usage-meter (eenmalig, ±2 min op de pc):** `python tools/usage_probe.py --login` (inloggen op claude.ai in het venster, venster sluiten), daarna `python tools/usage_probe.py --install`. Vanaf dan leest elke sessie de weeklimiet zelf met `python tools/usage.py`.
 - **Telefoontest kantelen**: pauzeer/▶ een paar keer, ook scheef vastgehouden, en na "Nieuwe opdracht".
 - Claude-browserpane op de pc inloggen op claude.ai (weeklimiet aflezen; 21 nov nog uitgelogd).
 - www-doorverwijzing + automatische verlenging domein (OVH).

@@ -104,6 +104,10 @@ Start dan een subagent met een duidelijke rol. Dat is gereedschap, geen verplich
 ## ⛽ Budget
 
 Christian geeft een plafond per sessie of per week op (bijv. "tot ±60% van de weeklimiet").
+**Overal, ook in de cloud: `python tools/usage.py`** leest de laatste meting (week- en sessie-%),
+die de pc elke 30 min via `tools/usage_probe.py` op branch `meta/usage` zet. Draai het bij de
+start en na elk groot blok; vraag Christian er niet naar. Meting ouder dan 3 uur of ontbrekend:
+schat voorzichtig (zie hieronder). Op de pc kun je ook zelf kijken (zelfde pagina).
 Kun je de meter aflezen, doe dat dan bij de start en af en toe tussendoor
 (https://claude.ai/settings/usage; in de pagina:
 `[...document.querySelectorAll('[aria-valuenow]')].map(m=>m.getAttribute('aria-valuenow'))`,
