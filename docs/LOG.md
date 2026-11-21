@@ -13,3 +13,5 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 2026-11-21 Missies: elk rond één echt conflict; startpunt berekend uit de LVNL-data (vrij, rechte lijn door het lesgebied) zodat AIRAC-wijzigingen niets breken. Ballon: alleen starts waarvoor een hoogteplan bestaat.
 - 2026-11-21 Uitbreiding: luchtruim landelijk in één keer (klein), landschap/AIP/missies per regio. Arnhem–Nijmegen eerst; full reset vóór 10 dec voor "heel NL"; data vóór Mexico binnen.
 - 2026-11-21 Push naar `main` door Claude werd tegengehouden door de veiligheidscheck → publiceren alleen na Christians expliciete "ok, live".
+- 2026-11-21 LVNL (gis@lvnl.nl): Geoportaal is de aangewezen bron (AIRAC-updates, licentie in metadata); niet bouwen op de VFR-chart-services. GitHub Actions (akkoord Christian) bereikt het Geoportaal wel, de eAIP niet.
+- 2026-11-21 Draaimoment: oorzaak bocht = vertraagde schermstandwissel (rol ±90° in het oude scherm). Aanpak: draai herkennen aan rol > 55°, koers/hoogte terugzetten, ijken na rust.

@@ -26,10 +26,11 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 
 ## Top 5 (de noordster: conflicten zien)
 1. **Publiceren** van het bovenstaande na Christians mobiele check (missies + kantelgevoel). Push naar `main` vraagt zijn expliciete "ok, live".
-2. **Data uit index.html** naar `data/luchtruim.json` + `data/regio-*.json`, één ophaalscript (LVNL via Chrome op de pc). Fundament voor uitbreiding.
-3. **Arnhem–Nijmegen** (pc-sessie): Malden, Deelen, Terlet, Nieuw Milligen TMA, SUP 03/2022, 3 regiomissies, link `#arnhem`.
-4. **"Heel Nederland-week" met de full reset (±3–6 dec, vóór 10 dec):** luchtruim landelijk in één keer; landschap per regio (Randstad → Noord → Zeeland/Limburg); alle data binnen vóór Mexico.
-5. Kantelen na draaien staand↔liggend: eerst Christians ervaring met de nieuwe geleidelijke besturing afwachten.
+2. **Data via GitHub Actions** (akkoord Christian 21 nov): `.github/workflows/data-probe.yml` → branch `data/probe`. Geoportaal (ArcGIS Hub, org `lvnl.maps.arcgis.com`) ✓ bereikbaar; Overpass 406 (User-Agent toevoegen); eAIP 403 en geoservices.lvnl.nl onbereikbaar vanaf GitHub. Volgende stap: Hub-API zoeken naar luchtruimdatasets + licentie uit de metadata.
+3. **Data uit index.html** naar `data/luchtruim.json` + `data/regio-*.json`, één ophaalscript (LVNL via Chrome op de pc). Fundament voor uitbreiding.
+4. **Arnhem–Nijmegen**: Malden, Deelen, Terlet, Nieuw Milligen TMA, SUP 03/2022, 3 regiomissies, link `#arnhem`.
+6. **"Heel Nederland-week" met de full reset (±3–6 dec, vóór 10 dec):** luchtruim landelijk in één keer; landschap per regio (Randstad → Noord → Zeeland/Limburg); alle data binnen vóór Mexico.
+5. **Draaimoment staand↔liggend** (Christian: "essentieel"): branch `wip/draaien`. Bevriezen + koers terugzetten bij een draai, ijken na 0,4 s rust; test `d_tilt_rotate_real` (oude code: 65° bocht). **Open:** vergrendelde schermstand (rol ~90° in het oude scherm) wordt nog niet goed geijkt. Eerst doen in de nieuwe chat.
 
 ## Daarna
 - Gevarenlagen LVNL (Parajump, Miscellaneous, Obstacles), één klik naar de eAIP-plek, minimale vlieghoogtes SERA.5005(f) (pc).
@@ -38,7 +39,7 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 - Uitbreiden naar Arnhem–Nijmegen, daarna heel NL.
 
 ## Wacht op Christian
-- LVNL-licentiemail versturen (concept in Gmail).
+- LVNL antwoordde 19 nov (gis@lvnl.nl): gebruik het Geoportaal; licentie staat in de metadata; de VFR-chart-services kunnen veranderen.
 - www-doorverwijzing + automatische verlenging domein (OVH).
 - Claude-browserpane op de pc één keer inloggen op claude.ai, zodat de weeklimiet zelf af te lezen is.
 - Mexico 15 dec – 9 jan: vóór vertrek samen alle LVNL/OSM-data voor heel NL downloaden.
