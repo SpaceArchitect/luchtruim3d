@@ -147,8 +147,9 @@ async def t_aircraft(a):
             else: await a.pg.keyboard.down('ArrowRight'); await a.wait(900); await a.pg.keyboard.up('ArrowRight')
             h1 = await a.v('v.PLANE.hdg')
             ok(abs(((h1 - h0 + 540) % 360) - 180) > 2 or await a.v('v.PAUSED'), f'{ac}: draaien werkt niet')
-        await a.ev('()=>{window.__vfr.NOTICE="";window.__vfr.PAUSED=false;window.__vfr.hudTick()}')
-        await a.hit('#btnPause'); ok(await a.v('v.PAUSED'), f'{ac}: pauze werkt niet')
+        # geen melding mag tussendoor zelf pauzeren (lierterrein, doel, luchtruim): anders zet de tik hem juist weer aan
+        await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.nm);v.GOAL=null;v.TASK="";v.NOTICE="";v.PAUSED=false;v.hudTick()}')
+        await a.hit('#btnPause'); ok(await a.v('v.PAUSED'), f'{ac}: pauze werkt niet ({(await a.v("v.NOTICE") or "")[:60]!r})')
         await a.shot('fly_' + ac)
     await a.hit('#btnMode'); ok(await a.v('v.MODE') == 'map', 'terug naar kaart werkt niet')
 
