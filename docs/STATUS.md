@@ -1,28 +1,24 @@
 # Status — lees dit eerst
 
-*Bijgewerkt: 21 nov 2026, 01:00 (cloudsessie 20→21 nov).*
+*Bijgewerkt: 21 nov 2026, ±11:30 (cloudsessie).*
 
 ## Live
-- https://luchtruim3d.nl = `main` = 170a615 (21 nov 01:30, volledige suite groen: 28 smoke + 128 det + 8 fuzz, seed 2111). Live gecontroleerd via GitHub Actions.
-  Vorige live-versie: `release/2026-11-15` (053d823-inhoud); daarvoor `release/s1-live-1…4`.
-- Regio: Eindhoven (bbox 4.75–6.15 E / 51.2–51.8 N), AIRAC 29 okt 2026.
+- https://luchtruim3d.nl = `main` = wip/arnhem + gevaren + fixes 21 nov (volledige suite: 28 smoke + 155/156 det + 8 fuzz; de ene misser gefixt en opnieuw getest: kantel 24/24, smoke 14/14).
+  Vorige live: `release/2026-11-21` (170a615-inhoud), daarvoor `release/2026-11-15`.
+- Regio: Eindhoven + noordrand Arnhem–Nijmegen (tot 52.15 N), AIRAC 11-2026.
 
-## Half af (bewaard, niet live)
-- `wip/s2-15nov`, `wip/s2b-15nov`: kantel-ijken na draaien, labels vervagen (afgewezen),
-  TRA/TSA aan. Bruikbaar als bron, niet blind mergen. De kantel-fix brak live (te strenge
-  stilte-eis); test `d_tilt_start_shaky` staat in de stash op `wip/s2b-15nov`.
+## Nieuw live 21 nov
+- Arnhem–Nijmegen: Deelen CTR/RMZ, Terlet, R9/R61, PJA Wijk bij Duurstede/Westbroek, missies Terlet en Arnhem, Eusebiuskerk.
+- Gevaren: lierterreinen scherm/delta als **cilinder** (250 m, GND–bovengrens uit AIP ENR 5.5), label op de top (Christian, idee vfr3d).
+- Doorsnede langs een lijn, rondleiding (7 stappen), linkvoorbeeld (og).
+- Fix: klaring Deelen CTR dekt de RMZ Deelen (H24) erover (`d_ctr_covers_rmz`).
+- Fix: kantelen na ▶ / nieuwe opdracht: ijken op gemiddelde na 0,3 s rust (max 1,2 s), scheef tot 45° = rechtuit, vergrendelde liggende houding blijft (`d_tilt_pause_edges`, ruis + tik-schok).
 
-## Live sinds 21 nov (was `wip/briefing-20nov`)
-Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/index.html
-- Alle luchtruimgroepen standaard aan; kaartlabels aan/uit op afstand, gevaren 1,6× verder (`d_defaults_labels`).
-- Missiedoel als goudkleurig baken + label "🎯 A67 · x km" (Boyd) (`d_goal_marker`).
-- Tik op een melding = verder; de tik viel eerst door naar de 3D-scène = "lege melding onderin" (Fleur) (`d_tap_notice`).
-- Toestel wisselen: tik op het toesteltje onderin (Fleur) (`d_ac_switch`).
-- Landen in de bebouwde kom krijgt een eigen tekst; missietekst zonder dubbel "verboden" (`d_land_city`).
-- Tests draaien op een vast tijdstip (di 10:00): de uitslag hing af van de klok (RMZ 's nachts actief).
-- Kantelen geleidelijk: dode zone 8°, lineair tot vol bij 35° (bocht) / 30° (klim) (`d_tilt_analog`, ±5° ruis).
-- 7 missies rond echte conflicten (`MISSIONS` in index.html): start berekend uit de data, keerpunten, les + ⭐ achteraf; ballon met hoogteplan-solver en eigen wind (`d_missions`).
-- Doelbaken: lichtbundel, draaiende ruit, uitdijende ring. Kaart liggend: tijduitleg verborgen.
+## Wacht op Christian
+- **Telefoontest kantelen**: pauzeer/▶ een paar keer, ook scheef vastgehouden, en na "Nieuwe opdracht".
+- Claude-browserpane op de pc inloggen op claude.ai (weeklimiet aflezen; 21 nov nog uitgelogd).
+- www-doorverwijzing + automatische verlenging domein (OVH).
+- Mexico 15 dec – 9 jan: vóór vertrek alle data voor heel NL binnen.
 
 ## Top 5 (de noordster: conflicten zien)
 1. **Draaimoment live** na Christians telefoontest (zie 5).

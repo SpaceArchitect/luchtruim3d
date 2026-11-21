@@ -904,7 +904,7 @@ async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren
     await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
     st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2500, 0, paused=False)
     await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.nm)}')
-    rng = random.Random(2111)
+    rng = random.Random(int(os.environ.get('TILT_SEED', '2111')))
     import time as _t
     ang0 = await a.v('v.tiltAng()')
     async def hold(turn, back, ms, ang=None, jit=4, p0=60):
