@@ -4,7 +4,7 @@ Bewust ruw: de omzetting naar het compacte app-formaat (osm/areadata/rwdata/pwda
 import json, os, sys, time, urllib.parse, urllib.request
 REGIONS = {  # zuid, west, noord, oost
     'eindhoven': (51.2, 4.75, 51.8, 6.15),
-    'arnhem-nijmegen': (51.7, 5.4, 52.15, 6.25),
+    'arnhem-nijmegen': (51.75, 4.75, 52.15, 6.2),  # hele noordrand van de regio (Rivierenland, Arnhem, Nijmegen, Veluwezoom)
 }
 Q = {
     'motorways': 'way["highway"~"^(motorway|trunk)$"]',
@@ -16,6 +16,8 @@ Q = {
     'power': 'way["power"="line"]["voltage"~"^(150000|220000|380000)"]',
     'wind': 'node["generator:source"="wind"]',
     'places': 'node["place"~"^(city|town|village)$"]',
+    'border': 'way["boundary"="administrative"]["admin_level"="2"]',
+    'rail': 'way["railway"="rail"]["usage"="main"]',
     'tall': 'node["man_made"~"^(tower|chimney|mast)$"]["height"]',
 }
 ERR = []
