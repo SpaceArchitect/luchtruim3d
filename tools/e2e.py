@@ -937,6 +937,17 @@ async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren
     ok(await a.v('v.PAUSED'), 'nieuwe opdracht start niet in pauze')
     await a.hit('#btnPause')  # was pauze → eerst nog even pauzeren zodat resume_check het patroon volgt
     await resume_check('na nieuwe opdracht', 12, 5)
+    # hele onrustige hand (±15°): melding "houd even stil", geen bocht; stil houden → melding weg en bestuurbaar
+    await a.hit('#btnPause'); await hold(0, 0, 400); await a.hit('#btnPause')
+    h0 = await a.v('v.PLANE.hdg'); await hold(0, 0, 1700, jit=15)
+    ok(await a.visible('#stillHint'), 'onrustige hand: geen melding "houd de telefoon even stil"')
+    await a.shot('still_hint')
+    ok(await a.v('v.TAX.r') == 0, 'onrustige hand: stuurt al vóór het ijken')
+    dh = abs(((await a.v('v.PLANE.hdg')) - h0 + 540) % 360 - 180); ok(dh < 6, f'onrustige hand: bocht van {dh:.0f}°')
+    await hold(0, 0, 700, jit=3)
+    ok(not await a.visible('#stillHint'), 'melding "houd stil" blijft staan na stil houden')
+    await hold(22, 0, 300, jit=2); ok(await a.v('v.TAX.r') > .2, 'na onrustige hand niet bestuurbaar')
+    await hold(0, 0, 300, jit=2)
     # schermstand vergrendeld, telefoon liggend vastgehouden
     if a.form != 'p7l':
         for k in range(1, 16):

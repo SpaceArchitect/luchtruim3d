@@ -82,6 +82,7 @@
   #info details .lim{font-variant-numeric:tabular-nums;font-weight:800;margin-right:4px}
   #info .free.clr{background:#0b3a6e;color:#fff}#info .free.warn{background:#fff3c4;border:2px dashed #3d2c00}#info .free.bad{background:#1c2024;color:#fff}#info .free.ok{background:#fff;border:2px solid #1c2024}
   #info .ovl{margin-top:8px;font-size:13px}
+  #stillHint{white-space:nowrap;position:absolute;left:50%;top:42%;transform:translateX(-50%);z-index:30;background:var(--panel);border-radius:10px;padding:8px 14px;font-weight:800;font-size:16px;box-shadow:0 2px 10px rgba(0,0,0,.2);pointer-events:none}#stillHint[hidden]{display:none}
   #tChip{position:absolute;right:10px;bottom:160px;background:var(--panel);border-radius:8px;padding:4px 10px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.15);font-size:14px}
   body.looking #tChip,body.onlymap .flysec,body.onlymap #tChip{display:none}
   body.onlyfly [data-ac=map],body.onlyfly #btnMode{display:none}
@@ -253,7 +254,7 @@
 </div>
 <div id="info"></div>
 <canvas id="compass"></canvas><div id="north" title="Noorden" style="position:absolute;right:14px;bottom:20px;width:44px;height:44px;border-radius:50%;transform:scale(var(--ns,1));transform-origin:bottom right;background:rgba(255,255,255,.92);box-shadow:0 1px 6px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;pointer-events:none;z-index:6"><div id="northIn" style="font:800 13px system-ui;color:#c62828;text-align:center;line-height:1">▲<br><span style="color:#222">N</span></div></div>
-<div id="tour" class="hidden" role="dialog" aria-label="Rondleiding" aria-live="polite"><div id="tourTxt"></div><div class="tourbtns"><button id="tourStop" class="xsbtn">Stop</button><button id="tourNext" class="xsbtn">Volgende ▶</button></div></div><div id="xsHint" role="status">Tik op het eindpunt van de doorsnede</div><div id="xs" class="hidden" role="dialog" aria-label="Doorsnede"><div class="xshead"><b id="xsTitle">Doorsnede</b><button class="close" id="xsClose" aria-label="Sluiten">✕</button></div><canvas id="xsCanvas"></canvas><div class="xsnote">Verticaal profiel langs de lijn op de kaart. Hoogtes in ft AMSL (FL bij 1013 hPa). Vereenvoudigd; de AIP is leidend.</div></div><div id="banner" class="banner ok"></div><div id="relaxChip">🌤️ Relaxmodus: luchtruim verborgen · ⚙ Weergave om terug te gaan</div><div id="a11y" class="hidden" role="dialog" aria-label="Toegankelijkheid"><label><input type="checkbox" id="a11yBig"> Grote letters</label><label><input type="checkbox" id="a11yHC"> Hoog contrast</label></div>
+<div id="stillHint" role="status" hidden>📱 Houd de telefoon even stil</div><div id="tour" class="hidden" role="dialog" aria-label="Rondleiding" aria-live="polite"><div id="tourTxt"></div><div class="tourbtns"><button id="tourStop" class="xsbtn">Stop</button><button id="tourNext" class="xsbtn">Volgende ▶</button></div></div><div id="xsHint" role="status">Tik op het eindpunt van de doorsnede</div><div id="xs" class="hidden" role="dialog" aria-label="Doorsnede"><div class="xshead"><b id="xsTitle">Doorsnede</b><button class="close" id="xsClose" aria-label="Sluiten">✕</button></div><canvas id="xsCanvas"></canvas><div class="xsnote">Verticaal profiel langs de lijn op de kaart. Hoogtes in ft AMSL (FL bij 1013 hPa). Vereenvoudigd; de AIP is leidend.</div></div><div id="banner" class="banner ok"></div><div id="relaxChip">🌤️ Relaxmodus: luchtruim verborgen · ⚙ Weergave om terug te gaan</div><div id="a11y" class="hidden" role="dialog" aria-label="Toegankelijkheid"><label><input type="checkbox" id="a11yBig"> Grote letters</label><label><input type="checkbox" id="a11yHC"> Hoog contrast</label></div>
 <canvas id="tape" class="off"></canvas>
 <div id="miniwrap"><canvas id="mini" class="off"></canvas><div id="loc"></div></div>
 <div id="flash"></div><div id="tChip">×5</div>
@@ -1734,7 +1735,7 @@ document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
   const off=()=>{keys[k]=false;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);});
 function setTempo(i){TI=Math.max(0,Math.min(TEMPOS.length-1,i));$('tempo').value=TI;$('tempoVal').textContent='×'+TEMPO();$('tChip').textContent='×'+TEMPO();}
-function togglePause(){PAUSED=!PAUSED;if(!PAUSED){NOTICE='';tiltRecal();/* ▶ = opnieuw ijken: zo houd je hem nu = rechtuit */}}
+function togglePause(){PAUSED=!PAUSED;$('stillHint').hidden=true;if(!PAUSED){NOTICE='';tiltRecal();/* ▶ = opnieuw ijken: zo houd je hem nu = rechtuit */}}
 function tiltRecal(){/* Christian 21 nov: na ▶ of een nieuwe opdracht ging kantelen soms de mist in: er werd geijkt op het eerste sensorsignaal (de tik-schok), scheef vasthouden (>25°) werd een vaste bocht en de vergrendelde liggende houding ging verloren. Nu: besturing even neutraal, ijken zodra de telefoon 0,3 s rustig is (uiterlijk 1,2 s), rol tot 45° telt als rechtuit, fysieke houding blijft. */
   if(!$('optTilt').checked||!TILT){TILT=null;return;}const now=performance.now();TILT={recal:true,pend:true,ang:TILT.ang,sAng:TILT.sAng,phys:TILT.phys,start:now,ts:now};keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;}
 let wheelAcc=0;renderer.domElement.addEventListener('wheel',e=>{if(MODE!=='fly')return;e.preventDefault();if(e.shiftKey||e.ctrlKey){const dz=e.deltaY||e.deltaX;/* Chrome/Windows maakt van Shift+scrollen horizontaal scrollen (deltaX): zoomen werkte niet (Christian 14 nov) */CAM.dist=Math.max(.35,Math.min(6,CAM.dist*Math.exp(dz*.0012)));return;}wheelAcc+=e.deltaY;if(Math.abs(wheelAcc)>=60){setTempo(TI+(wheelAcc<0?1:-1));wheelAcc=0;}},{passive:false});// scrollen = tempo (zoals eerst), Shift/Ctrl+scrollen of knijpen = zoomen
@@ -1765,7 +1766,8 @@ function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite
   if(TILT&&(TILT.ang!==ang||(TILT.sAng!==undefined&&TILT.sAng!==sAng)))TILT={ang,sAng,pend:true,t,p,ts:now,start:TILT.pend?TILT.start:now};
   if(TILT&&TILT.recal){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;
     if(!TILT.S||Math.abs(t-TILT.S[0]/TILT.S[2])>7||Math.abs(p-TILT.S[1]/TILT.S[2])>7){TILT.ts=now;TILT.S=[t,p,1];}else{TILT.S[0]+=t;TILT.S[1]+=p;TILT.S[2]++;}/* rust = dicht bij het lopende gemiddelde (een schok-meetpunt is geen referentie) */
-    if(now-TILT.ts<300&&now-TILT.start<1200)return;
+    if(now-TILT.ts<300){if(now-TILT.start>1200)$('stillHint').hidden=false;/* Christian 21 nov: hele onrustige hand → vraag het even stil te houden i.p.v. op een schok te ijken */if(now-TILT.start<5000)return;}
+    $('stillHint').hidden=true;
     const mt=TILT.S[0]/TILT.S[2],mp=TILT.S[1]/TILT.S[2];/* gemiddelde over het rustige stuk: één trillend meetpunt is geen goede nulstand */
     if(Math.abs(mt)<45){TILT={p0:mp,t0:mt,ang,sAng,phys:TILT.phys};return;}TILT={ang,sAng,pend:true,t,p,ts:now,start:now};}
   if(TILT&&TILT.pend){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;
@@ -1786,7 +1788,7 @@ $('optTilt').onchange=async e=>{if(e.target.checked){try{if(typeof DeviceOrienta
     TILT=null;tiltSeen=false;removeEventListener('deviceorientation',onTilt);addEventListener('deviceorientation',onTilt);tiltNote('Houd de telefoon zoals je wilt en tik ▶: dat is "rechtuit". Naar je toe = stijgen, van je af = dalen, opzij = draaien, ver naar je toe = looping.');
     try{localStorage.setItem('vfr3d_tilt','1');}catch(_){}
     setTimeout(()=>{if(!tiltSeen&&$('optTilt').checked){$('optTilt').checked=false;removeEventListener('deviceorientation',onTilt);document.body.classList.remove('tiltmode');tiltNote('Geen sensorgegevens: je stuurt met de knoppen.');}},2500);}
-  else{removeEventListener('deviceorientation',onTilt);keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;document.body.classList.remove('tiltmode');if(e.isTrusted!==false){try{localStorage.setItem('vfr3d_tilt','0');}catch(_){}}tiltNote('');}};
+  else{removeEventListener('deviceorientation',onTilt);$('stillHint').hidden=true;keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;document.body.classList.remove('tiltmode');if(e.isTrusted!==false){try{localStorage.setItem('vfr3d_tilt','0');}catch(_){}}tiltNote('');}};
 function autoTilt(){/* S1c (Christian): op telefoon/tablet standaard kantelen, knoppen weg; geen sensor = knoppen terug; uitzetten in Weergave wordt onthouden */
   let pref=null;try{pref=localStorage.getItem('vfr3d_tilt');}catch(_){}
   if(!matchMedia('(pointer:coarse)').matches||pref==='0'||$('optTilt').checked)return;$('optTilt').checked=true;$('optTilt').onchange({target:$('optTilt')});}$('tSlow').onclick=()=>setTempo(TI-1);$('tFast').onclick=()=>setTempo(TI+1);
