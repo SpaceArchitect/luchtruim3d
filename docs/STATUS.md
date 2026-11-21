@@ -26,7 +26,11 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 
 ## Top 5 (de noordster: conflicten zien)
 1. **Publiceren** van het bovenstaande na Christians mobiele check (missies + kantelgevoel). Push naar `main` vraagt zijn expliciete "ok, live".
-2. **Data via GitHub Actions** (akkoord Christian 21 nov): `.github/workflows/data-probe.yml` → branch `data/probe`. Geoportaal (ArcGIS Hub, org `lvnl.maps.arcgis.com`) ✓ bereikbaar; Overpass 406 (User-Agent toevoegen); eAIP 403 en geoservices.lvnl.nl onbereikbaar vanaf GitHub. Volgende stap: Hub-API zoeken naar luchtruimdatasets + licentie uit de metadata.
+2. **Data via GitHub Actions** (akkoord Christian 21 nov; `.github/workflows/data-probe.yml` → branch `data/probe`). Bereikbaar vanaf GitHub:
+   ✓ **Geoportaal-API** `geoportaal.lvnl.nl/api/search/v1/collections/all/items` → datasets Airspace/Aerodrome/Route/Waypoint/Navaid (Feature Service, WFS, OGC), **licentie CC BY 4.0** ✓.
+   ✓ **eAIP** met `curl` + browser-User-Agent (Playwright krijgt Cloudflare-check); edities als `AIRAC AMDT 12-2026_2026_11_26\index.html`.
+   ✓ Overpass (OSM) met User-Agent. ✓ luchtruim3d.nl (+ Playwright) → automatische live-test na publicatie mogelijk.
+   ✗ geoservices.lvnl.nl: onvolledige certificaatketen (en LVNL raadt het af) → niet meer gebruiken.
 3. **Data uit index.html** naar `data/luchtruim.json` + `data/regio-*.json`, één ophaalscript (LVNL via Chrome op de pc). Fundament voor uitbreiding.
 4. **Arnhem–Nijmegen**: Malden, Deelen, Terlet, Nieuw Milligen TMA, SUP 03/2022, 3 regiomissies, link `#arnhem`.
 6. **"Heel Nederland-week" met de full reset (±3–6 dec, vóór 10 dec):** luchtruim landelijk in één keer; landschap per regio (Randstad → Noord → Zeeland/Limburg); alle data binnen vóór Mexico.
