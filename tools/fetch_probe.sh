@@ -31,4 +31,5 @@ async def m():
         await b.close()
 asyncio.run(m())
 PY
+echo "LIVE-CHECK goalVizTick: $(grep -c goalVizTick probe/luchtruim3d_nl.body) MISSIONS: $(grep -c "const MISSIONS" probe/luchtruim3d_nl.body)" >> probe/summary.txt
 ls -la probe >> probe/summary.txt
