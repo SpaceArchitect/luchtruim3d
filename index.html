@@ -208,6 +208,11 @@
   /* S1: vliegbanner = vaste regels zonder uitklappen (D2) */
   .banner .head,.banner .task,.banner .ahead{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.banner:not(.open):not(.noticeonly) .head::after{content:none!important}
   @media (max-width:520px){.banner .task .q{display:none}}
+  /* Christian 21 nov: kaart liggend op mobiel moeilijk leesbaar → sonde als smalle lade rechts (≤ ⅓), kolom "boven de sonde" weg zolang de lade open is (de lijst toont dezelfde stapel) */
+  @media (max-height:500px) and (orientation:landscape){
+    #info{top:54px!important;bottom:8px!important;right:8px!important;left:auto!important;width:min(290px,33vw)!important;max-height:none!important;padding:8px 10px!important;font-size:12px}
+    body:has(#info[style*="block"]) #tape{display:none!important}
+    body:has(#info[style*="block"]) #north{right:calc(min(290px,33vw) + 18px)!important}}
 </style>
 <script type="text/plain" id="enr55">
 gld|Arnhem/Deelen|EHDLGLD001|5.87194|52.05972|0.25|2300|AGL|Zweefvliegclub Deelen/Rotterdam|123.505

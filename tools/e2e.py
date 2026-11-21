@@ -979,6 +979,23 @@ async def d_enr55_sites(a):  # 21 nov: alle ENR 5.5-terreinen (lier, lierstart z
     h = next(x for x in hg if x['nm'] == 'Malden' and x['typ'] == 'gld')
     await a.place(h['x'] - 4, h['n'] - 3, 1500, 55, paused=True); await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.hudTick()}'); await a.frames(6); await a.shot('enr55_malden')
 
+async def d_landscape_probe(a):  # Christian 21 nov: "kaart horizontaal op mobiel is nog steeds moeilijk leesbaar" → sonde als smalle lade rechts
+    if a.form != 'p7l': return
+    await a.hit('#modal [data-ac=map]'); await a.frames(3)
+    vw = a.pg.viewport_size
+    await a.tap_xy(vw['width'] * .4, vw['height'] * .55); await a.frames(3)
+    if not await a.visible('#info .lim'): await a.hit('#info .free')  # ingeklapt → uitklappen
+    await a.frames(2)
+    r = await a.ev('()=>{const b=document.getElementById("info").getBoundingClientRect();return [b.left,b.top,b.right,b.bottom]}')
+    ok(vw['width'] - r[2] < 14 and r[2] - r[0] <= .36 * vw['width'], f'sonde liggend is geen smalle lade rechts: {r} (scherm {vw})')
+    ok(r[3] - r[1] > .6 * vw['height'], f'lade gebruikt de hoogte niet: {r}')
+    tape = await a.ev('()=>{const e=document.getElementById("tape");if(!e||getComputedStyle(e).display==="none"||e.offsetParent===null)return null;const b=e.getBoundingClientRect();return b.width?[b.left,b.top,b.right,b.bottom]:null}')
+    ok(not tape or tape[2] <= r[0] + 2, f'kolom "boven de sonde" overlapt of staat naast de lade (samen > ⅓): {tape}')
+    px = await a.ev('()=>{const v=window.__vfr;return v.scr(v.PROBE.x,v.PROBE.n)}')
+    ok(px[0] < r[0] - 10, f'sondepunt valt onder de lade: x={px[0]:.0f}, lade vanaf {r[0]:.0f}')
+    m = await a.menus_open(); ok(len(m) <= 1, f'meerdere menu\'s open: {m}')
+    await a.shot('landscape_probe')
+
 async def d_para_text(a):  # AIP ENR 5.5: elke paradropzone zijn eigen bovengrens en operator (was overal 'FL100 · ENPC')
     await a.hit('#modal [data-ac=glider]'); await a.frames(2)
     r = await a.ev('()=>{const v=window.__vfr;return v.LAYERS.filter(f=>f.layer==="PJA").map(f=>[f.ident,f.hiTxt,v.warnText(f)])}')
@@ -1089,7 +1106,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('doorsnede', d_cross_section), ('rondleiding', d_tour)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('doorsnede', d_cross_section), ('rondleiding', d_tour)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:

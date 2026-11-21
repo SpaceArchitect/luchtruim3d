@@ -14,6 +14,12 @@
 - Fix: klaring Deelen CTR dekt de RMZ Deelen (H24) erover (`d_ctr_covers_rmz`).
 - Fix: kantelen na ▶ / nieuwe opdracht: ijken op gemiddelde na 0,3 s rust (max 1,2 s), scheef tot 45° = rechtuit, vergrendelde liggende houding blijft (`d_tilt_pause_edges`, ruis + tik-schok).
 
+## Klaar op `wip/live-21nov`, nog niet live (sessie 21 nov middag)
+- "Houd de telefoon even stil"-melding bij onrustige hand na ▶ (getest, kantel groen).
+- Alle 74 ENR 5.5-terreinen in de regio als cilinder: scherm/delta, lierstart zweefvliegen (GND–2300 ft AGL), modelvliegen, ULV (`tools/build_enr55.py`, test `d_enr55_sites` groen).
+- Kaart liggend: sonde als lade rechts (≤ ⅓), kolom weg zolang de lade open is. **Nog niet getest** (`d_landscape_probe`).
+- Volledige suite liep half: misser `ballon voorbij doel` op p7l (nog uitzoeken: flaky of door de nieuwe terreinmeldingen?). Daarna volledige suite → live.
+
 ## Wacht op Christian
 - **Telefoontest kantelen**: pauzeer/▶ een paar keer, ook scheef vastgehouden, en na "Nieuwe opdracht".
 - Claude-browserpane op de pc inloggen op claude.ai (weeklimiet aflezen; 21 nov nog uitgelogd).
