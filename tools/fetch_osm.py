@@ -16,9 +16,10 @@ Q = {
     'power': 'way["power"="line"]["voltage"~"^(150000|220000|380000)"]',
     'wind': 'node["generator:source"="wind"]',
     'places': 'node["place"~"^(city|town|village)$"]',
-    'tall': 'node["man_made"~"^(tower|chimney|mast)$"]["height"]; way["building"]["height"]',
+    'tall': 'node["man_made"~"^(tower|chimney|mast)$"]["height"]',
 }
-UA = {'User-Agent': 'luchtruim3d-data (github.com/SpaceArchitect/luchtruim3d)', 'Content-Type': 'application/x-www-form-urlencoded'}
+ERR = []
+UA = {'User-Agent': 'luchtruim3d-data (github.com/SpaceArchitect/luchtruim3d)', 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json,*/*'}
 def overpass(q):
     body = urllib.parse.urlencode({'data': q}).encode()
     for k in range(4):
@@ -26,15 +27,17 @@ def overpass(q):
             with urllib.request.urlopen(urllib.request.Request('https://overpass-api.de/api/interpreter', data=body, headers=UA), timeout=300) as r:
                 return json.load(r)
         except Exception as e:
-            print('  retry', k, e); time.sleep(20 * (k + 1))
-    raise SystemExit('Overpass faalt')
+            msg = getattr(e, 'read', lambda: b'')()[:300]
+            print('  retry', k, e, msg); ERR.append(f'{e} {msg!r}'); time.sleep(20 * (k + 1))
+    return None
 for reg, (s, w, n, e) in REGIONS.items():
     if len(sys.argv) > 1 and reg not in sys.argv[1:]: continue
     out = os.path.join('osm', reg); os.makedirs(out, exist_ok=True)
     for name, sel in Q.items():
         parts = ''.join(f'{p.strip()}({s},{w},{n},{e});' for p in sel.split(';') if p.strip())
         d = overpass(f'[out:json][timeout:240];({parts});out geom;')
+        if d is None: print(reg, name, 'MISLUKT'); continue
         json.dump(d, open(os.path.join(out, name + '.json'), 'w'))
         print(reg, name, len(d.get('elements', [])))
         time.sleep(5)
-    json.dump({'bbox': [s, w, n, e], 'license': 'ODbL, © OpenStreetMap-bijdragers', 'fetched': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, open(os.path.join(out, 'meta.json'), 'w'))
+    json.dump({'bbox': [s, w, n, e], 'license': 'ODbL, © OpenStreetMap-bijdragers', 'fetched': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'errors': ERR}, open(os.path.join(out, 'meta.json'), 'w'))
