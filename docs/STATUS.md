@@ -43,6 +43,11 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 - Testharnas robuuster: wachten op wandklok i.p.v. frames (panel/looping), `fly()` wacht op het paneel.
 - 10 lierterreinen scherm-/deltavliegen in de regio (LVNL Hangglider-laag): paarse ring + label, waarschuwing onder 2000 ft binnen 1,5 km, vermelding in de sonde (`d_winch_sites`). Kabelhoogte staat niet in de data → verwijzing ENR 5.5.
 
+## Klaar op `wip/arnhem` (bovenop `wip/gevaren`, nog niet live)
+- **Regio uitgebreid tot 52.15 N**: Arnhem, Nijmegen, Rivierenland, Veluwezoom, Utrecht-zuid. Landschap uit OSM (`tools/build_landscape.py --region arnhem-nijmegen --clip 4.75,51.8,6.15,52.15 --write`), 92 luchtruimvolumes (o.a. Deelen CTR, Terlet GLD, Nieuw Milligen B/E, Schiphol-TMA-delen), velden Deelen/Terlet/Soesterberg, NL-vlak uit de OSM-landsgrens.
+- 2 nieuwe missies: *Naar de Veluwe* (Terlet, les Deelen CTR), *Over de Rijn* (Nijmegen → Arnhem).
+- **Open:** AIP-info Deelen (frequentie, openingstijden) ontbreekt → altijd "klaring nodig" (vereenvoudigd); herkenningspunten noord (Waalbrug, John Frostbrug, Eusebiuskerk) nog niet; full suite op 4 vormen nog draaien.
+
 ## Daarna
 - Gevarenlagen LVNL (Parajump, Miscellaneous, Obstacles), één klik naar de eAIP-plek, minimale vlieghoogtes SERA.5005(f) (pc).
 - Kaart liggend: sonde als smalle lade rechts.
