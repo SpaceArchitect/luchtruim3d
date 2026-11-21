@@ -536,8 +536,8 @@ async def d_panel_fixes(a):  # panelronde 14 nov (Fatima, Noor, Daan): elk punt 
     # radiomelding: Sluiten zichtbaar in beeld (Fatima 2, Noor 3, Daan 9)
     e = await a.ev(JS_FREE_EDGE, ['EHEH', 1.5, 1000])
     await a.place(e[0], e[1], 1000, e[2], paused=False)
-    for _ in range(80):
-        await a.frames(2)
+    for _ in range(150):  # op wandkloktijd wachten: onder belasting (volledige suite) zijn frames traag
+        await a.wait(100)
         if await a.v('v.NOTICE'): break
     await a.hit('#banner [data-rt^=open]')
     b = await a.pg.locator('#banner [data-rt=close]').bounding_box(); vw = a.pg.viewport_size
