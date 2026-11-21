@@ -17,3 +17,4 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 2026-11-21 Draaimoment: oorzaak bocht = vertraagde schermstandwissel (rol ±90° in het oude scherm). Aanpak: draai herkennen aan rol > 55°, koers/hoogte terugzetten, ijken na rust.
 - 2026-11-21 Licentie geregeld: LVNL Geoportaal-datasets (o.a. Airspace) staan onder CC BY 4.0 (metadata). Bronvermelding "LVNL, CC BY 4.0" in de footer.
 - 2026-11-21 Vanaf GitHub Actions bereikbaar: Geoportaal-API, eAIP (curl + UA), Overpass, luchtruim3d.nl. Daarmee kan vrijwel alles in de cloud; de thuisbot-route is niet nodig.
+- 2026-11-21 Vergrendelde schermstand: sturen in het assenstelsel van hoe de telefoon vastgehouden wordt (zwaartekracht, kleinste rol over 0/90/180/270). Rust meten in dat assenstelsel; rond 90° springen de schermhoeken.

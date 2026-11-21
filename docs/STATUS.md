@@ -25,7 +25,7 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 - Doelbaken: lichtbundel, draaiende ruit, uitdijende ring. Kaart liggend: tijduitleg verborgen.
 
 ## Top 5 (de noordster: conflicten zien)
-1. **Draaimoment afmaken** (zie 5) en Christian laten testen op zijn telefoon.
+1. **Draaimoment live** na Christians telefoontest (zie 5).
 2. **Data via GitHub Actions** (akkoord Christian 21 nov; `.github/workflows/data-probe.yml` → branch `data/probe`). Bereikbaar vanaf GitHub:
    ✓ **Geoportaal-API** `geoportaal.lvnl.nl/api/search/v1/collections/all/items` → datasets Airspace/Aerodrome/Route/Waypoint/Navaid (Feature Service, WFS, OGC), **licentie CC BY 4.0** ✓.
    ✓ **eAIP** met `curl` + browser-User-Agent (Playwright krijgt Cloudflare-check); edities als `AIRAC AMDT 12-2026_2026_11_26\index.html`.
@@ -34,7 +34,7 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 3. **Data uit index.html** naar `data/luchtruim.json` + `data/regio-*.json`, één ophaalscript (LVNL via Chrome op de pc). Fundament voor uitbreiding.
 4. **Arnhem–Nijmegen**: Malden, Deelen, Terlet, Nieuw Milligen TMA, SUP 03/2022, 3 regiomissies, link `#arnhem`.
 6. **"Heel Nederland-week" met de full reset (±3–6 dec, vóór 10 dec):** luchtruim landelijk in één keer; landschap per regio (Randstad → Noord → Zeeland/Limburg); alle data binnen vóór Mexico.
-5. **Draaimoment staand↔liggend** (Christian: "essentieel"): branch `wip/draaien`. Bevriezen + koers terugzetten bij een draai, ijken na 0,4 s rust; test `d_tilt_rotate_real` (oude code: 65° bocht). **Open:** vergrendelde schermstand (rol ~90° in het oude scherm) wordt nog niet goed geijkt. Eerst doen in de nieuwe chat.
+5. **Draaimoment staand↔liggend:** fix klaar op `wip/draaien` (alle kanteltests groen, ook vergrendelde schermstand via zwaartekracht-assenstelsel). Wacht op Christians telefoontest + "ok" → live.
 
 ## Daarna
 - Gevarenlagen LVNL (Parajump, Miscellaneous, Obstacles), één klik naar de eAIP-plek, minimale vlieghoogtes SERA.5005(f) (pc).
