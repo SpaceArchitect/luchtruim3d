@@ -2270,6 +2270,7 @@ function hudTick(){document.body.classList.toggle('menuopen',!$('panel').classLi
         NOTICE=`${vf.f.layer==='P'?'⛔':vf.clr?'🔶':'⚠'} ${cl>0?'Boven':'Onder'} je ${cl>0?'vanaf':'tot'} ${fmtAlt(b)}: <b>${short(vf.f)}</b>${vf.clr?' · klaring nodig':vf.f.layer==='P'?' · verboden':''}${rtLine(ii)}<br><small>▶ = verder</small>${vf.clr&&ii&&ii.freq&&!RELAX?rtButton(vf.f):''}`;}}}}
     // opnieuw waarschuwen na verlaten: wat ~4 s niet meer binnen of vóór je ligt, mag weer
     for(const f of INSIDE)SEEN.set(f.ident,NOW);if(ahead)SEEN.set(ahead.f.ident,NOW);
+    for(const h of hgNear(PLANE.x,PLANE.n,2.6))if(PLANE.alt<=h.top+700)SEEN.set('HG'+h.ident,NOW);/* terrein blijft 'gezien' zolang je in de buurt bent: één melding per nadering (Christian 21 nov) */
     for(const id of [...WARNED])if(!PAUSED&&NOW-(SEEN.get(id)||0)>4000)WARNED.delete(id);for(const id of [...REFW])if(!PAUSED&&NOW-(SEEN.get(id)||0)>4000)REFW.delete(id);
     if(ACTYPE==='balloon'){const w=windAt(PLANE.alt),dh=((w.from+180)%360)*Math.PI/180,L=w.kt*1.852/60*10;let hit=null;
       for(let d=.5;d<=L&&!hit;d+=.5){const fs=applies(featsAt(PLANE.x+Math.sin(dh)*d,PLANE.n+Math.cos(dh)*d),PLANE.alt);const g=governing(fs);const p=fs.find(f=>f.layer==='P'||f.layer==='R');

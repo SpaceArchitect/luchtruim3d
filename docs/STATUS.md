@@ -17,8 +17,13 @@
 ## Klaar op `wip/live-21nov`, nog niet live (sessie 21 nov middag)
 - "Houd de telefoon even stil"-melding bij onrustige hand na ▶ (getest, kantel groen).
 - Alle 74 ENR 5.5-terreinen in de regio als cilinder: scherm/delta, lierstart zweefvliegen (GND–2300 ft AGL), modelvliegen, ULV (`tools/build_enr55.py`, test `d_enr55_sites` groen).
-- Kaart liggend: sonde als lade rechts (≤ ⅓), kolom weg zolang de lade open is. **Nog niet getest** (`d_landscape_probe`).
-- Volledige suite liep half: misser `ballon voorbij doel` op p7l (nog uitzoeken: flaky of door de nieuwe terreinmeldingen?). Daarna volledige suite → live.
+- Kaart liggend: sonde als lade rechts (≤ ⅓), kolom weg zolang de lade open is (`d_landscape_probe` 4/4).
+- Fix terreinmeldingen (lier e.d.): kwamen elke 4 s terug zolang je in de buurt bleef (ENR 5.5-terreinen werden nooit als 'gezien' gemarkeerd). Nu één melding per nadering, zoals luchtruim. Test in `d_enr55_sites`.
+- 'ballon voorbij doel' was geen flaky: tests zetten alleen luchtruim op 'gewaarschuwd', niet de terreinen → tests aangepast. Quick 14/14.
+- **Volgende:** volledige suite → live.
+
+## Nieuwe opdracht Christian (21 nov middag)
+Zie `docs/OPDRACHT-21nov.md`: tutorial + startflow, MSFS-besturing, sneltoetskaart, Spatie bij keerpunten, herkenningspunten-audit, ballonrealisme.
 
 ## Wacht op Christian
 - **Telefoontest kantelen**: pauzeer/▶ een paar keer, ook scheef vastgehouden, en na "Nieuwe opdracht".

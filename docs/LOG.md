@@ -25,3 +25,4 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 2026-11-21 Lierterreinen: hoogte uit AIP ENR 5.5 (cirkel 250 m, 500–2000 ft); getekend als cilinder in ware grootte, waarschuwing tot top+500 ft.
 - 2026-11-21 Kantelen na ▶: niet ijken op het eerste meetpunt (tik-schok) maar op het gemiddelde na 0,3 s rust t.o.v. het lopende gemiddelde; rol tot 45° = nulstand. Les: test pauze/hervat met schok en scheve houding.
 - 2026-11-21 ENR 5.5 is de bron voor alle terreinen met een cirkel (lier, lierstart, model, ULV): hoogte + straal uit de AIP, één bouwscript. Malden: eerst modelvliegen (0,5 NM), dan lierstart.
+- 21 nov: WARNED verloopt na 4 s zonder SEEN; ENR 5.5-terreinen kregen nooit SEEN → herhaalde meldingen (Christian). Terreinen binnen 2,6 km/onder top+700 ft nu in SEEN. Les: elke nieuwe meldingsbron moet ook SEEN bijwerken.

@@ -133,7 +133,7 @@ async def t_aircraft(a):
         await a.fly(ac)
         st = await a.v('v.PLANE')
         await a.place(st['x'], st['n'], 1500, st['hdg'], paused=True)
-        await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident)}')  # alleen de knop testen, geen luchtruimmelding
+        await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident)}')  # alleen de knop testen, geen luchtruimmelding
         await a.hit('#btnPause'); ok(not await a.v('v.PAUSED'), f'{ac}: start-knop hervat niet ({(await a.v("v.NOTICE") or "")[:60]!r})')
         alt0 = await a.v('v.PLANE.alt')
         if a.touch: await a.hold('#ctrl [data-k=arrowup]', 900)
@@ -150,7 +150,7 @@ async def t_aircraft(a):
         # geen melding mag tussendoor zelf pauzeren (lierterrein, doel, luchtruim): anders zet de tik hem juist weer aan
         await a.ev('''()=>{const v=window.__vfr;for(let k=0;k<3000;k++){const x=v.PLANE.x+(Math.random()-.5)*60,n=v.PLANE.n+(Math.random()-.5)*60;
           if(v.inNL(x,n)&&!v.featsAt(x,n).some(f=>f.lo<4000)&&![1,2,3,4,5,6].some(d=>v.featsAt(x+Math.sin(v.PLANE.hdg*Math.PI/180)*d,n+Math.cos(v.PLANE.hdg*Math.PI/180)*d).some(f=>f.lo<4000))&&!v.hgNear(x,n,4).length){v.PLANE.x=x;v.PLANE.n=n;break}}
-          for(const f of v.LAYERS)v.WARNED.add(f.ident);v.GOAL=null;v.TASK="";v.NOTICE="";v.PAUSED=false;v.hudTick()}''')
+          for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);v.GOAL=null;v.TASK="";v.NOTICE="";v.PAUSED=false;v.hudTick()}''')
         await a.hit('#btnPause'); ok(await a.v('v.PAUSED'), f'{ac}: pauze werkt niet ({(await a.v("v.NOTICE") or "")[:60]!r})')
         await a.shot('fly_' + ac)
     await a.hit('#btnMode'); ok(await a.v('v.MODE') == 'map', 'terug naar kaart werkt niet')
@@ -378,14 +378,14 @@ async def d_balloon_past(a):
     await a.hit('#modal [data-ac=balloon]')
     st = await a.v('v.PLANE')
     await a.place(st['x'], st['n'], 800, st['hdg'], paused=False)
-    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);v.GOAL={x:v.PLANE.x-0.1,n:v.PLANE.n-4.2,name:"Testdoel",min:1.7};v.TASK="Drijf naar Testdoel";v.hudTick()}')
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);v.GOAL={x:v.PLANE.x-0.1,n:v.PLANE.n-4.2,name:"Testdoel",min:1.7};v.TASK="Drijf naar Testdoel";v.hudTick()}')
     n = await a.v('v.NOTICE') or ''
     ok('Missie mislukt' in n and 'ballon' in n, f'ballon voorbij doel geen "mislukt": {n[:80]!r}')
     ok(await a.v('v.GOAL') is None, 'doel blijft staan na mislukt')
     await a.fly('glider')
     st = await a.v('v.PLANE')
     await a.place(st['x'], st['n'], 1500, st['hdg'], paused=False)
-    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);v.GOAL={x:v.PLANE.x,n:v.PLANE.n-4.2,name:"Testdoel",min:1.7};v.hudTick()}')  # andere meldingen uit: alleen 'doel gemist' testen
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);v.NOTICE="";v.PAUSED=false;v.GOAL={x:v.PLANE.x,n:v.PLANE.n-4.2,name:"Testdoel",min:1.7};v.hudTick()}')  # andere meldingen uit: alleen 'doel gemist' testen
     n = await a.v('v.NOTICE') or ''
     ok('Doel gemist' in n, f'zweefvliegtuig voorbij doel: {n[:60]!r}')
 
@@ -508,7 +508,7 @@ async def d_cam_no_jump(a):  # Christian 14 nov: 'hele beeld schokt en springt h
     for ac in ('glider', 'balloon', 'motor'):
         await a.fly(ac)
         st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2000, st['hdg'], paused=False)
-        await a.ev('()=>{const v=window.__vfr;v.setTempo(5);for(const f of v.LAYERS)v.WARNED.add(f.ident);window.__R=[];const f=()=>{const c=v.camera.position,p=v.PLANE;window.__R.push([c.x-p.x,c.y,-c.z-p.n]);if(window.__R.length<500)requestAnimationFrame(f)};requestAnimationFrame(f)}')
+        await a.ev('()=>{const v=window.__vfr;v.setTempo(5);for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);window.__R=[];const f=()=>{const c=v.camera.position,p=v.PLANE;window.__R.push([c.x-p.x,c.y,-c.z-p.n]);if(window.__R.length<500)requestAnimationFrame(f)};requestAnimationFrame(f)}')
         await a.wait(800)
         vw = a.pg.viewport_size; cx, cy = vw['width'] * .45, vw['height'] * .55
         if a.touch:
@@ -579,7 +579,7 @@ async def d_tilt_rotate(a):  # Christian 14 nov avond: na staand→liggend→sta
     if not a.touch: return
     await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
     st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2000, 0, paused=False)
-    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident)}')
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident)}')
     keys = '[v.keys.tl,v.keys.tr,v.keys.tu,v.keys.td]'
     cdp = await a.ctx.new_cdp_session(a.pg); vw = a.pg.viewport_size
     W, H = min(vw['width'], vw['height']), max(vw['width'], vw['height'])
@@ -635,7 +635,7 @@ async def d_tilt_loop_balloon(a):  # Christian: looping door te kantelen; ballon
     st = await a.ev('()=>{const v=window.__vfr;for(let k=0;k<3000;k++){const x=v.PLANE.x+(Math.random()-.5)*60,n=v.PLANE.n+(Math.random()-.5)*60;if(v.inNL(x,n)&&!v.featsAt(x,n).some(f=>f.lo<4000)&&!v.featsAt(x+Math.sin(0)*6,n+6).some(f=>f.lo<4000))return {x,n}}return null}')
     ok(st, 'geen vrije plek gevonden')
     await a.place(st['x'], st['n'], 2000, 0, paused=True)  # eerst alle meldingen 'gezien', dan pas vliegen (race)
-    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.NOTICE="";v.PAUSED=false;v.resetTilt()}')
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.NOTICE="";v.PAUSED=false;v.resetTilt()}')
     ang = await a.v('v.tiltAng()')
     await a.ev(SEND, orient(0, 0, ang)); await a.ev(SEND, orient(0, 25, ang))
     ok(not await a.v('!!v.LOOP'), 'looping al bij 25° (moet ver kantelen)')
@@ -652,7 +652,7 @@ async def d_tilt_loop_balloon(a):  # Christian: looping door te kantelen; ballon
     st = await a.ev('()=>{const v=window.__vfr;for(let k=0;k<3000;k++){const x=v.PLANE.x+(Math.random()-.5)*60,n=v.PLANE.n+(Math.random()-.5)*60;if(v.inNL(x,n)&&!v.featsAt(x,n).some(f=>f.lo<4000))return {x,n}}return null}')
     ok(st, 'geen vrije plek voor de ballon gevonden')
     await a.place(st['x'], st['n'], 1000, 0, paused=False)
-    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);v.resetTilt()}')
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);v.resetTilt()}')
     await a.ev(SEND, orient(0, 0, ang)); await a.ev(SEND, orient(0, 20, ang))
     alt0 = await a.v('v.PLANE.alt')
     for _ in range(100):
@@ -821,7 +821,7 @@ async def d_tilt_rotate_real(a):  # Christian 21 nov: het draaimoment staand↔l
     if not a.touch or a.form == 'p7l': return
     await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
     st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2000, 0, paused=False)
-    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident)}')
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident)}')
     cdp = await a.ctx.new_cdp_session(a.pg); vw = a.pg.viewport_size
     W, H = min(vw['width'], vw['height']), max(vw['width'], vw['height'])
     rng = random.Random(21)
@@ -875,7 +875,7 @@ async def d_winch_sites(a):  # backlog 15 nov: schermvlieg-/lierterreinen ontbra
     exp = 1500 * 0.0003048 * await a.v('v.EXAG')
     ok(abs(cyl[0] - exp) < 0.05 and abs(cyl[1] - 0.5) < 0.05, f'cilinder Sterksel: top {cyl[0]:.2f} (verwacht {exp:.2f}), breedte {cyl[1]:.2f} km (verwacht 0,5)')
     await a.place(h['x'] - 1.6, h['n'] - .3, 900, 80, paused=True)
-    await a.ev('(h)=>{const v=window.__vfr;v.WARNED.add("HG"+h.ident);for(const f of v.LAYERS)v.WARNED.add(f.ident);v.NOTICE="";v.hudTick()}', h); await a.frames(6)
+    await a.ev('(h)=>{const v=window.__vfr;v.WARNED.add("HG"+h.ident);for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);v.NOTICE="";v.hudTick()}', h); await a.frames(6)
     await a.shot('winch_cylinder')
     await a.place(h['x'] - 3, h['n'], 3000, 90, paused=False)
     await a.ev('(h)=>{const v=window.__vfr;v.WARNED.delete("HG"+h.ident);Object.assign(v.PLANE,{x:h.x,n:h.n});v.hudTick()}', h)
@@ -903,7 +903,7 @@ async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren
     if not a.touch: return
     await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
     st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2500, 0, paused=False)
-    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident)}')
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident)}')
     rng = random.Random(int(os.environ.get('TILT_SEED', '2111')))
     import time as _t
     ang0 = await a.v('v.tiltAng()')
@@ -933,7 +933,7 @@ async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren
     await resume_check('erg scheef (32°)', -32, -5)
     await resume_check('rechtop', 0, 0)
     # na een nieuwe opdracht (missie klaar) idem
-    await a.ev('()=>{const v=window.__vfr;v.newTask();for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.PLANE.alt=Math.max(v.PLANE.alt,2500)}')
+    await a.ev('()=>{const v=window.__vfr;v.newTask();for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.PLANE.alt=Math.max(v.PLANE.alt,2500)}')
     ok(await a.v('v.PAUSED'), 'nieuwe opdracht start niet in pauze')
     await a.hit('#btnPause')  # was pauze → eerst nog even pauzeren zodat resume_check het patroon volgt
     await resume_check('na nieuwe opdracht', 12, 5)
@@ -973,6 +973,15 @@ async def d_enr55_sites(a):  # 21 nov: alle ENR 5.5-terreinen (lier, lierstart z
             if n: break
         ok(word in n and lim in n, f'{nm}: verwacht "{word}" en "{lim}": {n[:140]}')
         if typ == 'gld': ok('123.355' in n, f'Malden: frequentie ontbreekt: {n[:160]}')
+        # Christian 21 nov: bij een lierterrein kwam elke 4 s opnieuw een melding. Eén keer per nadering, zoals bij luchtruim.
+        await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.PAUSED=false}')
+        rep = ''
+        for _ in range(60):
+            await a.wait(100)
+            await a.ev('(h)=>{const v=window.__vfr;v.PLANE.x=h.x-h.r-0.9;v.PLANE.n=h.n;v.PLANE.alt=800;v.PAUSED=false;v.hudTick()}', h)
+            rep = await a.v('v.NOTICE') or ''
+            if word in rep: break
+        ok(word not in rep, f'{nm}: melding herhaalt zich terwijl je er nog bent: {rep[:80]}')
     b = next(x for x in hg if x['nm'] == 'Boxtel')
     w = await a.ev('(nm)=>{const v=window.__vfr;const c=v.hgCyl.children.find(m=>m.userData.hg===nm&&m.userData.typ==="uas");const b=new v.THREE.Box3().setFromObject(c);return b.max.x-b.min.x}', 'Boxtel')
     ok(abs(w - 2 * 0.926) < 0.05, f'Boxtel: straal 0,5 NM verwacht, breedte {w:.2f} km')
@@ -1039,7 +1048,7 @@ async def d_ahead_full(a):  # Noor 1: frequentie in de waarschuwingsregel nooit 
     await a.hit('#modal [data-ac=motor]')
     e = await a.ev(JS_FREE_EDGE, ['EHEH', 1.8, 1000])
     await a.place(e[0], e[1], 1000, e[2], paused=True)
-    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);v.hudTick()}'); await a.frames(2)
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);v.hudTick()}'); await a.frames(2)
     r = await a.ev('()=>{const t=document.querySelector("#banner .ahead");return t?[t.innerText,t.scrollWidth,t.clientWidth]:null}')
     ok(r and '131.005' in r[0] and r[1] <= r[2] + 1, f'waarschuwingsregel afgekapt: {r}')
 
