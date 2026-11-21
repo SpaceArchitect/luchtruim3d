@@ -50,6 +50,9 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 - **eAIP-spiegel** draait: `tools/fetch_eaip.py` + workflow → branch `data/eaip` (ENR 1/2/5, GEN 2.1, AD 2 van burgervelden; militaire velden staan niet in AD 2).
 - **Open:** Eusebiuskerk toegevoegd; bruggen (Waalbrug, John Frostbrug) niet betrouwbaar in OSM-namen → later;
 
+## AIRAC-wissel 26 nov (AMDT 12-2026)
+- Na donderdag: `git fetch origin data/lvnl data/eaip`, dan `python tools/build_airspace.py --bbox 4.75,51.2,6.15,52.15 --check` en `python tools/aip_check.py` (21 nov: 16/16 frequenties OK tegen AMDT 11-2026). AIRAC-datum in de footer bijwerken.
+
 ## Daarna
 - Gevarenlagen LVNL (Parajump, Miscellaneous, Obstacles), één klik naar de eAIP-plek, minimale vlieghoogtes SERA.5005(f) (pc).
 - Kaart liggend: sonde als smalle lade rechts.

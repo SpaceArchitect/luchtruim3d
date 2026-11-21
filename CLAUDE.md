@@ -72,7 +72,8 @@ python tools/e2e.py --quick  # ±3 min: smoke-tests op desktop + Pixel 7
 | Wat | Cloud | Pc (desktop-app) |
 |---|---|---|
 | Code, tests, git push | ✓ (repo als bron toevoegen met push-rechten) | ✓ |
-| luchtruim3d.nl / LVNL / OSM bekijken | ✗ (proxy blokkeert) | ✓ via Claude in Chrome / ingebouwde browser |
+| LVNL-data, eAIP, OSM | ✓ via GitHub Actions → branches `data/lvnl`, `data/eaip`, `data/osm` (wekelijks; `tools/fetch_*.py`) | ✓ |
+| luchtruim3d.nl live bekijken | via Actions (`data-probe`) | ✓ via Claude in Chrome / ingebouwde browser |
 | Weeklimiet aflezen (claude.ai → Instellingen → Gebruik) | ✗ | ✓ als de browser is ingelogd |
 
 Iets niet bereikbaar? Ga gewoon door met wat wél kan, en schrijf in `docs/STATUS.md`
@@ -93,6 +94,7 @@ we zo op: **hoe dichter bij de gebruiker, hoe strenger.**
 | Commit op een werkbranch | `--quick` |
 | Publiceren naar `main` | de volledige suite (`e2e.py`, ±40 min), alle 4 schermvormen |
 | Raakt het sensoren of touch (kantelen, gebaren, draaien)? | test met *realistische* ruis (±5° trillende hand), en Christian test op zijn telefoon vóór of direct na live |
+| Nieuwe AIRAC (elke 28 dagen, donderdag) | `git fetch origin data/lvnl data/eaip` → `python tools/build_airspace.py --bbox … --check` en `python tools/aip_check.py` |
 | Na publicatie, als de pc bereikbaar is | open de live site in Chrome; anders controleer je de Pages-deploy via GitHub |
 
 Bug gevonden of gemeld? Eerst een test die faalt, dan de fix. Zo komt hij niet terug.
