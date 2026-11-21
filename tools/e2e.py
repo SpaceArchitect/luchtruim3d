@@ -85,9 +85,10 @@ class App:
     async def fly(s, ac):  # via de echte knoppen naar vliegen met toestel ac
         if not await s.visible('#modal [data-ac=%s]' % ac):
             if await s.v('v.MODE') != 'fly': await s.hit('#btnMode')
-            if not await s.visible('#modal [data-ac=%s]' % ac):
-                if not await s.visible('#btnAc'): await s.hit('#btnPanel')
-                await s.hit('#btnAc')
+            for _ in range(2):  # paneel schuift in; op klein scherm viel de tik soms midden in de animatie
+                if await s.visible('#modal [data-ac=%s]' % ac): break
+                if not await s.visible('#btnAc'): await s.hit('#btnPanel'); await s.wait(400)
+                await s.hit('#btnAc'); await s.wait(300)
         await s.hit('#modal [data-ac=%s]' % ac)
         await s.frames(3)
         ok(await s.v('v.MODE') == 'fly' and await s.v('v.ACTYPE') == ac, f'niet in vliegmodus met {ac}')
