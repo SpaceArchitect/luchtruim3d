@@ -637,8 +637,8 @@ async def d_tilt_loop_balloon(a):  # Christian: looping door te kantelen; ballon
     ok(not await a.v('!!v.LOOP'), 'looping al bij 25° (moet ver kantelen)')
     await a.ev(SEND, orient(0, 45, ang)); await a.frames(2)
     ok(await a.v('!!v.LOOP'), 'geen looping bij ver naar je toe kantelen ' + json.dumps(await a.v('[v.PAUSED,v.NOTICE,v.PLANE.alt,v.TILT,v.MODE,v.ACTYPE]')))
-    for _ in range(400):
-        await a.frames(2)
+    for _ in range(300):  # wandklok (max 30 s): onder belasting zijn frames traag
+        await a.wait(100)
         if not await a.v('!!v.LOOP'): break
     ok(not await a.v('!!v.LOOP'), 'looping eindigt niet')
     await a.ev(SEND, orient(0, 45, ang)); await a.frames(2)
