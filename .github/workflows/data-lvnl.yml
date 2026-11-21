@@ -1,0 +1,24 @@
+name: data-lvnl
+# LVNL Geoportaal (CC BY 4.0) → branch data/lvnl. Akkoord Christian 21 nov. Raakt main/live niet.
+on:
+  push:
+    branches: ['wip/**']
+    paths: ['tools/fetch_lvnl.py', '.github/workflows/data-lvnl.yml']
+  workflow_dispatch:
+  schedule:
+    - cron: '17 6 * * 4'   # wekelijks (donderdag; AIRAC-wissels vallen op donderdag)
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/fetch_lvnl.py
+      - name: Naar branch data/lvnl
+        run: |
+          git config user.name "luchtruim3d-bot"; git config user.email "bot@luchtruim3d.nl"
+          git checkout --orphan data/lvnl
+          git rm -rq --cached . ; git add -f lvnl
+          git commit -qm "LVNL Geoportaal $(date -u +%F)"
+          git push -f origin HEAD:refs/heads/data/lvnl
