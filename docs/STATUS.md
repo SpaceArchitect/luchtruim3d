@@ -46,7 +46,9 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 ## Klaar op `wip/arnhem` (bovenop `wip/gevaren`, nog niet live)
 - **Regio uitgebreid tot 52.15 N**: Arnhem, Nijmegen, Rivierenland, Veluwezoom, Utrecht-zuid. Landschap uit OSM (`tools/build_landscape.py --region arnhem-nijmegen --clip 4.75,51.8,6.15,52.15 --write`), 92 luchtruimvolumes (o.a. Deelen CTR, Terlet GLD, Nieuw Milligen B/E, Schiphol-TMA-delen), velden Deelen/Terlet/Soesterberg, NL-vlak uit de OSM-landsgrens.
 - 2 nieuwe missies: *Naar de Veluwe* (Terlet, les Deelen CTR), *Over de Rijn* (Nijmegen → Arnhem).
-- **Open:** AIP-info Deelen (frequentie, openingstijden) ontbreekt → altijd "klaring nodig" (vereenvoudigd); herkenningspunten noord (Waalbrug, John Frostbrug, Eusebiuskerk) nog niet; full suite op 4 vormen nog draaien.
+- Deelen: AIP ENR 2.1/2.2 (AIRAC 11-2026) → Tower 129.930, CTR HO (dus altijd als actief getoond + NOTAM-hint), RMZ H24 Dutch MIL Info 132.350.
+- **eAIP-spiegel** draait: `tools/fetch_eaip.py` + workflow → branch `data/eaip` (ENR 1/2/5, GEN 2.1, AD 2 van burgervelden; militaire velden staan niet in AD 2).
+- **Open:** herkenningspunten noord (Waalbrug, John Frostbrug, Eusebiuskerk) nog niet; full suite op 4 vormen nog draaien.
 
 ## Daarna
 - Gevarenlagen LVNL (Parajump, Miscellaneous, Obstacles), één klik naar de eAIP-plek, minimale vlieghoogtes SERA.5005(f) (pc).

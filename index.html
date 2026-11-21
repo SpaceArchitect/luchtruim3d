@@ -1614,7 +1614,7 @@ function effLo(f,col){let lo=f.lo;for(let k=0;k<4;k++){const ex=(EXCL[f.ident]||
 // Radio en tijden per luchtruim (lokale tijd)
 const AIPINFO={
   EHEH:{unit:'Eindhoven Tower',freq:'131.005',hrs:'eh'}, EHDP:{unit:'Eindhoven Tower (deel bij Volkel: Volkel Tower 136.080)',freq:'131.005',hrs:'eh'},
-  EHVK:{unit:'Volkel Tower',freq:'136.080',hrs:'mil'}, EHGR:{unit:'Gilze-Rijen Tower',freq:'125.330',hrs:'mil'},
+  EHVK:{unit:'Volkel Tower',freq:'136.080',hrs:'mil'},EHDL:{unit:'Deelen Tower',freq:'129.930',hrs:'ho'},EHDLRMZ:{unit:'Dutch MIL Info',freq:'132.350',hrs:'h24'}/* AIP ENR 2.1/2.2, AIRAC 11-2026: CTR HO, buiten bedrijfstijd Dutch MIL Info; RMZ H24 */, EHGR:{unit:'Gilze-Rijen Tower',freq:'125.330',hrs:'mil'},
   EBBL2:{unit:'Kleine-Brogel Approach',freq:'134.480',hrs:'be',note:'Toestemming nodig om erin te vliegen.'},
   EDLV2:{unit:'Niederrhein Tower',freq:'129.405',hrs:'de',note:'Klaring nodig om erin te vliegen of over te steken.'},
   EHEH1:{unit:'Eindhoven Arrival (VFR oversteken)',freq:'132.530',hrs:'eh'},EHEH2:{unit:'Eindhoven Arrival (VFR oversteken)',freq:'132.530',hrs:'eh'},EHEH3:{unit:'Eindhoven Arrival (VFR oversteken)',freq:'132.530',hrs:'eh'},EHEH4:{unit:'Eindhoven Arrival (VFR oversteken)',freq:'132.530',hrs:'eh'},
@@ -1632,7 +1632,7 @@ const AIPINFO={
   EHAAPJA010:{warn:'Paradropzone tot FL100: parachutisten en het afzettoestel. Activiteit wordt dagelijks bekendgemaakt. Operator: Skydive ENPC, 0165 320 955.'},
   EHVKRMZ:{unit:'Dutch MIL Info',freq:'132.350',hrs:'miloff'}/* AIP ENR 2.2 RMZ VOLKEL: SAT SUN HOL H24, Dutch MIL Info 132.350 */,EHGRRMZ:{unit:'Dutch MIL Info',freq:'132.350',hrs:'miloff'},
 };
-const HRS_TXT={eh:'open 07:00–24:00',mil:'open ma–vr 08:00–16:45 (niet op feestdagen)',be:'tijden: zie AIP België',de:'tijden: zie AIP Duitsland',h24:'H24',
+const HRS_TXT={ho:'actief wanneer operationeel nodig (HO): check NOTAM',eh:'open 07:00–24:00',mil:'open ma–vr 08:00–16:45 (niet op feestdagen)',be:'tijden: zie AIP België',de:'tijden: zie AIP Duitsland',h24:'H24',
   ehoff:'actief 00:00–07:00 (als Eindhoven Tower dicht is)',miloff:'actief buiten ma–vr 08:00–16:45 (als de toren dicht is)'};
 let TIMEMODE=(E2E&&(/[?&]t=(wkday|weekend)/.exec(location.search)||[])[1])||'now';// testharnas: vast tijdstip, anders hangt de uitslag van de klok af
 let CUSTOM={dow:6,min:14*60};const DAYS=['zo','ma','di','wo','do','vr','za'];
