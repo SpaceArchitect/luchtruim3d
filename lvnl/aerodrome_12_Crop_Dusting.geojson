@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "id": 26710, "geometry": {"type": "Point", "coordinates": [4.95027777800004, 52.8352777920001]}, "properties": {"OBJECTID": 26710, "usage_nl": "C", "ControlType": null, "Designator": "EHV022", "Name": "SLOOTDORP", "Type": "LS", "Source": "AeroDB", "EffectiveDate": 1793232000000, "MaxCableHeight": null}}]}
