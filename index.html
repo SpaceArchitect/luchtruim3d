@@ -1734,7 +1734,9 @@ document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
   const off=()=>{keys[k]=false;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);});
 function setTempo(i){TI=Math.max(0,Math.min(TEMPOS.length-1,i));$('tempo').value=TI;$('tempoVal').textContent='×'+TEMPO();$('tChip').textContent='×'+TEMPO();}
-function togglePause(){PAUSED=!PAUSED;if(!PAUSED){NOTICE='';if(TILT)TILT=null;/* ▶ = opnieuw ijken: zo houd je hem nu = rechtuit */}}
+function togglePause(){PAUSED=!PAUSED;if(!PAUSED){NOTICE='';tiltRecal();/* ▶ = opnieuw ijken: zo houd je hem nu = rechtuit */}}
+function tiltRecal(){/* Christian 21 nov: na ▶ of een nieuwe opdracht ging kantelen soms de mist in: er werd geijkt op het eerste sensorsignaal (de tik-schok), scheef vasthouden (>25°) werd een vaste bocht en de vergrendelde liggende houding ging verloren. Nu: besturing even neutraal, ijken zodra de telefoon 0,3 s rustig is (uiterlijk 1,2 s), rol tot 45° telt als rechtuit, fysieke houding blijft. */
+  if(!$('optTilt').checked||!TILT){TILT=null;return;}const now=performance.now();TILT={recal:true,pend:true,ang:TILT.ang,sAng:TILT.sAng,phys:TILT.phys,start:now,ts:now};keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;}
 let wheelAcc=0;renderer.domElement.addEventListener('wheel',e=>{if(MODE!=='fly')return;e.preventDefault();if(e.shiftKey||e.ctrlKey){const dz=e.deltaY||e.deltaX;/* Chrome/Windows maakt van Shift+scrollen horizontaal scrollen (deltaX): zoomen werkte niet (Christian 14 nov) */CAM.dist=Math.max(.35,Math.min(6,CAM.dist*Math.exp(dz*.0012)));return;}wheelAcc+=e.deltaY;if(Math.abs(wheelAcc)>=60){setTempo(TI+(wheelAcc<0?1:-1));wheelAcc=0;}},{passive:false});// scrollen = tempo (zoals eerst), Shift/Ctrl+scrollen of knijpen = zoomen
 $('btnLoop').onclick=()=>startLoop();
 // ---------- kantelsturing (Boyd): links/rechts kantelen = draaien, voorover = dalen, achterover = stijgen ----------
@@ -1761,6 +1763,11 @@ function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite
     const H=TILT.hist||[];let k=H.length-1;while(k>0&&Math.abs(H[k][1])>8)k--;if(H[k]&&now-H[k][0]<1500&&MODE==='fly'&&!LOOP){PLANE.hdg=H[k][2];PLANE.alt=H[k][3];PLANE.bank=0;}
     TILT={ang,sAng,pend:true,t,p,ts:now,start:now};}
   if(TILT&&(TILT.ang!==ang||(TILT.sAng!==undefined&&TILT.sAng!==sAng)))TILT={ang,sAng,pend:true,t,p,ts:now,start:TILT.pend?TILT.start:now};
+  if(TILT&&TILT.recal){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;
+    if(TILT.qt===undefined||Math.abs(t-TILT.qt)>9||Math.abs(p-TILT.qp)>9){TILT.qt=t;TILT.qp=p;TILT.ts=now;TILT.S=[0,0,0];}TILT.S[0]+=t;TILT.S[1]+=p;TILT.S[2]++;
+    if(now-TILT.ts<300&&now-TILT.start<1200)return;
+    const mt=TILT.S[0]/TILT.S[2],mp=TILT.S[1]/TILT.S[2];/* gemiddelde over het rustige stuk: één trillend meetpunt is geen goede nulstand */
+    if(Math.abs(mt)<45){TILT={p0:mp,t0:mt,ang,sAng,phys:TILT.phys};return;}TILT={ang,sAng,pend:true,t,p,ts:now,start:now};}
   if(TILT&&TILT.pend){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;
     const pa=physAng(e.beta,e.gamma),q=tiltAngles(e.beta,e.gamma,pa);// rust meten in het fysieke assenstelsel: geen sprongen rond 90°
     if(Math.abs(q.t-(TILT.qt??q.t))>9||Math.abs(q.p-(TILT.qp??q.p))>9||TILT.pa!==pa){TILT.qt=q.t;TILT.qp=q.p;TILT.pa=pa;TILT.ts=now;}else if(TILT.qt===undefined){TILT.qt=q.t;TILT.qp=q.p;TILT.pa=pa;}
@@ -2027,7 +2034,7 @@ function rtClick(k){const [act,arg]=k.split(':');
   if(act==='rb'&&RT){const o=RT.rb[+arg];
     if(o[1]!==1){NOTICE=`❌ ${o[1]==='roger'?'"Roger" is niet genoeg: een klaring lees je terug.':'Ook de hoogte hoort in je readback.'}<br><i>"${CALLSIGN}, ${RT.st}, ${RT.clr}"</i>`+RT.rb.map((q,j)=>rtBtn(q[0],'rb:'+j)).join('')+RTCLOSE;hudTick();return;}
     CLR.add(RT.f.ident);WARNED.add(RT.f.ident);NOTICE=`✅ Klaring voor <b>${short(RT.f)}</b>. Blijf op ${RT.alt} ft: hoger of lager kan ander luchtruim zijn.<br><small>(vereenvoudigd) · ▶ = verder</small>`;RT=null;hudTick();}}
-function newTask(){const st=randomStart(ACTYPE);Object.assign(PLANE,{x:st.x,n:st.n,alt:st.alt,hdg:st.hdg,bank:0,pitch:0});WARNED.clear();FAILS.clear();CLR.clear();REFUSED.clear();REFW.clear();
+function newTask(){const st=randomStart(ACTYPE);if(TILT)TILT.hist=[];/* geen koers/hoogte van de vorige opdracht terugzetten */Object.assign(PLANE,{x:st.x,n:st.n,alt:st.alt,hdg:st.hdg,bank:0,pitch:0});WARNED.clear();FAILS.clear();CLR.clear();REFUSED.clear();REFW.clear();
   TASK=st.task||'';GOAL=st.task?{...LASTGOAL}:null;PAUSED=true;NOTICE=(st.task?`🎯 ${st.task}<br>`:'')+'<small>▶ = start</small>';chase(0,true);hudTick();}
 function setHTML(el,h){if(el.__last!==h){el.__last=h;el.innerHTML=h;}}
 function setMode(m,ac){

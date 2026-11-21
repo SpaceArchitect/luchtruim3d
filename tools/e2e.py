@@ -899,6 +899,53 @@ async def d_ctr_covers_rmz(a):  # Christian 21 nov: "missie mislukt, RMZ Deelen 
     f = await a.ev('()=>[...window.__vfr.FAILS.keys()]')
     ok('EHDLRMZ' in f, f'zonder klaring of oproep hoort RMZ Deelen een fout te zijn: {f}')
 
+async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren/onpauzeren gaat het kantelen nu en dan de mist in"
+    if not a.touch: return
+    await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
+    st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2500, 0, paused=False)
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.nm)}')
+    rng = random.Random(2111)
+    import time as _t
+    ang0 = await a.v('v.tiltAng()')
+    async def hold(turn, back, ms, ang=None, jit=4, p0=60):
+        t0 = _t.time()
+        while _t.time() - t0 < ms / 1000:
+            await a.ev(SEND, orient(turn + rng.uniform(-jit, jit), back + rng.uniform(-jit, jit), ang0 if ang is None else ang, p0)); await a.wait(35)
+    async def jolt(turn, back, ang=None, p0=60):  # de tik op ▶ schudt de telefoon
+        for _ in range(4):
+            await a.ev(SEND, orient(turn + rng.uniform(-14, 14), back + rng.uniform(-14, 14), ang0 if ang is None else ang, p0)); await a.wait(20)
+    async def resume_check(label, turn, back, ang=None, p0=60):
+        # pauze, telefoon anders vasthouden (lezen), ▶ met schok, dan rustig in de nieuwe houding
+        await a.hit('#btnPause'); ok(await a.v('v.PAUSED'), f'{label}: pauze gaat niet aan')
+        await hold(rng.uniform(-30, 30), -35, 600, ang, jit=8, p0=p0)
+        await hold(turn, back, 400, ang, p0=p0)
+        await a.hit('#btnPause'); await jolt(turn, back, ang, p0)
+        ok(not await a.v('v.PAUSED'), f'{label}: ▶ hervat niet')
+        h0 = await a.v('v.PLANE.hdg'); al0 = await a.v('v.PLANE.alt')
+        await hold(turn, back, 2200, ang, p0=p0)
+        dh = abs(((await a.v('v.PLANE.hdg')) - h0 + 540) % 360 - 180)
+        ok(dh < 6, f'{label}: na ▶ een bocht van {dh:.0f}° terwijl je de telefoon stil houdt')
+        ok(await a.v('v.TAX.r') == 0 and await a.v('v.TAX.p') == 0, f'{label}: stuurt nog na ▶ in rust: {await a.v("[v.TAX.r,v.TAX.p]")}')
+        await hold(turn + 22, back, 300, ang, jit=2, p0=p0); ok(await a.v('v.TAX.r') > .2, f'{label}: rechts kantelen werkt niet na ▶')
+        await hold(turn, back, 300, ang, jit=2, p0=p0)
+    await a.ev('()=>window.__vfr.resetTilt()'); await hold(0, 0, 500)
+    await resume_check('scheef (20°) vastgehouden', 20, 10)
+    await resume_check('erg scheef (32°)', -32, -5)
+    await resume_check('rechtop', 0, 0)
+    # na een nieuwe opdracht (missie klaar) idem
+    await a.ev('()=>{const v=window.__vfr;v.newTask();for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.nm);v.PLANE.alt=Math.max(v.PLANE.alt,2500)}')
+    ok(await a.v('v.PAUSED'), 'nieuwe opdracht start niet in pauze')
+    await a.hit('#btnPause')  # was pauze → eerst nog even pauzeren zodat resume_check het patroon volgt
+    await resume_check('na nieuwe opdracht', 12, 5)
+    # schermstand vergrendeld, telefoon liggend vastgehouden
+    if a.form != 'p7l':
+        for k in range(1, 16):
+            await a.ev(SEND, orient(90 * k / 15, 0, 0, 60)); await a.wait(33)
+        await hold(0, 0, 3200, ang=90)
+        ok(await a.v('v.TAX.r') == 0, 'vergrendeld: stuurt na ijken')
+        await resume_check('vergrendeld liggend', 8, 5, ang=90)
+    await a.sane()
+
 async def d_para_text(a):  # AIP ENR 5.5: elke paradropzone zijn eigen bovengrens en operator (was overal 'FL100 · ENPC')
     await a.hit('#modal [data-ac=glider]'); await a.frames(2)
     r = await a.ev('()=>{const v=window.__vfr;return v.LAYERS.filter(f=>f.layer==="PJA").map(f=>[f.ident,f.hiTxt,v.warnText(f)])}')
@@ -1009,7 +1056,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('doorsnede', d_cross_section), ('rondleiding', d_tour)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('doorsnede', d_cross_section), ('rondleiding', d_tour)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:
