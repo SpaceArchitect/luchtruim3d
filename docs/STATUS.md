@@ -47,6 +47,7 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 - **Regio uitgebreid tot 52.15 N**: Arnhem, Nijmegen, Rivierenland, Veluwezoom, Utrecht-zuid. Landschap uit OSM (`tools/build_landscape.py --region arnhem-nijmegen --clip 4.75,51.8,6.15,52.15 --write`), 92 luchtruimvolumes (o.a. Deelen CTR, Terlet GLD, Nieuw Milligen B/E, Schiphol-TMA-delen), velden Deelen/Terlet/Soesterberg, NL-vlak uit de OSM-landsgrens.
 - AIP-gecontroleerd (eAIP AMDT 11-2026): paradropzones Wijk bij Duurstede/Westbroek (FL060, Skydive Hilversum), R9 Harskamp + R61 Arnhemse Heide (tijden als Reek/Riel), Deelen CTR/RMZ. `tools/aip_check.py`: 16/16 frequenties OK.
 - **Doorsnede** (backlog M4): sonde → "📏 Doorsnede vanaf hier" → tik eindpunt → verticaal profiel (wortelschaal, labels per volume, P/R gearceerd), lijn op de kaart (`d_cross_section`).
+- **Rondleiding** (⚙ Weergave → 🎬): 7 stappen CTR → TMA → P → militaire CTR/RMZ → zweefvlieggebied/lier → sonde/doorsnede; teksten uit de data, uitgelicht volume (`d_tour`).
 - 2 nieuwe missies: *Naar de Veluwe* (Terlet, les Deelen CTR), *Over de Rijn* (Nijmegen → Arnhem).
 - Deelen: AIP ENR 2.1/2.2 (AIRAC 11-2026) → Tower 129.930, CTR HO (dus altijd als actief getoond + NOTAM-hint), RMZ H24 Dutch MIL Info 132.350.
 - **eAIP-spiegel** draait: `tools/fetch_eaip.py` + workflow → branch `data/eaip` (ENR 1/2/5, GEN 2.1, AD 2 van burgervelden; militaire velden staan niet in AD 2).
