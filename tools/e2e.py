@@ -847,9 +847,12 @@ async def d_tilt_rotate_real(a):  # Christian 21 nov: het draaimoment staand↔l
     # schermstand vergrendeld: telefoon draait, scherm niet → na ≤ 3 s weer bestuurbaar vanuit de nieuwe houding
     for k in range(1, 16):
         await a.ev(SEND, orient(90 * k / 15, 0, 0, 60)); await a.wait(33)
-    await hold(90, 0, 0, 3200)
+    h0 = await a.v('v.PLANE.hdg')
+    await hold(0, 0, 90, 3200)  # fysiek liggend vastgehouden (sensor), scherm blijft staand
+    dh = abs(((await a.v('v.PLANE.hdg')) - h0 + 540) % 360 - 180); ok(dh < 6, f'vergrendeld: bocht van {dh:.0f}° tijdens de draai')
     ok(await a.v('v.TAX.r') == 0, 'vergrendeld: stuurt nog na het ijken in de nieuwe houding')
-    await hold(90 + 22, 0, 0, 300, jit=2); ok(await a.v('v.TAX.r') > .2, 'vergrendeld: niet meer bestuurbaar na draaien')
+    await hold(22, 0, 90, 300, jit=2); ok(await a.v('v.TAX.r') > .2, 'vergrendeld: niet meer bestuurbaar na draaien')
+    await hold(0, 18, 90, 300, jit=2); ok(await a.v('v.TAX.p') > .2 and await a.v('v.TAX.r') == 0, 'vergrendeld: klimmen werkt niet of geeft een bocht')
     await cdp.send('Emulation.clearDeviceMetricsOverride'); await a.sane()
 
 async def d_ahead_full(a):  # Noor 1: frequentie in de waarschuwingsregel nooit afgekapt

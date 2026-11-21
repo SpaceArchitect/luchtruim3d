@@ -1302,7 +1302,10 @@ function tiltAngles(beta,gamma,ang){// S1-fix: via de zwaartekrachtrichting i.p.
   let sx=ux,sy=uy;if(ang===90){sx=-uy;sy=ux;}else if(ang===270){sx=uy;sy=-ux;}else if(ang===180){sx=-ux;sy=-uy;}
   return {t:Math.asin(Math.max(-1,Math.min(1,-sx)))*180/Math.PI,p:Math.atan2(sy,uz)*180/Math.PI};}// t = rol (rechts +), p = stand (rechtop = 90)
 const TAX={r:0,p:0};// analoge kantelstand −1…1 (rol, pitch)
-function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite(e.beta))return;tiltSeen=true;const ang=tiltAng();let {t,p}=tiltAngles(e.beta,e.gamma,ang);
+function physAng(beta,gamma){let best=0,bv=1e9;for(const a of [0,90,180,270]){const r=tiltAngles(beta,gamma,a);if(isFinite(r.t)&&Math.abs(r.t)<bv){bv=Math.abs(r.t);best=a;}}return best;}// hoe de telefoon echt vastgehouden wordt (zwaartekracht)
+function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite(e.beta))return;tiltSeen=true;const sAng=tiltAng();
+  /* (4) schermstand vergrendeld: stuur in het assenstelsel van hoe je de telefoon vasthoudt (zolang het scherm niet meedraait) */
+  const ang=TILT&&TILT.phys&&TILT.sAng===sAng?TILT.ang:sAng;let {t,p}=tiltAngles(e.beta,e.gamma,ang);
   if(!isFinite(t)||!isFinite(p))return;const now=performance.now();
   /* S1d (Christian): na draaien staand↔liggend werd geijkt op een stand midden in de draai → blijvende bocht. Nu na draaien eerst wachten tot de telefoon 0,35 s stil ligt. */
   /* Christian 21 nov: het draaimoment staand↔liggend moet soepel. Android/iOS melden de nieuwe schermstand pas 0,5–1 s ná de draai;
@@ -1313,13 +1316,15 @@ function onTilt(e){if(e.gamma==null||e.beta==null||!isFinite(e.gamma)||!isFinite
   if(TILT&&!TILT.pend){const H=TILT.hist||(TILT.hist=[]);H.push([now,t-TILT.t0,PLANE.hdg,PLANE.alt]);while(H.length&&now-H[0][0]>1500)H.shift();}
   if(TILT&&!TILT.pend&&Math.abs(t-TILT.t0)>55){/* (1b) het begin van de draai leek op een bocht: terug naar koers/hoogte van vlak vóór de draai */
     const H=TILT.hist||[];let k=H.length-1;while(k>0&&Math.abs(H[k][1])>8)k--;if(H[k]&&now-H[k][0]<1500&&MODE==='fly'&&!LOOP){PLANE.hdg=H[k][2];PLANE.alt=H[k][3];PLANE.bank=0;}
-    TILT={ang,pend:true,t,p,ts:now,start:now};}
-  if(TILT&&TILT.ang!==ang)TILT={ang,pend:true,t,p,ts:now,start:TILT.pend?TILT.start:now};
+    TILT={ang,sAng,pend:true,t,p,ts:now,start:now};}
+  if(TILT&&(TILT.ang!==ang||(TILT.sAng!==undefined&&TILT.sAng!==sAng)))TILT={ang,sAng,pend:true,t,p,ts:now,start:TILT.pend?TILT.start:now};
   if(TILT&&TILT.pend){keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;
-    if(Math.abs(t-TILT.t)>9||Math.abs(p-TILT.p)>9){TILT.t=t;TILT.p=p;TILT.ts=now;}
+    const pa=physAng(e.beta,e.gamma),q=tiltAngles(e.beta,e.gamma,pa);// rust meten in het fysieke assenstelsel: geen sprongen rond 90°
+    if(Math.abs(q.t-(TILT.qt??q.t))>9||Math.abs(q.p-(TILT.qp??q.p))>9||TILT.pa!==pa){TILT.qt=q.t;TILT.qp=q.p;TILT.pa=pa;TILT.ts=now;}else if(TILT.qt===undefined){TILT.qt=q.t;TILT.qp=q.p;TILT.pa=pa;}
     const calm=now-TILT.ts>=400,sane=Math.abs(t)<35,late=now-TILT.start>2500;
-    if(!((calm&&sane)||(late&&calm)||now-TILT.start>4000))return;const force=!sane;TILT=null;if(force){TILT={p0:p,t0:t,ang};}}
-  if(!TILT)TILT={p0:p,t0:Math.abs(t)<25?t:0,ang};/* ook de rol ijken (zo houd je hem = rechtuit), behalve bij een duidelijke bocht */
+    if(!((calm&&sane)||(late&&calm)||now-TILT.start>4000))return;
+    if(sane)TILT=null;else{TILT={p0:q.p,t0:Math.abs(q.t)<25?q.t:0,ang:pa,sAng,phys:pa!==sAng};return;}}
+  if(!TILT)TILT={p0:p,t0:Math.abs(t)<25?t:0,ang,sAng};/* ook de rol ijken (zo houd je hem = rechtuit), behalve bij een duidelijke bocht */
   t-=TILT.t0;const b=((p-TILT.p0+540)%360)-180,DZ=8;// Christian 14 nov: naar je toe kantelen (bovenkant naar je toe) = stijgen, naar voren = dalen; ballon idem
   keys['tl']=t<-DZ;keys['tr']=t>DZ;keys['tu']=b>DZ;keys['td']=b<-DZ;if(!keys['tu'])TO_WAIT=false;
   /* Christian 21 nov: geleidelijk i.p.v. aan/uit. Dode zone 8°, daarna lineair tot vol bij 35° (bocht) / 30° (klim-daal). */
