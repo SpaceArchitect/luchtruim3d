@@ -869,6 +869,14 @@ async def d_winch_sites(a):  # backlog 15 nov: schermvlieg-/lierterreinen ontbra
         n = await a.v('v.NOTICE') or ''
         if n: break
     ok('Lierterrein Sterksel' in n, f'geen waarschuwing bij lierterrein: {n[:80]}')
+    ok('1500 ft AMSL' in n, f'waarschuwing noemt de bovengrens uit ENR 5.5 niet: {n[:120]}')
+    cyl = await a.ev('()=>{const v=window.__vfr;const c=v.hgCyl.children.find(m=>m.userData.hg==="Sterksel");if(!c)return null;const b=new v.THREE.Box3().setFromObject(c);return [b.max.y,b.max.x-b.min.x]}')
+    ok(cyl, 'geen cilinder bij lierterrein Sterksel')
+    exp = 1500 * 0.0003048 * await a.v('v.EXAG')
+    ok(abs(cyl[0] - exp) < 0.05 and abs(cyl[1] - 0.5) < 0.05, f'cilinder Sterksel: top {cyl[0]:.2f} (verwacht {exp:.2f}), breedte {cyl[1]:.2f} km (verwacht 0,5)')
+    await a.place(h['x'] - 1.6, h['n'] - .3, 900, 80, paused=True)
+    await a.ev('(h)=>{const v=window.__vfr;v.WARNED.add("HG"+h.nm);for(const f of v.LAYERS)v.WARNED.add(f.ident);v.NOTICE="";v.hudTick()}', h); await a.frames(6)
+    await a.shot('winch_cylinder')
     await a.place(h['x'] - 3, h['n'], 3000, 90, paused=False)
     await a.ev('(h)=>{const v=window.__vfr;v.WARNED.delete("HG"+h.nm);Object.assign(v.PLANE,{x:h.x,n:h.n});v.hudTick()}', h)
     ok('Lierterrein' not in (await a.v('v.NOTICE') or ''), 'waarschuwing ook hoog boven het lierterrein (3000 ft)')
