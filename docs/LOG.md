@@ -26,3 +26,6 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 2026-11-21 Kantelen na ▶: niet ijken op het eerste meetpunt (tik-schok) maar op het gemiddelde na 0,3 s rust t.o.v. het lopende gemiddelde; rol tot 45° = nulstand. Les: test pauze/hervat met schok en scheve houding.
 - 2026-11-21 ENR 5.5 is de bron voor alle terreinen met een cirkel (lier, lierstart, model, ULV): hoogte + straal uit de AIP, één bouwscript. Malden: eerst modelvliegen (0,5 NM), dan lierstart.
 - 21 nov: WARNED verloopt na 4 s zonder SEEN; ENR 5.5-terreinen kregen nooit SEEN → herhaalde meldingen (Christian). Terreinen binnen 2,6 km/onder top+700 ft nu in SEEN. Les: elke nieuwe meldingsbron moet ook SEEN bijwerken.
+- 21 nov: besturing zoals MSFS (W/↑ = neus omlaag, S/↓ = omhoog), ook ballon S = stijgen (consistent; Christian kan omdraaien). Looping = Shift+S: 'lang S vasthouden = looping' zou gewoon klimmen onmogelijk maken. Stuurknoppen weg op desktop (pointer:fine), net als kantelmodus.
+- 21 nov: sneltoetskaart alleen desktop, 1× per bezoek, 'niet meer tonen' onthouden, ?/H opent. De toets die de kaart sluit doet verder niets (geen per-ongeluk-start).
+- 21 nov: Spatie bij melding met 'Nieuwe opdracht'-knop = volgende missie; anders pauze/verder. Desktop-meldingen tonen 'Spatie' i.p.v. ▶ (kbText, alleen bij weergave; NOTICE zelf ongewijzigd voor tests).

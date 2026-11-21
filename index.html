@@ -175,6 +175,10 @@
   #modal{position:absolute;inset:0;background:rgba(20,24,28,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
   #modal .box{background:#fff;border-radius:14px;max-width:440px;padding:20px 22px;box-shadow:0 10px 40px rgba(0,0,0,.3);font-size:14px;line-height:1.5}
   #modal h2{margin:0 0 8px;font-size:18px}
+  #keycard{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:12;background:rgba(255,255,255,.97);border-radius:14px;padding:16px 20px;box-shadow:0 10px 40px rgba(0,0,0,.3);font-size:14px;line-height:1.45;max-width:min(420px,92vw)}
+  #keycard h3{margin:0 0 8px;font-size:16px}#keycard table{border-collapse:collapse}#keycard td{padding:3px 10px 3px 0;vertical-align:top}#keycard td:first-child{white-space:nowrap}
+  #keycard kbd{display:inline-block;min-width:1.6em;text-align:center;border:1px solid #9aa4ae;border-bottom-width:2px;border-radius:5px;padding:0 5px;font:600 13px system-ui;background:#f4f6f8}
+  #keycard .go{margin-top:10px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;color:#444}
   @media (max-width:700px){
     #panel{top:auto;bottom:10px;left:10px;right:10px;width:auto;max-height:52%}
     #info{top:auto;bottom:10px;left:10px;right:10px;width:auto;max-height:55%;z-index:5}
@@ -201,8 +205,8 @@
   .banner .notice [data-rt=close]{position:sticky;bottom:0;box-shadow:0 -4px 8px rgba(11,58,110,.6)}@media (max-height:500px),(max-width:700px){.banner .rtnote{display:none}}
   @media (max-height:500px),(max-width:700px){body.menuopen .banner,body.menuopen #compass{visibility:hidden}}/* één ding tegelijk: menu open = melding even weg (Fatima) */
   /* S1c: kantelmodus (sensor geeft data): stuurknoppen weg, alleen ⏪ ❚❚ ⏩ in één rij */
-  body.tiltmode #ctrl [data-k],body.tiltmode #btnLoop{display:none!important}
-  body.tiltmode #ctrl{grid-template-rows:46px!important}body.tiltmode #ctrl #tSlow{grid-row:1!important;grid-column:1!important}body.tiltmode #btnPause{grid-row:1!important;grid-column:2!important}body.tiltmode #ctrl #tFast{grid-row:1!important;grid-column:3!important}
+  body.tiltmode #ctrl [data-k],body.tiltmode #btnLoop,body.kbd #ctrl [data-k],body.kbd #btnLoop{display:none!important}
+  body.tiltmode #ctrl,body.kbd #ctrl{grid-template-rows:46px!important}body.tiltmode #ctrl #tSlow,body.kbd #ctrl #tSlow{grid-row:1!important;grid-column:1!important}body.tiltmode #btnPause,body.kbd #btnPause{grid-row:1!important;grid-column:2!important}body.tiltmode #ctrl #tFast,body.kbd #ctrl #tFast{grid-row:1!important;grid-column:3!important}
   body.tiltmode #tChip{bottom:66px!important}
   .banner .nt.mini{display:inline-block;margin:0 4px 0 0;min-height:30px;padding:2px 8px;font-size:12.5px;background:#0b3a6e;color:#fff;vertical-align:middle}
   /* S1: vliegbanner = vaste regels zonder uitklappen (D2) */
@@ -304,7 +308,7 @@ ulm|Weert/Budel|EHBDULT001|5.60083|51.25444|0.25|500|AMSL||
   <div class="flysec"><h3>Vliegen</h3>
   <div class="row"><input type="range" id="tempo" min="0" max="6" step="1" value="2"><span class="val" id="tempoVal"></span></div>
   <p class="note">Tempo: ×1 is echte snelheid. Ook met scrollen of + en −.</p>
-  <p class="note">Camera: slepen = rondkijken (loslaten = terug achter het toestel). Shift+scrollen of knijpen = zoomen. <b>C</b> = camera terug (zoom ook). <b>L</b> = looping.</p>
+  <p class="note">Camera: slepen = rondkijken (loslaten = terug achter het toestel). Shift+scrollen of knijpen = zoomen. <b>C</b> = camera terug (zoom ook). <b>Shift+S</b> of <b>L</b> = looping.</p>
   <div class="row"><input type="checkbox" id="optTilt"><label for="optTilt">📱 Sturen door de telefoon te kantelen</label></div><p class="note" id="tiltNote" style="display:none"></p>
   <button id="btnAc">Ander toestel kiezen</button></div>
   <h3>Hulpmiddelen</h3>
@@ -340,10 +344,10 @@ ulm|Weert/Budel|EHBDULT001|5.60083|51.25444|0.25|500|AMSL||
 <div id="miniwrap"><canvas id="mini" class="off"></canvas><div id="loc"></div></div>
 <div id="flash"></div><div id="tChip">×5</div>
 <div id="ctrl">
-  <button data-k="arrowup" title="Stijgen (↑ of W)">▲</button>
+  <button data-k="arrowup" title="Stijgen (S of ↓)">▲</button>
   <button id="tSlow" title="Langzamer (− of scrollen)">⏪</button><button id="tFast" title="Sneller (+ of scrollen)">⏩</button>
   <button data-k="arrowleft" title="Links (← of A)">◀</button><button id="btnPause" title="Pauze (spatie)">❚❚</button><button data-k="arrowright" title="Rechts (→ of D)">▶</button>
-  <button data-k="arrowdown" title="Dalen (↓ of S)">▼</button>
+  <button data-k="arrowdown" title="Dalen (W of ↑)">▼</button>
   <button id="btnLoop" title="Looping (L)" aria-label="Looping">🔄<small>looping</small></button>
 </div>
 <div id="modal"><div class="box">
@@ -358,7 +362,7 @@ ulm|Weert/Budel|EHBDULT001|5.60083|51.25444|0.25|500|AMSL||
     <label class="relaxpick"><input type="checkbox" id="relaxBox"> 🌤️ Vliegen zonder luchtruim</label>
   </div>
   <p class="note touch"><b>Vliegen op de telefoon:</b> ◀ ▶ draaien · ▲ ▼ stijgen/dalen · ⏩ ⏪ tempo · ❚❚ pauze (knoppen rechtsonder).</p>
-  <p class="note kb"><b>Vliegen:</b> ← → draaien · ↑ ↓ stijgen/dalen · scrollen of + − = tempo · spatie = pauze · slepen = rondkijken · L = looping. Telefoon: knoppen rechtsonder.</p>
+  <p class="note kb"><b>Vliegen (zoals MSFS):</b> A D of ← → = draaien · S of ↓ = neus omhoog · W of ↑ = neus omlaag · Shift+S = looping · scrollen of + − = tempo · spatie = pauze/verder · slepen = rondkijken.</p>
   <p class="note">Je start steeds op een andere plek en krijgt een kleine opdracht.</p>
   <button id="ok" style="display:none">ok</button>
 </div></div>
@@ -1803,12 +1807,20 @@ const PROBE=(()=>{const [x,n]=proj(5.4697,51.4416);return {x,n,name:'Eindhoven'}
 let WIND=null;// missie kan de wind zetten: {f0,f1,k0,k1} (grond → 6000 ft)
 function windAt(alt){const t=Math.min(1,alt/6000),w=WIND||{f0:210,f1:270,k0:8,k1:28};return {from:(w.f0+(w.f1-w.f0)*t+360)%360,kt:w.k0+(w.k1-w.k0)*t};}
 const keys={};
-addEventListener('keydown',e=>{const t=e.target.tagName;if(t==='INPUT'||t==='SELECT')return;const k=e.key.toLowerCase();
-  if(k===' '){togglePause();e.preventDefault();return;}
+/* Christian 21 nov: besturing zoals MSFS. Toetsen worden vertaald naar de logische knoppen (arrowup = stijgen, arrowdown = dalen). */
+const KMAP={w:'arrowdown',arrowup:'arrowdown',s:'arrowup',arrowdown:'arrowup'};
+const KBD=matchMedia('(hover:hover) and (pointer:fine)').matches;if(KBD)document.body.classList.add('kbd');
+const UPK=()=>document.body.classList.contains('kbd')?'S':'▲';
+addEventListener('keydown',e=>{const t=e.target.tagName;if(t==='INPUT'||t==='SELECT')return;const k0=e.key.toLowerCase();
+  if($('keycard')){if(!['shift','control','alt','meta'].includes(k0)){e.preventDefault();keyCardClose();}return;}
+  if((k0==='?'||k0==='h')&&MODE==='fly'){keyCard();return;}
+  if(e.shiftKey&&(k0==='s'||k0==='arrowdown')){e.preventDefault();startLoop();return;}
+  const k=KMAP[k0]||k0;
+  if(k===' '){e.preventDefault();/* Christian 21 nov: missie klaar → Spatie = volgende missie; keerpunt → Spatie = door naar het volgende */if(MODE==='fly'&&PAUSED&&/<button class="nt">/.test(NOTICE)){newTask();hudTick();return;}togglePause();return;}
   if(k==='l'){startLoop();return;}if(k==='c'){camReset();return;}
   if(k==='+'||k==='='){setTempo(TI+1);return;} if(k==='-'||k==='_'){setTempo(TI-1);return;}
   if(['arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();keys[k]=true;});
-addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
+addEventListener('keyup',e=>{const k0=e.key.toLowerCase();keys[KMAP[k0]||k0]=false;});
 const releaseAll=()=>{for(const k in keys)keys[k]=false;if(typeof PTR!=='undefined'){PTR.clear();pinch0=null;dragging=false;}document.querySelectorAll('[data-k].on').forEach(b=>b.classList.remove('on'));};
 addEventListener('blur',releaseAll);document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseAll();});addEventListener('pointerleave',releaseAll);
 document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
@@ -1816,6 +1828,22 @@ document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
   const off=()=>{keys[k]=false;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);});
 function setTempo(i){TI=Math.max(0,Math.min(TEMPOS.length-1,i));$('tempo').value=TI;$('tempoVal').textContent='×'+TEMPO();$('tChip').textContent='×'+TEMPO();}
+/* Op desktop heet ▶ gewoon Spatie; een afgeronde missie toont 'Volgende missie (spatie)' (Christian 21 nov) */
+function kbText(n){if(!document.body.classList.contains('kbd'))return n;
+  if(/<button class="nt">/.test(n))return n.replace(/<button class="nt">🎯 Nieuwe opdracht<\/button>/,`<button class="nt">🎯 ${MODE==='fly'&&nextMission(ACTYPE)?'Volgende missie':'Nieuwe opdracht'} (spatie)</button>`);
+  return n.replace(/▶ = (toch )?(verder|start)/g,'Spatie = $1$2');}
+/* Sneltoetskaart vóór de vlucht (Christian 21 nov): alleen op desktop, één keer per bezoek, 'niet meer tonen' wordt onthouden, ? of H = opnieuw */
+function keyCard(){if($('keycard'))return;const b=ACTYPE==='balloon',d=document.createElement('div');d.id='keycard';d.setAttribute('role','dialog');d.setAttribute('aria-label','Sneltoetsen');
+  const r=(k,t)=>`<tr><td>${k}</td><td>${t}</td></tr>`;
+  d.innerHTML=`<h3>⌨ Sneltoetsen · ${b?'ballon':ACTYPE==='glider'?'zweefvliegtuig':'motorvliegtuig'}</h3><table>`+
+   (b?r('<kbd>S</kbd> <kbd>↓</kbd>','stijgen (branden)')+r('<kbd>W</kbd> <kbd>↑</kbd>','dalen')+r('','sturen doe je met de wind: elke hoogte heeft een andere windrichting')
+     :r('<kbd>S</kbd> <kbd>↓</kbd>','neus omhoog (klimmen)')+r('<kbd>W</kbd> <kbd>↑</kbd>','neus omlaag (dalen)')+r('<kbd>A</kbd> <kbd>D</kbd> <kbd>←</kbd> <kbd>→</kbd>','bocht links / rechts')+r('<kbd>Shift</kbd>+<kbd>S</kbd>','looping'))+
+   r('<kbd>Spatie</kbd>','pauze / verder · na een keerpunt: door naar het volgende')+r('scrollen, <kbd>+</kbd> <kbd>−</kbd>','tempo')+r('slepen, <kbd>C</kbd>','rondkijken, camera terug')+r('<kbd>?</kbd>','deze kaart')+
+   `</table><div class="go"><label><input type="checkbox" id="kcNo"> Niet meer tonen</label><span>Elke toets of klik = sluiten</span></div>`;
+  document.body.appendChild(d);}
+addEventListener('pointerdown',e=>{const d=$('keycard');if(!d||e.target.closest('#keycard label'))return;e.preventDefault();e.stopPropagation();keyCardClose();},true);// klik waar dan ook = starten
+function keyCardClose(){const d=$('keycard');if(!d)return;try{if($('kcNo').checked)localStorage.setItem('l3d_keys_seen','1');sessionStorage.setItem('l3d_keys_s','1');}catch(_){}d.remove();}
+function keyCardAuto(){if(!document.body.classList.contains('kbd'))return;try{if(localStorage.getItem('l3d_keys_seen')||sessionStorage.getItem('l3d_keys_s'))return;}catch(_){}keyCard();}
 function togglePause(){PAUSED=!PAUSED;$('stillHint').hidden=true;if(!PAUSED){NOTICE='';tiltRecal();/* ▶ = opnieuw ijken: zo houd je hem nu = rechtuit */}}
 function tiltRecal(){/* Christian 21 nov: na ▶ of een nieuwe opdracht ging kantelen soms de mist in: er werd geijkt op het eerste sensorsignaal (de tik-schok), scheef vasthouden (>25°) werd een vaste bocht en de vergrendelde liggende houding ging verloren. Nu: besturing even neutraal, ijken zodra de telefoon 0,3 s rustig is (uiterlijk 1,2 s), rol tot 45° telt als rechtuit, fysieke houding blijft. */
   if(!$('optTilt').checked||!TILT){TILT=null;return;}const now=performance.now();TILT={recal:true,pend:true,ang:TILT.ang,sAng:TILT.sAng,phys:TILT.phys,start:now,ts:now};keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;}
@@ -1934,7 +1962,7 @@ const pinLbl=addLabel('▼ sonde','lm',()=>new THREE.Vector3(PROBE.x,CAP*FT*EXAG
 function nearField(x,n){let best=null,bd=1e9;for(const [ic,nm,lo,la,g] of FIELDS){const [fx,fn]=proj(lo,la),d=Math.hypot(fx-x,fn-n);if(d<bd){bd=d;best={ic,nm,g};}}return bd<=1.5?best:null;}
 function landText(){const x=PLANE.x,n=PLANE.n,f=nearField(x,n),r=nearRoad(x,n),g=governing(featsAt(x,n).filter(f=>contains(f,0)));
   let t;if(f)t=`<b>Geland</b> op ${f.g?'zweefveld':'vliegveld'} ${f.nm}.`;else if(ACTYPE==='balloon')t=`<b>Geland</b> ${whereText(x,n)}.`;else if(builtUp(x,n))t=`<b>Noodlanding in de bebouwde kom</b> ${whereText(x,n)}. In het echt kies je op tijd een veld buiten de bebouwing.`;else t=`<b>Buitenlanding</b> ${whereText(x,n)}${ACTYPE==='glider'?' (in een weiland)':''}.`;
-  return `${SVG[ACTYPE]} ${t}`+(r&&!f?`<br>⚠ Snelweg ${r} dichtbij.`:'')+(needsClr(g)?`<br>⚠ Je staat in ${g.name}.`:'')+`<br>▲ = ${ACTYPE==='glider'?'lierstart':'opstijgen'}.`;}
+  return `${SVG[ACTYPE]} ${t}`+(r&&!f?`<br>⚠ Snelweg ${r} dichtbij.`:'')+(needsClr(g)?`<br>⚠ Je staat in ${g.name}.`:'')+`<br>${UPK()} = ${ACTYPE==='glider'?'lierstart':'opstijgen'}.`;}
 // ---------- looping (Boyd): 3 s schermtijd, straal 300 ft, eindigt op dezelfde hoogte ----------
 function startLoop(){if(MODE!=='fly'||ACTYPE==='balloon'||LOOP)return;if(PAUSED&&NOTICE&&!/Te laag voor een looping/.test(NOTICE))return;/* S1b Daan: een open melding niet wegklikken met looping */if(PAUSED){PAUSED=false;NOTICE='';}/* looping-knop start ook vanuit pauze (eindtest 13 nov) */if(PLANE.alt<700){NOTICE='🔄 Te laag voor een looping: eerst boven 700 ft.<br><small>▶ = verder</small>';PAUSED=true;return;}
   LOOP={t:0,alt0:PLANE.alt,x0:PLANE.x,n0:PLANE.n};VZ=0;}
@@ -1956,7 +1984,7 @@ function sim(dt){
   PLANE.pitch+=((ACTYPE==='balloon'?0:climb*.32)-PLANE.pitch)*Math.min(1,dt*4);VZ=PLANE.alt>0||climb>0?climb:0;
   if(PLANE.alt<=0&&climb>0&&!TAKEOFF_ASKED&&!RELAX){TAKEOFF_ASKED=true;const fs=applies(featsAt(PLANE.x,PLANE.n),0),g=governing(fs),p=fs.find(f=>f.layer==='P'||f.layer==='R'||f.layer==='UAS');
     if(needsClr(g)||p){const i=needsClr(g)?AIPINFO[g.ident]:null;PAUSED=true;keys['arrowup']=keys['w']=false;TO_WAIT=true;
-      NOTICE=needsClr(g)?`🔶 Opstijgen in <b>${short(g)}</b> · klaring nodig${rtLine(i)}<br><small>▲ = toch opstijgen</small>`:`⛔ Opstijgen in <b>${short(p)}</b><br><small>▲ = toch opstijgen</small>`;return;}}
+      NOTICE=needsClr(g)?`🔶 Opstijgen in <b>${short(g)}</b> · klaring nodig${rtLine(i)}<br><small>${UPK()} = toch opstijgen</small>`:`⛔ Opstijgen in <b>${short(p)}</b><br><small>${UPK()} = toch opstijgen</small>`;return;}}
   if(PLANE.alt>0)TAKEOFF_ASKED=false;
   PLANE.alt=Math.max(0,Math.min(CAP-100,PLANE.alt+climb*ac.fpm/60*T*dt));
   if(PLANE.alt<=0){kt=0;if(WAS_AIR){WAS_AIR=false;NOTICE=landText();}}else if(!WAS_AIR){WAS_AIR=true;NOTICE='';}
@@ -2127,7 +2155,7 @@ function setMode(m,ac){
   document.body.classList.toggle('looking',m!=='fly');document.body.classList.toggle('balloon',ACTYPE==='balloon');
   $('btnMode').innerHTML=m==='fly'?'→ Kaart':'→ Vliegen';
   $('tape').classList.toggle('off',m==='fly'?!$('optTape').checked:false);
-  if(m==='fly'&&(prev!=='fly'||ac))camReset();// elke vlucht begint met de camera achter het toestel
+  if(m==='fly'&&(prev!=='fly'||ac)){camReset();keyCardAuto();}else if(m!=='fly')keyCardClose();// elke vlucht begint met de camera achter het toestel
   if(m==='fly'&&prev!=='fly'&&PROBE.user){PLANE.x=PROBE.x;PLANE.n=PROBE.n;if(SLICE>0&&ACTYPE!=='balloon')PLANE.alt=SLICE;PROBE.user=false;WARNED.clear();FAILS.clear();CLR.clear();
     {let t=null,hd=PLANE.hdg;const hs=ACTYPE==='balloon'?[(windAt(Math.max(300,PLANE.alt)).from+180)%360]:[0,45,90,135,180,225,270,315];for(const h of hs){t=pickTask(PLANE.x,PLANE.n,h,ACTYPE);if(t){hd=h;break;}}/* S1b panel (Fatima): ook vanaf de sonde een opdracht */
      TASK=t&&!RELAX?t:'';GOAL=TASK?{...LASTGOAL}:null;PLANE.hdg=hd;if(TASK){PAUSED=true;NOTICE=`🎯 ${t}<br><small>▶ = start</small>`;}}}
@@ -2278,7 +2306,7 @@ function hudTick(){document.body.classList.toggle('menuopen',!$('panel').classLi
       DRIFT_HIT=!!hit;if(hit&&!ahead)ahead={f:hit.f,d:hit.d,clr:true,drift:hit.why};
       st.sub.unshift('Oranje lijn = drift 10 min');}
     const b=$('banner');b.className='banner '+st.cls+(BANNER_OPEN?' open':'')+(ahead?' hasAhead':'');
-    if(NOTICE){b.className='banner noticeonly';b.__html=`<div class="notice">${NOTICE}</div>`;}else b.__html=(TASK?`<div class="task">🎯 ${TASK.replace(/<br>.*$/,'').replace(/<\/?b>/g,'').replace(/\s*\(\d+ km\)/,'')}${GOAL&&GOAL.d!=null?` · ${GOAL.arrow||''} nog ${GOAL.d<10?GOAL.d.toFixed(1).replace('.',','):Math.round(GOAL.d)} km`:''}${FAILS.size?' · ❌':''}${GOAL?'<span class="q"> · Luchtruim vrij?</span>':''}</div>`:'')+`<div class="head">${st.tags.join(' ')} ${st.head}${st.radio?` · <b>${st.radio}</b>`:''}</div>`+
+    if(NOTICE){b.className='banner noticeonly';b.__html=`<div class="notice">${kbText(NOTICE)}</div>`;}else b.__html=(TASK?`<div class="task">🎯 ${TASK.replace(/<br>.*$/,'').replace(/<\/?b>/g,'').replace(/\s*\(\d+ km\)/,'')}${GOAL&&GOAL.d!=null?` · ${GOAL.arrow||''} nog ${GOAL.d<10?GOAL.d.toFixed(1).replace('.',','):Math.round(GOAL.d)} km`:''}${FAILS.size?' · ❌':''}${GOAL?'<span class="q"> · Luchtruim vrij?</span>':''}</div>`:'')+`<div class="head">${st.tags.join(' ')} ${st.head}${st.radio?` · <b>${st.radio}</b>`:''}</div>`+
      (ahead?`<div class="ahead">⚠ ${ahead.drift?`Drift naar <b>${short(ahead.f)}</b> (${ahead.d.toFixed(1).replace('.',',')} km) · andere hoogte?`:`${ahead.d.toFixed(1).replace('.',',')} km: <b>${short(ahead.f)}</b>${ahead.clr&&AIPINFO[ahead.f.ident]?` · ${unitS(AIPINFO[ahead.f.ident].unit)} ${AIPINFO[ahead.f.ident].freq}`:''}`}</div>`:'')+
      
      (AT_EDGE?'<div class="ahead">Rand van het kaartgebied: draai om.</div>':'');
@@ -2446,7 +2474,7 @@ let last=performance.now(),acc=0;
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   goalVizTick(now);renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+window.__vfr={get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get MIS(){return MIS},get CIRC_PTS(){return CIRC_PTS},get VRP(){return VRP},get TASK(){return TASK},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 // ---------- voorbeeldcircuit Eindhoven (AIP EHEH AD 2.22: 1000 ft AMSL, RWY 03 links, RWY 21 rechts → beide aan de NW-kant) ----------
 var CIRC_RW='03';

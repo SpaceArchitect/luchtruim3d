@@ -100,6 +100,7 @@ async def new_app(p, b, form, url):
     kw = dict(p.devices[spec]) if isinstance(spec, str) else dict(spec)
     kw['device_scale_factor'] = 1
     ctx = await b.new_context(**kw)
+    await ctx.add_init_script("try{localStorage.setItem('l3d_keys_seen','1')}catch(e){}")  # sneltoetskaart alleen in d_keycard
     pg = await ctx.new_page(); a = App(pg, form, ctx)
     await pg.goto(url); await a.wait(1800); await a.frames(2)
     return a
@@ -137,7 +138,7 @@ async def t_aircraft(a):
         await a.hit('#btnPause'); ok(not await a.v('v.PAUSED'), f'{ac}: start-knop hervat niet ({(await a.v("v.NOTICE") or "")[:60]!r})')
         alt0 = await a.v('v.PLANE.alt')
         if a.touch: await a.hold('#ctrl [data-k=arrowup]', 900)
-        else: await a.pg.keyboard.down('ArrowUp'); await a.wait(900); await a.pg.keyboard.up('ArrowUp')
+        else: await a.pg.keyboard.down('ArrowDown'); await a.wait(900); await a.pg.keyboard.up('ArrowDown')  # MSFS: ↓ = neus omhoog
         alt1 = await a.v('v.PLANE.alt')
         ok(alt1 > alt0 or await a.v('v.PAUSED'), f'{ac}: stijgen werkt niet ({alt0}->{alt1})')
         if ac != 'balloon':
@@ -604,11 +605,86 @@ async def d_tilt_rotate(a):  # Christian 14 nov avond: na staand→liggend→sta
         prev = angle
     await cdp.send('Emulation.clearDeviceMetricsOverride'); await a.sane()
 
+async def d_msfs_keys(a):  # Christian 21 nov: W/↑ = neus omlaag, S/↓ = neus omhoog, A/D draaien, Shift+S = looping
+    if a.touch: return
+    await a.hit('#modal [data-ac=motor]'); await a.frames(2)
+    st = await a.v('v.PLANE')
+    for key, sign in (('w', -1), ('ArrowUp', -1), ('s', 1), ('ArrowDown', 1)):
+        await a.place(st['x'], st['n'], 3000, st['hdg'], paused=False)
+        await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);v.NOTICE="";v.PAUSED=false}')
+        a0 = await a.v('v.PLANE.alt')
+        await a.pg.keyboard.down(key); await a.wait(700); await a.pg.keyboard.up(key)
+        a1 = await a.v('v.PLANE.alt')
+        ok((a1 - a0) * sign > 0, f'{key}: hoogte {a0:.0f}→{a1:.0f}, verwacht {"omhoog" if sign > 0 else "omlaag"}')
+    ok(not any((await a.ev('()=>Object.entries(window.__vfr.keys).filter(([k,v])=>v).map(([k])=>k)'))), 'toets blijft hangen na loslaten')
+    for key, sign in (('d', 1), ('a', -1)):
+        await a.ev('()=>{window.__vfr.NOTICE="";window.__vfr.PAUSED=false}')
+        h0 = await a.v('v.PLANE.hdg'); await a.pg.keyboard.down(key); await a.wait(600); await a.pg.keyboard.up(key); h1 = await a.v('v.PLANE.hdg')
+        ok(((h1 - h0 + 540) % 360 - 180) * sign > 1, f'{key}: koers {h0:.0f}→{h1:.0f}')
+    await a.place(st['x'], st['n'], 3000, st['hdg'], paused=False)
+    await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.PAUSED=false}')
+    await a.pg.keyboard.press('Shift+S'); await a.frames(2)
+    ok(await a.v('!!v.LOOP'), 'Shift+S start geen looping')
+    for _ in range(50):
+        await a.wait(100)
+        if not await a.v('!!v.LOOP'): break
+    ok(not await a.v('!!v.LOOP'), 'looping eindigt niet')
+    ok(not await a.visible('#ctrl [data-k=arrowup]') and await a.visible('#btnPause'), 'desktop: stuurknoppen zichtbaar of pauzeknop weg')
+    t = await a.ev('()=>document.querySelector(".note.kb")?.textContent||""')
+    ok('W of ↑' in t and 'Shift+S' in t, f'uitleg toetsen niet bijgewerkt: {t[:80]}')
+
+async def d_keycard(a):  # Christian 21 nov: kleine uitleg sneltoetsen vóór de vlucht, makkelijk over te slaan
+    if a.touch:
+        await a.ev('()=>{localStorage.removeItem("l3d_keys_seen");sessionStorage.clear()}')
+        await a.hit('#modal [data-ac=glider]'); await a.frames(2)
+        ok(not await a.visible('#keycard'), 'telefoon: sneltoetskaart verschijnt (hoort alleen op desktop)'); return
+    await a.ev('()=>{localStorage.removeItem("l3d_keys_seen");sessionStorage.clear()}')
+    await a.hit('#modal [data-ac=glider]'); await a.frames(2)
+    ok(await a.visible('#keycard'), 'geen sneltoetskaart bij start vlucht')
+    t = await a.ev('()=>document.getElementById("keycard").innerText')
+    ok('Shift' in t and 'neus omhoog' in t and 'Spatie' in t, f'kaart mist toetsen: {t[:100]}')
+    await a.shot('keycard')
+    p0 = await a.v('v.PAUSED')
+    await a.pg.keyboard.press('Space'); await a.frames(2)
+    ok(not await a.visible('#keycard'), 'kaart gaat niet weg met een toets')
+    ok(await a.v('v.PAUSED') == p0, 'de toets die de kaart sluit, deed ook iets anders')
+    await a.ev('()=>window.__vfr.setMode("map")'); await a.ev('()=>window.__vfr.setMode("fly","motor")'); await a.frames(2)
+    ok(not await a.visible('#keycard'), 'kaart komt in hetzelfde bezoek terug')
+    await a.pg.keyboard.press('?'); await a.frames(1)
+    ok(await a.visible('#keycard'), '? opent de kaart niet')
+    await a.ev('()=>document.getElementById("kcNo").click()'); await a.pg.mouse.click(5, 5); await a.frames(1)
+    ok(not await a.visible('#keycard'), 'klik sluit de kaart niet')
+    ok(await a.ev('()=>localStorage.getItem("l3d_keys_seen")') == '1', '"niet meer tonen" niet onthouden')
+    await a.ev('()=>window.__vfr.setMode("fly","balloon")'); await a.pg.keyboard.press('h'); await a.frames(1)
+    t = await a.ev('()=>document.getElementById("keycard")?.innerText||""')
+    ok('stijgen' in t and 'Shift' not in t, f'ballonkaart klopt niet: {t[:100]}')
+    await a.pg.keyboard.press('Escape')
+
+async def d_space_waypoints(a):  # Christian 21 nov: keerpunt → Spatie = volgende; laatste → Spatie = volgende missie
+    if a.touch: return
+    await a.hit('#modal [data-ac=glider]'); await a.frames(2)
+    await a.ev('()=>{const v=window.__vfr;localStorage.setItem("l3d_missies",JSON.stringify(v.MISSIONS.filter(x=>x.ac==="glider"&&x.id!=="torens").map(x=>x.id)));v.newTask()}'); await a.frames(2)
+    ok((await a.v('v.MISSION||{}')).get('id') == 'torens', 'missie torens niet gekozen')
+    reach = '()=>{const v=window.__vfr,g=v.GOAL;Object.assign(v.PLANE,{x:g.x+.5,n:g.n,alt:1000});v.FAILS.clear();v.CLR.clear();for(const f of v.LAYERS)v.CLR.add(f.ident);for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.NOTICE="";v.PAUSED=false;v.hudTick()}'
+    for i in range(2):
+        await a.ev(reach); await a.frames(2)
+        txt = await a.ev('()=>document.querySelector("#banner .notice")?.innerText||""')
+        ok('Keerpunt' in txt and 'Spatie' in txt, f'keerpunt {i+1}: geen "Spatie" in melding: {txt[:90]}')
+        await a.pg.keyboard.press('Space'); await a.frames(2)
+        ok(not await a.v('v.PAUSED') and (await a.v('v.GOAL'))['li'] == i + 1, f'Spatie gaat niet door naar keerpunt {i+2}')
+    await a.ev(reach); await a.frames(2)
+    txt = await a.ev('()=>document.querySelector("#banner .notice")?.innerText||""')
+    ok('geslaagd' in txt and 'spatie' in txt.lower(), f'laatste keerpunt: geen spatie-hint: {txt[:120]}')
+    await a.ev('()=>localStorage.setItem("l3d_missies",JSON.stringify(window.__vfr.MISSIONS.filter(x=>x.ac==="glider"&&x.id!=="vught").map(x=>x.id)))')
+    await a.pg.keyboard.press('Space'); await a.frames(2)
+    m = (await a.v('v.MISSION||{}')).get('id')
+    ok(m == 'vught', f'Spatie start niet de volgende missie (vught), maar {m}')
+
 async def d_tilt_default(a):  # S1c (Christian): op telefoon standaard kantelen + knoppen weg; geen sensor = knoppen terug; uitzetten onthouden
     await a.hit('#modal [data-ac=glider]'); await a.frames(2)
     on = await a.ev('()=>document.getElementById("optTilt").checked')
     if not a.touch:
-        ok(not on, 'desktop: kantelen staat aan'); ok(await a.visible('#ctrl [data-k=arrowup]'), 'desktop: stuurknoppen weg'); return
+        ok(not on, 'desktop: kantelen staat aan'); ok(not await a.visible('#ctrl [data-k=arrowup]'), 'desktop: stuurknoppen nog zichtbaar (Christian 21 nov: weg)'); return
     ok(on, 'telefoon: kantelen niet standaard aan')
     ok(await a.visible('#ctrl [data-k=arrowup]'), 'stuurknoppen al weg vóór er sensordata is')
     await a.ev(SEND, orient(0, 0, await a.v('v.tiltAng()'))); await a.frames(2)
@@ -1088,7 +1164,7 @@ async def fuzz(a, seed, steps):
         elif k < .6:
             x, y = rnd.random() * vw['width'], rnd.random() * vw['height']; log.append(f'tap {x:.0f},{y:.0f}'); await a.tap_xy(x, y)
         elif k < .72:
-            key = rnd.choice(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'l', 'c', '+', '-']); log.append('key ' + key)
+            key = rnd.choice(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd', 'Shift+S', ' ', 'l', 'c', '+', '-']); log.append('key ' + key)
             await a.pg.keyboard.down(key); await a.wait(rnd.randint(30, 400)); await a.pg.keyboard.up(key)
         elif k < .85:
             o = {'beta': rnd.uniform(-60, 90), 'gamma': rnd.uniform(-60, 60)}; log.append(f'tilt {o}')
@@ -1115,7 +1191,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('doorsnede', d_cross_section), ('rondleiding', d_tour)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('toetsen zoals MSFS', d_msfs_keys), ('sneltoetskaart', d_keycard), ('spatie bij keerpunten', d_space_waypoints), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('doorsnede', d_cross_section), ('rondleiding', d_tour)]
     async with async_playwright() as p:
         b = await p.chromium.launch(args=ARGS)
         for form in forms:
