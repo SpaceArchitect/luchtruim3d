@@ -31,6 +31,8 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
    ✓ **eAIP** met `curl` + browser-User-Agent (Playwright krijgt Cloudflare-check); edities als `AIRAC AMDT 12-2026_2026_11_26\index.html`.
    ✓ Overpass (OSM) met User-Agent. ✓ luchtruim3d.nl (+ Playwright) → automatische live-test na publicatie mogelijk.
    ✗ geoservices.lvnl.nl: onvolledige certificaatketen (en LVNL raadt het af) → niet meer gebruiken.
+2b. ✅ **Datapijplijn draait:** `tools/fetch_lvnl.py` + `.github/workflows/data-lvnl.yml` → branch `data/lvnl` (wekelijks + bij push). Heel NL: 22 luchtruimlagen (o.a. CTR 16, TMA 42, Parajump 21, Danger 19, Restricted 26, TRA/TSA, Glider area, HPZ) + 13 vliegveldlagen (o.a. Glider 13, Microlight 20, Hangglider 63). Licentie CC BY 4.0. Lezen: `git fetch origin data/lvnl`. **Gevarenlagen (para, scherm/lier, ULV) zijn hiermee binnen bereik zonder pc.**
+   Tip voor Christian: in claude.ai → Instellingen → Capabilities kun je domeinen toestaan (bv. services-eu1.arcgis.com, eaip.lvnl.nl, overpass-api.de); dan kan de cloudwerkplek er ook direct bij.
 3. **Data uit index.html** naar `data/luchtruim.json` + `data/regio-*.json`, één ophaalscript (LVNL via Chrome op de pc). Fundament voor uitbreiding.
 4. **Arnhem–Nijmegen**: Malden, Deelen, Terlet, Nieuw Milligen TMA, SUP 03/2022, 3 regiomissies, link `#arnhem`.
 6. **"Heel Nederland-week" met de full reset (±3–6 dec, vóór 10 dec):** luchtruim landelijk in één keer; landschap per regio (Randstad → Noord → Zeeland/Limburg); alle data binnen vóór Mexico.
