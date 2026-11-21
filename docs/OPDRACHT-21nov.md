@@ -94,4 +94,5 @@ Een nieuwe bezoeker wordt in één minuut door het luchtruim geleid en kiest dan
 3. **Na de laatste missie:** opnieuw beginnen, of terug naar het keuzescherm?
 
 ## Al gedaan (21 nov)
+- Blok 0 (behalve live), 1, 2, 3 en de bruggen uit blok 4: zie STATUS. Herkenningspunten-tabel: `docs/herkenningspunten-voorstel.md`.
 - Liergebieden: de meldingen kwamen elke 4 s terug. Dat was een bug, niet zo bedoeld. Nu krijg je één melding per nadering, net als bij luchtruim (`d_enr55_sites`).

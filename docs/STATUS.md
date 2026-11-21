@@ -1,6 +1,6 @@
 # Status — lees dit eerst
 
-*Bijgewerkt: 21 nov 2026, ±11:30 (cloudsessie).*
+*Bijgewerkt: 21 nov 2026, ±15:50 (cloudsessie, gestopt op ±58% weeklimiet).*
 
 ## Live
 - https://luchtruim3d.nl = `main` = wip/arnhem + gevaren + fixes 21 nov (volledige suite: 28 smoke + 155/156 det + 8 fuzz; de ene misser gefixt en opnieuw getest: kantel 24/24, smoke 14/14).
@@ -14,21 +14,29 @@
 - Fix: klaring Deelen CTR dekt de RMZ Deelen (H24) erover (`d_ctr_covers_rmz`).
 - Fix: kantelen na ▶ / nieuwe opdracht: ijken op gemiddelde na 0,3 s rust (max 1,2 s), scheef tot 45° = rechtuit, vergrendelde liggende houding blijft (`d_tilt_pause_edges`, ruis + tik-schok).
 
-## Klaar op `wip/live-21nov`, nog niet live (sessie 21 nov middag)
-- "Houd de telefoon even stil"-melding bij onrustige hand na ▶ (getest, kantel groen).
-- Alle 74 ENR 5.5-terreinen in de regio als cilinder: scherm/delta, lierstart zweefvliegen (GND–2300 ft AGL), modelvliegen, ULV (`tools/build_enr55.py`, test `d_enr55_sites` groen).
-- Kaart liggend: sonde als lade rechts (≤ ⅓), kolom weg zolang de lade open is (`d_landscape_probe` 4/4).
-- Fix terreinmeldingen (lier e.d.): kwamen elke 4 s terug zolang je in de buurt bleef (ENR 5.5-terreinen werden nooit als 'gezien' gemarkeerd). Nu één melding per nadering, zoals luchtruim. Test in `d_enr55_sites`.
-- 'ballon voorbij doel' was geen flaky: tests zetten alleen luchtruim op 'gewaarschuwd', niet de terreinen → tests aangepast. Quick 14/14.
-- **Volgende:** volledige suite → live.
+## Klaar op `wip/live-21nov`, nog niet live
+**Eerste actie volgende sessie: volledige suite op deze branch → live** (`--quick` 14/14 en alle geraakte tests 4/4 groen; de volledige run is afgebroken voor het budget).
+- Alle 74 ENR 5.5-terreinen (lier, lierstart zweef, model, ULV) als cilinder; meldingen één keer per nadering (was: elke 4 s, bug Christian).
+- Missie- en losse starts nooit naast een terrein (anders eerst waarschuwing i.p.v. opdracht).
+- Kaart liggend: sonde als lade rechts. "Houd de telefoon even stil" na ▶.
+- Besturing zoals MSFS (W/↑ = neus omlaag, S/↓ = omhoog, Shift+S = looping), stuurknoppen weg op desktop.
+- Sneltoetskaart vóór de vlucht (desktop, 1× per bezoek, ? of H). Spatie: keerpunt → volgende, missie klaar → volgende missie.
+- 13 snelwegbruggen over Maas/Waal/Rijn/Lek/IJssel (berekend uit OSM).
+- Usage-meter (`tools/usage_probe.py` op de pc → `meta/usage`; lezen: `tools/usage.py`).
 
-## Nieuwe opdracht Christian (21 nov middag)
-Zie `docs/OPDRACHT-21nov.md`: tutorial + startflow, MSFS-besturing, sneltoetskaart, Spatie bij keerpunten, herkenningspunten-audit, ballonrealisme.
+## Volgende sessie (na live)
+Werk `docs/OPDRACHT-21nov.md` af: blok 4 herkenningspunten (voorstel klaar: `docs/herkenningspunten-voorstel.md`, wacht op Christians akkoord), blok 5 tutorial/startflow, blok 6 ballon. Plus de feedback hieronder.
+
+## Feedback 21 nov (nog te doen)
+- **Raquel: "locatietoestemming" bij openen.** De app vraagt géén locatie en zet géén cookies (alleen localStorage voor instellingen). Wat ze zag is de iOS-vraag "beweging en stand" voor kantelen; die is voor haar (ADHD) verwarrend. **Oplossing:** de iOS-vraag nooit meteen tonen; eerst ons eigen scherm "Sturen door de telefoon te kantelen? [Ja] [Nee, knoppen]" met één zin uitleg, en pas bij Ja `requestPermission`. Bij Nee: knoppen, nooit meer vragen. Ook in de privacy-tekst: "geen locatie, geen cookies".
+- **Raquel: snapte kantelen niet, en niet dat staand én liggend werkt.** → onderdeel van de tutorial (blok 5): korte, wegklikbare uitleg op de telefoon (kantelen = sturen, draai je telefoon voor liggend), met kleine animatie.
+- **Christian: tempo ×5 voelt traag, speelt meestal op ×20.** → uitzoeken welk standaardtempo het beste speelt (×10/×20?), per toestel (ballon trager?), met testers; meldingen moeten bij hoger tempo nog op tijd komen (`d_warn_lead`).
+- Stadsbruggen Nijmegen/Arnhem (Waalbrug, De Oversteek, John Frostbrug): coördinaten verifiëren via `data/osm` (Wikipedia was vandaag niet bereikbaar).
+- Open vragen OPDRACHT: ballontoetsen (nu S = stijgen, consistent), vrij vliegen luchtruim aan/uit, wat na de laatste missie.
 
 ## Wacht op Christian
 - **Usage-meter (eenmalig, ±2 min op de pc):** `python tools/usage_probe.py --login` (inloggen op claude.ai in het venster, venster sluiten), daarna `python tools/usage_probe.py --install`. Vanaf dan leest elke sessie de weeklimiet zelf met `python tools/usage.py`.
 - **Telefoontest kantelen**: pauzeer/▶ een paar keer, ook scheef vastgehouden, en na "Nieuwe opdracht".
-- Claude-browserpane op de pc inloggen op claude.ai (weeklimiet aflezen; 21 nov nog uitgelogd).
 - www-doorverwijzing + automatische verlenging domein (OVH).
 - Mexico 15 dec – 9 jan: vóór vertrek alle data voor heel NL binnen.
 
