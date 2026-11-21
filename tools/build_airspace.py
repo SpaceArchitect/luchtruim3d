@@ -16,7 +16,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LAYER = {'CTR': 'CTR', 'TMA': 'TMA', 'CTA': 'CTA', 'ATZ': 'ATZ', 'Prohibited_area': 'P', 'Restricted_area': 'R',
          'Danger_area': 'D', 'TRA': 'TRA', 'TSA': 'TSA', 'Parajump': 'PJA', 'Climb_area': 'CLIMB', 'TMZ_RTMZ': 'TMZ',
          'RMZ': 'RMZ', 'Glider_area': 'GLD', 'Low_Flying_area_': 'LFA'}
-IDENT_MAP = {'EHDPD': 'EHDP', 'EHAATMZD': 'EHTMZD1', 'EHBDRMZ': 'EHBDRMZA', 'EHBDATZ': 'EHBDATZA', 'EHBKTMZ': 'EHBKTMZ1'}  # oude namen behouden (missies, AIPINFO)
+IDENT_MAP = {'EHDPD': 'EHDP'}  # oude namen behouden (missies, AIPINFO)
 
 
 def load_geojson():
@@ -51,18 +51,25 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--bbox', required=True)
     ap.add_argument('--check', action='store_true'); ap.add_argument('--write', action='store_true')
     o = ap.parse_args(); x0, y0, x1, y1 = map(float, o.bbox.split(','))
-    src = load_geojson(); lines = []
+    src = load_geojson(); lines = []; feats = []
     for fn in sorted(os.listdir(src)):
         m = re.match(r'airspace_\d+_(.+)\.geojson$', fn)
         if not m or m.group(1) not in LAYER: continue
-        for f in json.load(open(os.path.join(src, fn)))['features']:
+        feats += [(m, f) for f in json.load(open(os.path.join(src, fn)))['features']]
+    part_names = {f['properties']['Name'] for _, f in feats if f['properties'].get('Type') == 'PART'}
+    all_names = {f['properties']['Name'] for _, f in feats if f['properties']['Name']}
+    for m, f in feats:
+        if True:
+            # 'RAS' = het hele gebied; als er delen (PART, eigen grenzen per deel) zijn, tonen we alleen de delen
+            N = f['properties']['Name']
+            if N and ((f['properties'].get('Type') == 'RAS' and N in part_names) or any(x.startswith(N + ' ') and len(x) == len(N) + 2 and x[-1] in 'ABCDEFGH' for x in all_names)): continue
             g = f['geometry']
             if not g: continue
             polys = [g['coordinates']] if g['type'] == 'Polygon' else g['coordinates']
             if not any(x0 <= lo <= x1 and y0 <= la <= y1 for p in polys for lo, la in p[0]): continue
             rings = [simplify(p[0]) for p in polys]
             P = f['properties']; ident = IDENT_MAP.get(P['Designator'], P['Designator'])
-            lines.append('|'.join(map(str, [LAYER[m.group(1)], ident, P['Name'], P.get('Type') or '', P.get('Class') or '',
+            lines.append('|'.join(map(str, [LAYER[m.group(1)], ident, P['Name'] or P['Designator'], P.get('Type') or '', P.get('Class') or '',
                          P['LowerLimit'], P['LowerLimitUnit'], P['LowerLimitReference'], P['UpperLimit'], P['UpperLimitUnit'],
                          P['UpperLimitReference'], ';'.join(enc(r) for r in rings)])))
     html = open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
