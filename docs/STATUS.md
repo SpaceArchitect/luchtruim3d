@@ -39,6 +39,8 @@ Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/briefing-20nov/i
 5. **Draaimoment staand↔liggend:** fix klaar op `wip/draaien` (alle kanteltests groen, ook vergrendelde schermstand via zwaartekracht-assenstelsel). Wacht op Christians telefoontest + "ok" → live.
 
 ## Klaar op `wip/gevaren` (bovenop `wip/draaien`, nog niet live)
+- **Luchtruimdata nu uit het LVNL Geoportaal (CC BY 4.0)** via `tools/build_airspace.py --bbox … --check|--write` (0 verschillen in grenzen; +EHTRA12/12A hoog; buitenland EB*/ED* blijft uit de oude data). Bronvermelding aangepast.
+- Testharnas robuuster: wachten op wandklok i.p.v. frames (panel/looping), `fly()` wacht op het paneel.
 - 10 lierterreinen scherm-/deltavliegen in de regio (LVNL Hangglider-laag): paarse ring + label, waarschuwing onder 2000 ft binnen 1,5 km, vermelding in de sonde (`d_winch_sites`). Kabelhoogte staat niet in de data → verwijzing ENR 5.5.
 
 ## Daarna
