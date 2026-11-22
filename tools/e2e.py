@@ -758,8 +758,10 @@ async def d_rmz_inside_call(a):  # Christian 14 nov: in RMZ Gilze-Rijen stond 'o
     good = await a.ev('()=>[...document.querySelectorAll("#banner .rt")].findIndex(b=>b.querySelectorAll("span").length===6&&!/PH-/.test(b.querySelector("span").textContent))')
     await a.hit(f'#banner .rt >> nth={good}')
     ok('Opgeroepen' in (await a.v('v.NOTICE') or '') and '132.350' in (await a.v('v.NOTICE') or ''), 'oproep Dutch MIL Info 132.350 niet bevestigd')
-    await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.PAUSED=false;v.hudTick()}'); await a.frames(2)
-    ok('OPGEROEPEN' in await a.ev('()=>document.querySelector("#banner .head").innerText'), 'statusregel toont geen OPGEROEPEN')
+    for _ in range(6):  # ENR 5.5-terreinen bij Gilze-Rijen geven elk één melding; die eerst wegklikken
+        await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.PAUSED=false;v.hudTick()}'); await a.frames(2)
+        if not await a.v('v.NOTICE'): break
+    ok('OPGEROEPEN' in await a.ev('()=>(document.querySelector("#banner .head")||{innerText:""}).innerText'), 'statusregel toont geen OPGEROEPEN: ' + str(await a.v('v.NOTICE'))[:100])
 
 async def d_zoom_desktop(a):  # Christian 14 nov: geen manier om in/uit te zoomen op desktop (Shift+scrollen = horizontaal in Chrome)
     if a.touch: return
@@ -1181,7 +1183,10 @@ async def fuzz(a, seed, steps):
             x, y = rnd.random() * vw['width'], rnd.random() * vw['height']; log.append(f'tap {x:.0f},{y:.0f}'); await a.tap_xy(x, y)
         elif k < .72:
             key = rnd.choice(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd', 'Shift+S', ' ', 'l', 'c', '+', '-']); log.append('key ' + key)
-            await a.pg.keyboard.down(key); await a.wait(rnd.randint(30, 400)); await a.pg.keyboard.up(key)
+            ks = key.split('+') if len(key) > 1 else [key]  # 'Shift+S' → Shift, S (keyboard.down kent geen combinaties)
+            for k_ in ks: await a.pg.keyboard.down(k_)
+            await a.wait(rnd.randint(30, 400))
+            for k_ in reversed(ks): await a.pg.keyboard.up(k_)
         elif k < .85:
             o = {'beta': rnd.uniform(-60, 90), 'gamma': rnd.uniform(-60, 60)}; log.append(f'tilt {o}')
             await a.ev('(o)=>window.dispatchEvent(Object.assign(new Event("deviceorientation"),{alpha:0,beta:o.beta,gamma:o.gamma}))', o)
