@@ -10,7 +10,7 @@
 
 ## Wacht op Christian
 - **Telefoontest** (mobiel, https://luchtruim3d.nl): vlieg, pauzeer/▶ een paar keer (ook scheef vastgehouden) en na "Nieuwe opdracht". Klopt de koers? Zie je "Houd de telefoon even stil"?
-- Verder niets: Christian doet geen handmatige acties (afspraak 22 nov). Geplande sessies di+vr 22:47.
+- Verder niets: Christian doet geen handmatige acties (afspraak 22 nov). Geplande sessies di+vr 22:47 (±25% per sessie).
 - (Geparkeerd: usage-meter tot de home server er is. OVH geregeld.)
 
 ## Koers (Christian 22 nov) — top 5

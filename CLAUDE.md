@@ -124,7 +124,7 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
   missies voor motor, zweef en ballon · live eAIP/AIRAC/NOTAM. Alle even zwaar; **bronnen moeten
   kloppen** (harde eis, zie grens 1).
 - **Initiatief ligt bij Claude.** Een geplande taak start di + vr 22:47 een werksessie
-  (max ±8% van de weeklimiet per sessie; Christians harde grens is 80% van de week).
+  (max ±25% van de weeklimiet per sessie; Christians harde grens is 80% van de week).
 - **Zelf publiceren mag** als de volledige suite groen is en het geen kantelen/touch/sensoren raakt.
   Raakt het dat wel: previewlink in STATUS, Christian test, dan pas live.
 - **Licht genoeg:** middenklasse Android van een paar jaar oud ≥ 30 fps, pagina < 2 MB.
