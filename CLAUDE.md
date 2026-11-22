@@ -127,6 +127,8 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
   kloppen** (harde eis, zie grens 1).
 - **Initiatief ligt bij Claude.** Een geplande taak start di + vr 22:47 een werksessie
   (max ±25% van de weeklimiet per sessie; Christians harde grens is 80% van de week).
+- **Weeklimiet aflezen:** `git fetch -q --depth=1 https://github.com/SpaceArchitect/claude-usage meta/usage && git show FETCH_HEAD:usage.json`
+  (gevuld door Christians pc; leeg of ouder dan een dag → voorzichtig schatten).
 - **Zelf publiceren mag** als de volledige suite groen is en het geen kantelen/touch/sensoren raakt.
   Raakt het dat wel: previewlink in STATUS, Christian test, dan pas live.
 - **Licht genoeg:** middenklasse Android van een paar jaar oud ≥ 30 fps, pagina < 2 MB.
