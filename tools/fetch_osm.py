@@ -18,6 +18,7 @@ Q = {
     'rivers': 'way["waterway"~"^(river|canal)$"]',
     'water': 'way["natural"="water"]; relation["natural"="water"]; way["water"]',
     'urban': 'way["landuse"~"^(residential|commercial|retail|industrial)$"]',
+    'forest': 'way["landuse"="forest"]; way["natural"="wood"]; relation["landuse"="forest"]; relation["natural"="wood"]',  # landschap procedureel (Christian 22 nov)
     'heath_sand': 'way["natural"~"^(heath|sand)$"]; relation["natural"~"^(heath|sand)$"]',
     'aeroways': 'way["aeroway"~"^(runway|aerodrome)$"]; relation["aeroway"="aerodrome"]',
     'power': 'way["power"="line"]["voltage"~"^(150000|220000|380000)"]',
