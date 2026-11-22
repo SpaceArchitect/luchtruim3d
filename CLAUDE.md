@@ -48,8 +48,11 @@ Is iets in deze briefing in de weg voor de noordster? Pas de briefing dan aan en
 - **Minimaal, intuïtief, immersief.** Elke knop moet zich bewijzen. Er is altijd maar één
   menu tegelijk open, en het landschap blijft zichtbaar: UI ≤ ⅓ van het scherm
   (klein staand ≤ 38%).
-- **Geen papieren kaart als ondergrond.** We tonen neutraal terrein met herkenningspunten
-  die je vanuit de lucht ziet (snelwegen, rivieren, steden, velden, hoge bouwwerken).
+- **Geen papieren kaart als ondergrond.** We tonen het landschap zoals je het vanuit de lucht
+  ziet: **zo mooi en realistisch mogelijk, mits het licht blijft** (goedkoop te draaien, ook op
+  een telefoon). Denk aan procedurele objecten (bos, heide, duinen, zand) en herkenningspunten
+  (snelwegen, rivieren, bruggen, steden, velden, hoge bouwwerken). Het luchtruim blijft het
+  duidelijkst; het landschap is gedempt genoeg om de kleuren van de volumes niet te verdringen.
 - **Labels staan rechtop, zijn scherp en hebben een vaste grootte.** Inhoud:
   `naam · klasse · ondergrens–bovengrens`. Een label is er óf niet. Gevaren reiken verder.
 - **Kleur = betekenis.** Okabe-Ito, kleur per klasse of type, arcering voor P/R/D, en
