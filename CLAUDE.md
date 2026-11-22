@@ -31,6 +31,7 @@ Is iets in deze briefing in de weg voor de noordster? Pas de briefing dan aan en
 1. **De AIP van LVNL is leidend.** Grenzen, klassen, frequenties en regels haal je uit de
    eAIP of de LVNL-MapServer, met de AIRAC erbij. Weet je het niet zeker, dan schrijf je
    "vereenvoudigd" of "nog te verifiëren", nooit een verzonnen regel.
+   Gebruik **primaire bronnen** (LVNL, Eurocontrol); kopieën zoals de FAA NOTAM Search alleen ter vergelijking.
    Disclaimer altijd zichtbaar: *alleen voor educatie*.
 2. **Live is heilig.** `main` = https://luchtruim3d.nl (GitHub Pages). Liever een dag
    niets publiceren dan iets dat op een telefoon stuk gaat. Bewaar vóór elke publicatie
