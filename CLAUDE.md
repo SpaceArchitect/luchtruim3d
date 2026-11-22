@@ -69,6 +69,7 @@ De repo is het hele project. Of je nu in de cloud (Linux) werkt of op Christians
 (Windows, `Documents\Projects\luchtruim3d` of `C:\Documents\...`), het begint zo:
 
 ```bash
+git pull                     # op de pc: altijd eerst (de repo is de enige bron)
 python tools/setup.py        # installeert three.js 0.160 + Playwright/Chromium als ze ontbreken
 python tools/e2e.py --quick  # ±3 min: smoke-tests op desktop + Pixel 7
 ```
@@ -131,6 +132,8 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
 - **Licht genoeg:** middenklasse Android van een paar jaar oud ≥ 30 fps, pagina < 2 MB.
 - **Geen handmatige acties van Christian.** Zoek eerst zelf een route (GitHub Actions, openbare
   bronnen). Alleen inloggen/2FA blijft van hem (grens 4).
+- **Model:** sessies draaien op Opus (ontwerp, bugs, AIP-juistheid); routinewerk (data omzetten,
+  teksten, tests nalopen) mag naar subagents op Sonnet. Elke geplande sessie is een nieuwe chat.
 - **Eén bron:** deze repo. CLAUDE.md, `docs/STATUS.md` en `docs/LOG.md` zijn het geheugen voor
   cloud, desktop en geplande sessies; de claude.ai-projectdocs zijn archief.
 
