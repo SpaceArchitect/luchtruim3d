@@ -10,7 +10,7 @@
 
 ## Wacht op Christian
 - **Telefoontest** (mobiel, https://luchtruim3d.nl): vlieg, pauzeer/▶ een paar keer (ook scheef vastgehouden) en na "Nieuwe opdracht". Klopt de koers? Zie je "Houd de telefoon even stil"?
-- Mexico 15 dec – 9 jan: vóór vertrek alle data voor heel NL binnen.
+- Verder niets: Christian doet geen handmatige acties (afspraak 22 nov). Geplande sessies di+vr 22:47.
 - (Geparkeerd: usage-meter tot de home server er is. OVH geregeld.)
 
 ## Koers (Christian 22 nov) — top 5
@@ -22,6 +22,9 @@
 
 ## Half af
 - `wip/herkenning-22nov`: 6 herkenningspunten weg (akkoord Christian; Eindhoven-centrum 7→2, Sluis Heumen), test `d_landmarks` groen 4/4. OSM-actie haalt bruggen/knooppunten/vliegvelden voor de hele regio op (`osm/herkenning/` op `data/osm`). Nog doen: Waalbrug, De Oversteek, John Frostbrug, Nelson Mandelabrug, knooppunten, Maasbrug Venlo, De Peel toevoegen uit die data; dan `--quick` en mee met de volgende live-gang.
+
+- `wip/herkenning-22nov` bevat ook: bos in `fetch_osm.py` en de **NOTAM-proef** (`tools/fetch_notam.py` → `data/notam`). Controleer de eerste runs (data-osm, data-notam); bridges-query faalde 22 nov door volle Overpass.
+- **Feedbackkanaal testers (open):** zonder handwerk van Christian. Idee: ⚙ → "Feedback" in de app die een vooraf ingevulde GitHub-issue opent (testers met account) — zoek een route zonder account én zonder server/secret.
 
 ## Werkwijze-notities
 - Cloud: `tools/e2e.py` valt terug op `/opt/pw-browsers/chromium`; testserver geeft 204 op `/favicon.ico`.

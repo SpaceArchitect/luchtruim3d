@@ -118,6 +118,21 @@ de 2e waarde = sessie, de 3e = week). Kun je dat niet,
 schat dan voorzichtig, stop ruim op tijd en meld je schatting. De volledige suite en
 browser-screenshots zijn het duurst: gebruik ze bewust.
 
+## 🤖 Zelfstandig werken (afspraak 22 nov)
+
+- **Koers:** game-ervaring · procedureel landschap · uitbreiden naar heel NL (later BE/DE) ·
+  missies voor motor, zweef en ballon · live eAIP/AIRAC/NOTAM. Alle even zwaar; **bronnen moeten
+  kloppen** (harde eis, zie grens 1).
+- **Initiatief ligt bij Claude.** Een geplande taak start di + vr 22:47 een werksessie
+  (max ±8% van de weeklimiet per sessie; Christians harde grens is 80% van de week).
+- **Zelf publiceren mag** als de volledige suite groen is en het geen kantelen/touch/sensoren raakt.
+  Raakt het dat wel: previewlink in STATUS, Christian test, dan pas live.
+- **Licht genoeg:** middenklasse Android van een paar jaar oud ≥ 30 fps, pagina < 2 MB.
+- **Geen handmatige acties van Christian.** Zoek eerst zelf een route (GitHub Actions, openbare
+  bronnen). Alleen inloggen/2FA blijft van hem (grens 4).
+- **Eén bron:** deze repo. CLAUDE.md, `docs/STATUS.md` en `docs/LOG.md` zijn het geheugen voor
+  cloud, desktop en geplande sessies; de claude.ai-projectdocs zijn archief.
+
 ## 🗂 Geheugen tussen sessies
 
 - `docs/STATUS.md`: **lees dit als eerste.** Wat er live staat, wat er half af is en
