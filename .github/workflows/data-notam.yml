@@ -1,0 +1,24 @@
+name: data-notam
+# NOTAMs EHAA + velden via openbare FAA NOTAM Search → branch data/notam. Raakt main/live niet.
+on:
+  schedule: [{cron: '17 4 * * *'}]
+  push:
+    branches: ['wip/**']
+    paths: ['tools/fetch_notam.py', '.github/workflows/data-notam.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/fetch_notam.py
+      - name: Naar branch data/notam
+        run: |
+          git config user.name "luchtruim3d-bot"; git config user.email "bot@luchtruim3d.nl"
+          git checkout --orphan data/notam
+          git rm -rq --cached . ; git add -f notam
+          git commit -qm "NOTAM $(date -u +%FT%H%MZ)"
+          git push -f origin HEAD:refs/heads/data/notam
