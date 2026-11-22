@@ -507,15 +507,9 @@ L|Sint-Janskathedraal|5.3084|51.6881
 L|Philips Stadion|5.4674|51.4417
 L|Zweefveld Malden|5.8800|51.7860
 L|Stuw en brug Grave|5.7356|51.7692
-L|Sluis Heumen|5.8503|51.7690
 L|Westpoint|5.0649|51.5600
 L|Grote Kerk Breda|4.7749|51.5891
-L|Catharinakerk|5.4800|51.4380
 L|ASML Veldhoven|5.4160|51.4050
-L|Strijp-S|5.4578|51.4488
-L|Bunkertoren|5.4795|51.4470
-L|Vestedatoren|5.4824|51.4376
-L|De Regent|5.4743|51.4385
 R|A 348|61002,520300,-193,-118,-293,-48,-176,-144,-273,-15,-256,-145
 R|A 348|59814,519826,239,143,279,17,185,147,286,46,240,113
 R|A 50|58278,520265,-89,1,-129,-232,-425,-218,53,-141,-48,-129,67,-425,-290,-189,-90,-171,-454,-402,-170,-359
@@ -1640,11 +1634,6 @@ const LM={
     const deck=new THREE.Mesh(new THREE.BoxGeometry(.06,.012,.42),d);deck.position.y=.02;g.add(deck);
     for(let i=0;i<7;i++){const q=new THREE.Mesh(new THREE.BoxGeometry(.09,.02,.016),p);q.position.set(0,.01,-.18+i*.06);g.add(q);}
     const s=new THREE.Mesh(new THREE.BoxGeometry(.05,.006,.16),new THREE.MeshBasicMaterial({color:0xd8dde2}));s.position.set(.1,.003,.12);g.add(s);}},
-  'Sluis Heumen':{icon:'⛴',build:g=>{// schut- en keersluis: twee lichte kolken langs het kanaal
-    const [ax,an]=proj(5.8666,51.7570),[bx,bn]=proj(5.8513,51.7677);g.rotation.y=Math.atan2(bx-ax,bn-an);
-    const c=new THREE.MeshBasicMaterial({color:0xe3e7ea}),w=new THREE.MeshBasicMaterial({color:0x5b6168});
-    for(const dx of [-.04,.04]){const k=new THREE.Mesh(new THREE.BoxGeometry(.05,.008,.3),c);k.position.set(dx,.004,0);g.add(k);}
-    const b=new THREE.Mesh(new THREE.BoxGeometry(.18,.014,.025),w);b.position.set(0,.012,-.15);g.add(b);}},
   'Westpoint':{icon:'🏢',build:g=>{// woontoren 142 m, hoogste van Brabant
     const t=new THREE.Mesh(new THREE.BoxGeometry(.035,.142,.035),new THREE.MeshBasicMaterial({color:0x7d8c99}));t.position.y=.071;g.add(t);}},
   'Eusebiuskerk':{icon:'⛪',build:g=>LM['Grote Kerk Breda'].build(g)},// Arnhem, toren ±93 m (Wikipedia); silhouet van de Grote Kerk Breda (±97 m)
@@ -1653,24 +1642,12 @@ const LM={
     const nave=new THREE.Mesh(new THREE.BoxGeometry(.03,.025,.09),m);nave.position.set(0,.0125,.06);g.add(nave);
     const t=new THREE.Mesh(new THREE.BoxGeometry(.022,.065,.022),m);t.position.y=.0325;g.add(t);
     const sp=new THREE.Mesh(new THREE.ConeGeometry(.014,.032,8),r);sp.position.y=.081;g.add(sp);}},
-  'Catharinakerk':{icon:'⛪',build:g=>{// twee spitse torens (neogotisch, Cuypers)
-    const m=new THREE.MeshBasicMaterial({color:0x9c6b52}),r=new THREE.MeshBasicMaterial({color:0x4d5a63});
-    const nave=new THREE.Mesh(new THREE.BoxGeometry(.03,.022,.08),m);nave.position.set(0,.011,.05);g.add(nave);
-    for(const dx of [-.013,.013]){const t=new THREE.Mesh(new THREE.BoxGeometry(.012,.04,.012),m);t.position.set(dx,.02,0);g.add(t);const sp=new THREE.Mesh(new THREE.ConeGeometry(.008,.03,8),r);sp.position.set(dx,.055,0);g.add(sp);}}},
   'ASML Veldhoven':{icon:'🔬',build:g=>{// campus De Run: grote witte/blauwe hallen ±400×300 m, ±30 m hoog
     const w=new THREE.MeshBasicMaterial({color:0xf1f3f6}),b=new THREE.MeshBasicMaterial({color:0x2b5fa8}),gl=new THREE.MeshBasicMaterial({color:0x8fb3d9});
     for(const [x,z,sx,sz,h,m] of [[-.12,-.06,.16,.1,.028,w],[.06,-.08,.18,.09,.032,w],[-.1,.08,.12,.12,.024,w],[.08,.07,.14,.11,.03,w],[0,0,.05,.05,.045,gl]]){const k=new THREE.Mesh(new THREE.BoxGeometry(sx,h,sz),m);k.position.set(x,h/2,z);g.add(k);}
     const band=new THREE.Mesh(new THREE.BoxGeometry(.181,.006,.091),b);band.position.set(.06,.026,-.08);g.add(band);
     // ASML-toren (gebouw 8), 82,6 m, 20 verdiepingen (Skyscraper Center), ±70 m O / 55 m Z van het campusmidden
     const tw=new THREE.Mesh(new THREE.BoxGeometry(.03,.0826,.03),gl);tw.position.set(.069,.0413,.056);g.add(tw);const tb=new THREE.Mesh(new THREE.BoxGeometry(.031,.006,.031),b);tb.position.set(.069,.078,.056);g.add(tb);}},
-  'Strijp-S':{icon:'🏭',build:g=>{// Klokgebouw (oude Philips-fabriek met klokkentoren) + hoge woontoren (109 m, OSM) 110 m westelijk
-    const br=new THREE.MeshBasicMaterial({color:0x9a5b3f}),wt=new THREE.MeshBasicMaterial({color:0xe8e4dc}),gr=new THREE.MeshBasicMaterial({color:0x7d8c99});
-    const hall=new THREE.Mesh(new THREE.BoxGeometry(.13,.025,.045),br);hall.position.y=.0125;g.add(hall);
-    const ct=new THREE.Mesh(new THREE.BoxGeometry(.014,.05,.014),br);ct.position.set(.03,.025,0);g.add(ct);const cl=new THREE.Mesh(new THREE.BoxGeometry(.016,.01,.016),wt);cl.position.set(.03,.05,0);g.add(cl);
-    const tw=new THREE.Mesh(new THREE.BoxGeometry(.03,.109,.03),gr);tw.position.set(-.111,.0545,0);g.add(tw);}},
-  'Bunkertoren':{icon:'🏢',build:g=>{const t=new THREE.Mesh(new THREE.BoxGeometry(.03,.103,.03),new THREE.MeshBasicMaterial({color:0x6f7780}));t.position.y=.0515;g.add(t);}},
-  'Vestedatoren':{icon:'🏢',build:g=>{const t=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.09,12),new THREE.MeshBasicMaterial({color:0x8a9aa8}));t.position.y=.045;g.add(t);}},
-  'De Regent':{icon:'🏢',build:g=>{const t=new THREE.Mesh(new THREE.BoxGeometry(.028,.096,.028),new THREE.MeshBasicMaterial({color:0xd6d2c8}));t.position.y=.048;g.add(t);}},
 
   'Zweefveld Malden':{icon:'✚',build:g=>{
     // terreinvorm uit OSM (aeroway=aerodrome, Zweefvliegveld Malden): lichte grasbanen als X in donker bos
