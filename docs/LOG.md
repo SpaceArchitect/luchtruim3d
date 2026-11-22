@@ -45,3 +45,4 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 22 nov: Christian: primaire NOTAM-bron = LVNL; Homebriefing en EasyVFR 'mag ook'. Uitzoeken: is Homebriefing officieel LVNL/AIS NL en zonder login leesbaar? EasyVFR = commerciële doorgever (abonnement/voorwaarden) → alleen vergelijking.
 - 22 nov: Christian maakte publieke repo SpaceArchitect/claude-usage (branch meta/usage, usage.json) voor de weeklimiet. 22 nov nog leeg. Commando in briefing + geplande taak.
 - 22 nov: claude-usage-repo vervallen (Cloudflare blokkeert bots op claude.ai; repo verwijderd). Weeklimiet blijft een voorzichtige schatting, max ±25% per geplande sessie.
+- 22 nov: live gezet (main 0b0ae88, Pages OK). Vorige live bewaard als release/2026-11-22 (c7d5b62). luchtruim3d.nl is vanuit de cloudwerkplek niet bereikbaar (curl 000) → deploy via GitHub gecontroleerd.

@@ -3,7 +3,7 @@
 *Bijgewerkt: 22 nov 2026, avond (cloudsessie; gestopt ruim vóór Christians grens van 80% weeklimiet).*
 
 ## Live
-- https://luchtruim3d.nl = `main` = `wip/live-21nov` + fixes 22 nov (LIVE_RESULT).
+- https://luchtruim3d.nl = `main` = `wip/live-21nov` + fixes 22 nov (live 22 nov ±20:13, volledige suite 28 smoke + 180/180 det + 8/8 fuzz, Pages-deploy geslaagd).
   Terugdraaien: `release/2026-11-22` (= live van 21 nov), daarvoor `release/2026-11-21`, `release/2026-11-15`.
 - Regio: Eindhoven + Arnhem–Nijmegen tot 52.15 N, AIRAC 11-2026.
 - Nieuw 22 nov: alle 74 ENR 5.5-terreinen (lier, lierstart zweef, model, ULV) als cilinder met één melding per nadering; starts nooit naast een terrein; sonde liggend als lade; "Houd de telefoon even stil" na ▶; besturing zoals MSFS + sneltoetskaart (desktop); 13 snelwegbruggen; RMZ-oproepknop blijft zichtbaar tijdens een melding.
