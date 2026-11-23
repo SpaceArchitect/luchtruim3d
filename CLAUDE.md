@@ -65,6 +65,8 @@ Is iets in deze briefing in de weg voor de noordster? Pas de briefing dan aan en
 - **Spel met progressie (Christian 23 nov).** Missies lopen van makkelijk (opwarmen) via medium
   (één instinker) naar lang en moeilijk (meerdere keerpunten). Langzaam genoeg voor beginners,
   pittig genoeg om ervaren spelers vast te houden. Elke missie heeft één leerdoel.
+- **Metadata zonder "spel"/"game" (Christian 23 nov).** Titel, beschrijving, og-tags, JSON-LD en
+  manifest noemen de site educatief; zo komen we bij webfilters niet in de categorie Games.
 - **Privacy: geen cookiemelding, geen accounts met inloggen (Christian 23 nov).** localStorage
   alleen functioneel en lokaal, zonder ID's. Analytics alleen anoniem en cookieloos, binnen AVG en
   Telecommunicatiewet; bij twijfel de strengste variant (minder meten > een melding).
