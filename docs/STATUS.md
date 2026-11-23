@@ -29,7 +29,7 @@
 - **Feedbackkanaal (besloten, route A, opdracht I):** "Klopt dit niet?" / 👍👎 na een missie / menu → Cloudflare Worker → GitHub-issue; e-mail optioneel en nooit in het openbare issue. Prioriteit omhoog (nog weinig feedback van vliegers). Stappenplan voor Christians eenmalige setup voorbereiden.
 
 ## Categorisering als educatie (Christian 23 nov)
-- Doel: luchtruim3d.nl opent ook op Christians werklaptop (bedrijfsfilter blokkeert nieuwe/ongecategoriseerde domeinen). Site-kant: duidelijke titel/meta-description ("educatief"), een korte Over-pagina die zonder JS leesbaar is, en `robots.txt` + `sitemap.xml`. Aanvragen tot hercategorisering (Education) bij de filterleveranciers gebeuren via webformulieren, eerst voor de leverancier die op de blokpagina staat.
+- Opdracht J: pictogram, zoekresultaat "educatief", `over.html`, robots/sitemap/JSON-LD; mailtje voor IT (waarschijnlijk Microsoft Defender-webfilter) + lijst met leveranciersformulieren. **Klein blok per sessie, ná de bugfixes; niet ten koste van de game.**
 
 ## Wacht op Christian
 - Niets. Geplande sessies di+vr 22:47 (±25% per sessie). Soms een extra handmatige sessie op vrijdagochtend als er tokens over zijn.

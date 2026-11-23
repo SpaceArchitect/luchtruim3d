@@ -74,3 +74,18 @@ Nooit tijdens het vliegen, hooguit één vraag per bezoek. De context bestaat ui
 - Bewaartermijn: het e-mailadres wordt gewist zodra de melding is afgehandeld, uiterlijk na 90 dagen. De privacytekst onder Over meldt dit (doel, bewaartermijn, verwijderen op verzoek).
 
 **Eenmalig door Christian (± 5–10 min, door de sessie in een stappenplan voorbereid):** een Cloudflare-account aanmaken en een fijnmazig GitHub-token (alleen issues op deze repo) als secret instellen. De sessie bouwt en test de Worker en de app-kant; zolang de ontvanger er niet is, blijft de knop verborgen.
+
+## J. Vindbaar en gecategoriseerd als educatie (Christian 23 nov) — klein, na de bugfixes
+**Prioriteit:** op korte termijn, maar **niet ten koste van de bugfixes (A) en de game (B–D)**. Per sessie hooguit een klein blok (±1 uur werk).
+**Aanleiding:** op Christians werklaptop: "Content blocked by your organization. Contact your administrator". Die tekst wijst waarschijnlijk (niet zeker) op **Microsoft Defender for Endpoint web content filtering**. Een categorie daar betwisten of een allow-indicator zetten kan alleen de beheerder (IT) in het Defender-portal. OVH (domein) en GitHub Pages (hosting) gaan niet over categorieën.
+
+**Site-kant (de sessie bouwt):**
+- **Pictogram:** eigen favicon + app-icoon (SVG + PNG 192/512, `apple-touch-icon`, `manifest.webmanifest`). Idee: een eenvoudig silhouet van een zweefvliegtuig boven drie gestapelde, licht transparante luchtruimlagen (Okabe-Ito-kleuren), ook leesbaar op 16 px. Eerst 2–3 varianten als preview aan Christian laten zien.
+- **Zoekresultaat:** titel en beschrijving kort en educatief, bijv. *"Luchtruim 3D – leer het Nederlandse luchtruim in 3D"* / *"Educatieve website: verken CTR's, TMA's en verboden gebieden in 3D of vlieg er zelf doorheen. Alleen voor educatie; de AIP van LVNL is leidend."* Geen extra tekst in de app zelf (de gebruiker niet doodgooien).
+- **Signalen voor scanners en beoordelaars:** een korte `over.html` (statisch, leesbaar zonder JS: wat, voor wie, bron AIP/LVNL, disclaimer, contact via het feedbackkanaal), `<noscript>`-tekst, `robots.txt`, `sitemap.xml`, `schema.org` JSON-LD (`WebApplication` + `EducationalOccupationalProgram` of `LearningResource`, `isAccessibleForFree`).
+- Woorden als "game"/"spel" niet prominent in titel en beschrijving (risico op de categorie Games); wel "educatief", "leren", "luchtvaart".
+
+**Categorisering (samen met Christian, formulieren versturen doet hij):**
+1. **IT van zijn werk:** de snelste route. Vraag om (a) een category lookup van luchtruim3d.nl en (b) een dispute naar "Education" of een allow-indicator. De sessie schrijft een kort mailtje dat hij kan doorsturen.
+2. **Openbare formulieren van de grote filterleveranciers** (voor vliegers bij andere bedrijven): Zscaler, Palo Alto, Cisco Talos, Fortinet, Broadcom/Symantec, Forcepoint, Trellix. De sessie zoekt de actuele formulieren op en zet een lijst met links in STATUS; pas indienen als J-site-kant live is.
+3. Daarna: Google Search Console + Bing Webmaster Tools (vereist login → Christian; levert ook Microsoft-signalen).
