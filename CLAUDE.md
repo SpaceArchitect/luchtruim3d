@@ -179,6 +179,7 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
 - Een sensorsimulatie zonder ruis bewijst niets (kantel-bug 15 nov).
 - Een fix ná de laatste test is een ongeteste fix.
 - Christian is opdrachtgever, geen bugjager. Vindt hij een open-deur-bug, dan is ons proces stuk.
+- Verwijderen pas nadat je per item hebt aangetoond waar de inhoud bewaard blijft (23 nov: projectdocs te snel gewist).
 - Christian vindt een idee goed als hij het ziet, niet als hij het leest: laat het hem zien (screenshot of preview).
 
 *Vliegen is: de juiste beslissing op tijd nemen. Bouwen ook. Veel plezier!* ✈️
