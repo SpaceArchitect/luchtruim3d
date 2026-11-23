@@ -11,8 +11,8 @@ Werk het af over meerdere sessies; wat niet past, blijft met prioriteit in STATU
 **Beter:**
 1. **Herkenningspunten kloppen deels niet.** Voorbeeld: de brug bij de A50 staat een kwartslag gedraaid. → Alle modellen nalopen op oriëntatie en positie. Richting uit OSM-weg- of rivier-as halen in plaats van een vaste rotatie, en elk punt vergelijken met de luchtfoto. Test: brug-as ⟂ rivier en ∥ weg.
 2. **Lieren (para's, schermvliegers):** nu een grote cirkel met een kleinere cilinder erop; oogt vreemd. → **Eén cilinder** met de straal en hoogte uit de AIP (ENR 5.5). Bron per terrein in LOG.
-3. **Malden: modelvliegveld overlapt deels met het zweefvliegveld.** Christian weet hier niets van. → Herkomst uitzoeken (ENR 5.5, OSM of openAIP?). Staat het niet in de AIP of klopt de positie niet: corrigeren of weghalen. Klopt het wel: Christian uitleggen wat er speelt.
-4. **Vught penitentiaire inrichting 's avonds onzichtbaar**, terwijl het volgens Christian 24/7 verboden is. → Tijden in AIP ENR 5.1 controleren en het tijd/dagdeel-filter repareren. Test: H24-gebieden altijd zichtbaar, op elk tijdstip.
+3. **Malden: modelvliegveld overlapt deels met het zweefvliegveld.** Christian (23 nov): er wordt daar soms modelgevlogen, maar **nooit tegelijk met zweefvliegen**. Nu staan er twee overlappende cilinders (groen en oranje), wat suggereert dat het tegelijk gebeurt. → Positie en maten controleren in ENR 5.5. Daarna een algemene regel voor overlappende ENR 5.5-terreinen op hetzelfde veld: één volume, of beide zichtbaar maar met de uitleg "gedeeld terrein, niet gelijktijdig in gebruik" (alleen als de AIP of het veld dat zegt; anders "lokale afspraak, nog te verifiëren"). In de vliegmodus één melding, geen twee.
+4. **Vught penitentiaire inrichting 's avonds onzichtbaar.** Christian denkt dat het 24/7 verboden is, maar heeft de AIP niet gecheckt: **zoek het zelf uit** in ENR 5.1 (status + activiteitstijden). → Tijden in AIP ENR 5.1 controleren en het tijd/dagdeel-filter repareren. Test: H24-gebieden altijd zichtbaar, op elk tijdstip. Is het niet H24, dan moet uitleg zichtbaar zijn waarom het gebied er nu niet staat (bijv. "niet actief, actief van … tot …"), zodat een gebruiker niet denkt dat het ontbreekt.
 5. **Missies veel te makkelijk** → zie B.
 
 ## B. Doelstelling 1: betere game-ervaring
@@ -53,3 +53,7 @@ Analytics **alleen anoniem, zonder cookiemelding en binnen AVG en Telecommunicat
 
 ## G. UX-review
 Na elk zichtbaar blok: een losse reviewer-subagent die de bouw niet heeft gezien. Die loopt de flow door op screenshots (desktop + mobiel staand/liggend) met de testpersona's. Checklist: binnen 2 min gevonden wat ik zoek? Wat is overbodig? Waar twijfel ik? Is de tekst kort genoeg? Bevindingen gaan in LOG; Christian blijft de eindtester.
+
+## H. Testers en budget (Christian 23 nov)
+- **Testers:** Boyd en Fleur zijn geen vliegers en dus niet de doelgroep. Van vliegers is er nog weinig feedback. → Het **feedbackkanaal** (STATUS, Half af) heeft prioriteit: laagdrempelig, zonder account, zonder handwerk van Christian. Vraag in de app expliciet "Vlieg je zelf? (zweef/PPL/ULV/ballon/para/nee)", zodat feedback van vliegers apart te wegen is. Christian vraagt zelf vliegers om feedback.
+- **Budget:** 2 × 25% per week blijft. Christian kan op vrijdagochtend handmatig een extra sessie starten als er tokens over zijn; houd STATUS dus altijd zo bij dat een losse sessie direct verder kan.

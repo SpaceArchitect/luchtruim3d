@@ -10,9 +10,9 @@
 
 ## Eerstvolgende sessie (di 24 nov 22:47) — in deze volgorde
 0. **AIRAC-wissel 26 nov (AMDT 12-2026)** gaat voor als de data er is (zie top 5 punt 5).
-1. **Vught penitentiaire inrichting** 's avonds onzichtbaar, maar volgens Christian 24/7 verboden → ENR 5.1-tijden + tijdfilter; test H24 altijd zichtbaar.
+1. **Vught penitentiaire inrichting** 's avonds onzichtbaar. Christian denkt 24/7, niet gecheckt → zelf uitzoeken in ENR 5.1, tijdfilter repareren of uitleg tonen waarom het er niet staat.
 2. **Lieren para/scherm:** één cilinder met de AIP-maten (nu cirkel + kleinere cilinder).
-3. **Malden:** het modelvliegveld overlapt deels met het zweefvliegveld → herkomst/AIP checken, corrigeren of uitleggen.
+3. **Malden:** overlappende cilinders zweef (groen) en model (oranje) suggereren gelijktijdig gebruik; dat gebeurt nooit (Christian) → één volume of uitleg "gedeeld, niet gelijktijdig"; één melding (opdracht A3).
 4. **Herkenningspunten:** de A50-brug staat een kwartslag gedraaid → alle modellen op oriëntatie (as uit OSM) nalopen. Samen met `wip/herkenning-22nov` (zie Half af).
 5. **Missies te makkelijk** → progressie easy → medium → lang/moeilijk met meerdere keerpunten, sterren, leerdoel (opdracht B).
 
@@ -26,10 +26,10 @@
 
 ## Half af
 - `wip/herkenning-22nov`: 6 herkenningspunten weg (akkoord Christian), test `d_landmarks` 4/4. Nog doen: Waalbrug, De Oversteek, John Frostbrug, Nelson Mandelabrug, knooppunten, Maasbrug Venlo, De Peel uit `osm/herkenning/` op `data/osm`. **Neem de oriëntatiefix (A50-brug) hierin mee.** Bevat ook bos in `fetch_osm.py` en de FAA-NOTAM-proef (niet in de app).
-- **Feedbackkanaal testers (open):** zonder handwerk van Christian, zonder account en zonder server/secret.
+- **Feedbackkanaal testers (open, prioriteit omhoog):** er is nog weinig feedback van vliegers (Boyd/Fleur zijn geen doelgroep). Zonder handwerk van Christian, zonder account, met de vraag "vlieg je zelf?" (opdracht H).
 
 ## Wacht op Christian
-- Niets. Geplande sessies di+vr 22:47 (±25% per sessie). Christian doet geen handmatige acties.
+- Niets. Geplande sessies di+vr 22:47 (±25% per sessie). Soms een extra handmatige sessie op vrijdagochtend als er tokens over zijn.
 
 ## Werkwijze-notities
 - Cloud: `tools/e2e.py` valt terug op `/opt/pw-browsers/chromium`; testserver geeft 204 op `/favicon.ico`.
