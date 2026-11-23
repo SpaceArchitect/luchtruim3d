@@ -28,6 +28,9 @@
 - `wip/herkenning-22nov`: 6 herkenningspunten weg (akkoord Christian), test `d_landmarks` 4/4. Nog doen: Waalbrug, De Oversteek, John Frostbrug, Nelson Mandelabrug, knooppunten, Maasbrug Venlo, De Peel uit `osm/herkenning/` op `data/osm`. **Neem de oriëntatiefix (A50-brug) hierin mee.** Bevat ook bos in `fetch_osm.py` en de FAA-NOTAM-proef (niet in de app).
 - **Feedbackkanaal (besloten, route A, opdracht I):** "Klopt dit niet?" / 👍👎 na een missie / menu → Cloudflare Worker → GitHub-issue; e-mail optioneel en nooit in het openbare issue. Prioriteit omhoog (nog weinig feedback van vliegers). Stappenplan voor Christians eenmalige setup voorbereiden.
 
+## Categorisering als educatie (Christian 23 nov)
+- Doel: luchtruim3d.nl opent ook op Christians werklaptop (bedrijfsfilter blokkeert nieuwe/ongecategoriseerde domeinen). Site-kant: duidelijke titel/meta-description ("educatief"), een korte Over-pagina die zonder JS leesbaar is, en `robots.txt` + `sitemap.xml`. Aanvragen tot hercategorisering (Education) bij de filterleveranciers gebeuren via webformulieren, eerst voor de leverancier die op de blokpagina staat.
+
 ## Wacht op Christian
 - Niets. Geplande sessies di+vr 22:47 (±25% per sessie). Soms een extra handmatige sessie op vrijdagochtend als er tokens over zijn.
 

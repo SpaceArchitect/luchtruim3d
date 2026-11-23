@@ -53,3 +53,4 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 23 nov: Malden: modelvliegen en zweefvliegen nooit tegelijk (Christian); overlappende ENR 5.5-cilinders moeten dat niet suggereren. Vught: H24 niet bevestigd, zelf in ENR 5.1 uitzoeken.
 - 23 nov: testers: Boyd en Fleur zijn geen vliegers → feedbackkanaal voor vliegers krijgt prioriteit. Budget 2×25%/week akkoord; extra handmatige vrijdagochtendsessie mogelijk.
 - 23 nov: feedbackkanaal = route A (Christian): Worker → GitHub-issues; e-mail optioneel, privé opgeslagen (niet in het openbare issue), gewist na afhandeling/≤90 d; verduidelijkingsmails pas na Christians ja.
+- 23 nov: wens Christian: luchtruim3d.nl gecategoriseerd als 'Education' bij webfilterleveranciers, zodat hij hem op zijn werklaptop kan openen.
