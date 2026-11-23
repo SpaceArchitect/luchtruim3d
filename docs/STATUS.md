@@ -14,7 +14,8 @@
 2. **Lieren para/scherm:** één cilinder met de AIP-maten (nu cirkel + kleinere cilinder).
 3. **Malden:** overlappende cilinders zweef (groen) en model (oranje) suggereren gelijktijdig gebruik; dat gebeurt nooit (Christian) → één volume of uitleg "gedeeld, niet gelijktijdig"; één melding (opdracht A3).
 4. **Herkenningspunten:** de A50-brug staat een kwartslag gedraaid → alle modellen op oriëntatie (as uit OSM) nalopen. Samen met `wip/herkenning-22nov` (zie Half af).
-5. **Missies te makkelijk** → progressie easy → medium → lang/moeilijk met meerdere keerpunten, sterren, leerdoel (opdracht B).
+5. **Voorbeeldcircuit Eindhoven + missie "Land op Eindhoven" eruit** (Christian 23 nov): optie in ⚙ Weergave (`optCirc`, `optCircRw`), code rond "voorbeeldcircuit" en de bijbehorende tests verwijderen. Klein; mee in dezelfde live-gang.
+6. **Missies te makkelijk** → progressie easy → medium → lang/moeilijk met meerdere keerpunten, sterren, leerdoel (opdracht B).
 
 ## Koers (Christian 22–23 nov) — top 5
 1. **Betere game-ervaring** (opdracht B–D): missieprogressie; UX-flow = rondleiding (+ "Wat is er veranderd?" na een AIRAC) → keuzescherm Kaart / Missies / Verkenningsvlucht / **Dagelijkse uitdaging** (favoriet Christian; fase 1 lokaal, geen accounts). Eerst een mock laten zien. Na elk zichtbaar blok een UX-review door een subagent.
