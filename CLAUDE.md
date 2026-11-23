@@ -173,6 +173,31 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
   onderwerp) of als een kleiner model volstaat (bv. Sonnet voor teksten, data of
   routinefixes; Opus voor ontwerp, lastige bugs en de briefing).
 
+## 📚 Vastgelegde kennis (uit de projectdocs 03–09, 23 nov)
+
+**AIP (AIRAC 11-2026; bij elke AIRAC opnieuw toetsen):**
+- Eindhoven TMA gaat voor op Nieuw Milligen TMA D (ENR 2.1: overlappende delen uitgesloten). TMA D = E 1500 ft–FL065, B FL065–FL195.
+- TMZ D: ondergrens 1200 ft AMSL alleen op werkdagen 09–17 lokaal, anders 2500 ft. Geldt niet in de CTR's De Peel, Eindhoven,
+  Gilze-Rijen, Kleine-Brogel, Niederrhein en Volkel, en niet in EHAAGLD087 Malden (2500 ft–FL045). Hang/paraglider: altijd 2500 ft.
+- CTR's (klasse D): Eindhoven en De Peel 07–24 lokaal (Eindhoven Tower 131.005); Volkel en Gilze-Rijen ma–vr 08:00–16:45, niet op
+  feestdagen; daarbuiten de RMZ. Eindhoven TMA oversteken: Eindhoven Arrival 132.530.
+- In een CTR is klaring nodig; uitluisteren is niet genoeg. VFR-transponder 7000 tenzij ATC anders zegt; NL kent geen aparte
+  uitluistersquawk. **Squawk 7000 alleen tonen bij een TMZ** (Christian: anders lijkt het alsof je erin mag).
+- Feestdagen: AIP GEN 2.1 §6 (11 dagen; Pasen en Pinksteren berekend). AIP SUP 03/2022 (Lelystad TMA 3–5, Nieuw Milligen TMA
+  B/C2/E) inbouwen zodra de regio die TMA's bevat.
+- **Nog te verifiëren:** status/klasse van een CTR buiten de openingstijden (nu afgeleid: niet actief, RMZ wel); Niederrhein TMZ
+  (squawk 6101 + Langen Radar 119.110? bron was een AI-overzicht → DFS-AIP); eerste oproep Arrival of Tower.
+
+**Licenties:** LVNL Geoportaal CC BY 4.0 · OSM ODbL ("© OpenStreetMap-bijdragers") · three.js MIT · Natural Earth publiek domein.
+
+**Open ideeën (niet gepland):** LVNL-obstakellaag (masten, windmolens) · hoog contrast ook in de 3D-scène · IFR-naderingsgebieden
+(VAC) · doorsnede A→B · legenda/afkortingen · grensstrook DE (eerst labels, bron DFS-AIP).
+**Niet doen (Christian):** voorbeeldcircuit en circuits per zweefveld · thermiek/zweven. AR-bril = apart project.
+
+**Feedback eerste gebruikers (14 nov; geen vliegers):** Fleur (iPhone): tik op een melding = verder; toestel wisselen moeilijk te
+vinden; liggend minder overzichtelijk. Boyd: kon het doel van zijn opdracht niet vinden → doel altijd zichtbaar maken. Karen:
+"leuke training tool". Feedback van echte vliegers ontbreekt nog → feedbackkanaal (opdracht I).
+
 ## 🧠 Lessen die we al betaald hebben
 
 - Een tester die alleen de happy flow probeert, mist alles. Fuzz en randgevallen vinden de echte bugs.
