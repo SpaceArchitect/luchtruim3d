@@ -89,3 +89,13 @@ Nooit tijdens het vliegen, hooguit één vraag per bezoek. De context bestaat ui
 1. **IT van zijn werk:** de snelste route. Vraag om (a) een category lookup van luchtruim3d.nl en (b) een dispute naar "Education" of een allow-indicator. De sessie schrijft een kort mailtje dat hij kan doorsturen.
 2. **Openbare formulieren van de grote filterleveranciers** (voor vliegers bij andere bedrijven): Zscaler, Palo Alto, Cisco Talos, Fortinet, Broadcom/Symantec, Forcepoint, Trellix. De sessie zoekt de actuele formulieren op en zet een lijst met links in STATUS; pas indienen als J-site-kant live is.
 3. Daarna: Google Search Console + Bing Webmaster Tools (vereist login → Christian; levert ook Microsoft-signalen).
+
+### J-aanvulling: advies van Gemini (via Christian, 23 nov), gewogen
+Overnemen:
+- **Titel/beschrijving** in de richting van "Luchtruim 3D – educatieve 3D-luchtruimkaart van Nederland" en "… op basis van AIP-gegevens van LVNL, voor vliegopleiding en luchtruimkennis". **Niet** "(AIP / LVNL)" in de titel: dat kan de indruk wekken dat dit een officiële LVNL-site is. Geen "Zuidoost-Nederland" vastleggen (de kaart groeit).
+- **JSON-LD** `WebApplication` met `applicationCategory: "EducationalApplication"`, `inLanguage: "nl"`, `isAccessibleForFree: true`, `educationalUse`. Auteur: "Luchtruim 3D" (geen persoonsnaam zonder Christians akkoord).
+- **`<meta name="keywords">`** mag (zoekmachines negeren het grotendeels, maar sommige filtercrawlers lezen het): luchtruim, Nederland, AIP, LVNL, educatie, luchtvaart, CTR, TMA, 3D-kaart, vliegopleiding.
+- **Kruipbare tekst ontdoen van spel-taal:** statische/zichtbare tekst die crawlers lezen ("Vliegen (zoals MSFS)", "looping", "opdracht") waar het kan neutraler ("vliegmodus", "oefening"). De UI-functie blijft gelijk; alleen woorden.
+- **Bing Webmaster Tools** heeft prioriteit (Microsofts filters leunen op Bing-signalen); login = Christian.
+- **Microsoft Security Intelligence-indieningsportaal** (URL indienen als website-eigenaar): proberen, maar het effect op de categorie van de Defender-webfilter is niet zeker; de dispute blijft via IT lopen. Sessie: het actuele formulier opzoeken en het stappenplan in STATUS zetten.
+Demo-tip voor nu: op de telefoon via mobiele data (niet het bedrijfsnetwerk) werkt de site gewoon.
