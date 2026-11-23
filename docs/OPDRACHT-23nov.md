@@ -57,3 +57,20 @@ Na elk zichtbaar blok: een losse reviewer-subagent die de bouw niet heeft gezien
 ## H. Testers en budget (Christian 23 nov)
 - **Testers:** Boyd en Fleur zijn geen vliegers en dus niet de doelgroep. Van vliegers is er nog weinig feedback. → Het **feedbackkanaal** (STATUS, Half af) heeft prioriteit: laagdrempelig, zonder account, zonder handwerk van Christian. Vraag in de app expliciet "Vlieg je zelf? (zweef/PPL/ULV/ballon/para/nee)", zodat feedback van vliegers apart te wegen is. Christian vraagt zelf vliegers om feedback.
 - **Budget:** 2 × 25% per week blijft. Christian kan op vrijdagochtend handmatig een extra sessie starten als er tokens over zijn; houd STATUS dus altijd zo bij dat een losse sessie direct verder kan.
+
+## I. Feedbackkanaal (besluit Christian 23 nov: route A)
+**In de app (één tik, context automatisch):**
+1. Kaartmodus: **"Klopt dit niet?"** onder het infopaneel van elk vak (gebied-ID, AIRAC en positie gaan automatisch mee).
+2. Na elke missie: 👍/👎 + optioneel tekstveld.
+3. Hoofdmenu: **💬 Feedback** voor de rest.
+4. Eén keer, bij het 3e bezoek: "Vlieg je zelf?" (zweef/PPL/ULV/ballon/para/nee). Dit blijft lokaal en gaat alleen mee met feedback.
+Nooit tijdens het vliegen, hooguit één vraag per bezoek. De context bestaat uit versie, AIRAC, modus, missie, toestel, positie/hoogte en schermtype. Geen naam en geen IP.
+
+**Ontvanger (route A):** een kleine Cloudflare Worker (gratis) zet elke melding als **GitHub-issue** in deze repo (label `feedback`, plus `vlieger`/`geen-vlieger`). Geplande sessies lezen de issues met `gh`, verwerken ze (fix / test / STATUS) en sluiten ze met een korte reden. Rate-limit en een honeypot tegen spam; het token staat alleen als Worker-secret.
+
+**E-mail (optioneel voor de gebruiker):**
+- De repo is openbaar, dus **een e-mailadres komt NOOIT in het issue**. De Worker bewaart het apart en privé (Cloudflare KV) onder het meldingsnummer; het issue krijgt alleen "contact mogelijk: ja" + het nummer.
+- Is de feedback onduidelijk, dan stelt de sessie een verduidelijkingsvraag op en zet die in het issue. **Versturen gebeurt pas na Christians ja** (grens 4), vanaf een projectadres (bijv. OVH-mail) of Christians eigen adres.
+- Bewaartermijn: het e-mailadres wordt gewist zodra de melding is afgehandeld, uiterlijk na 90 dagen. De privacytekst onder Over meldt dit (doel, bewaartermijn, verwijderen op verzoek).
+
+**Eenmalig door Christian (± 5–10 min, door de sessie in een stappenplan voorbereid):** een Cloudflare-account aanmaken en een fijnmazig GitHub-token (alleen issues op deze repo) als secret instellen. De sessie bouwt en test de Worker en de app-kant; zolang de ontvanger er niet is, blijft de knop verborgen.

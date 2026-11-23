@@ -52,3 +52,4 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 23 nov: les: input uit een chat stond eerst alleen in projectdoc claude/11-…; geplande sessies lezen alleen de repo. Regel in CLAUDE.md: Christians input altijd in de repo vastleggen.
 - 23 nov: Malden: modelvliegen en zweefvliegen nooit tegelijk (Christian); overlappende ENR 5.5-cilinders moeten dat niet suggereren. Vught: H24 niet bevestigd, zelf in ENR 5.1 uitzoeken.
 - 23 nov: testers: Boyd en Fleur zijn geen vliegers → feedbackkanaal voor vliegers krijgt prioriteit. Budget 2×25%/week akkoord; extra handmatige vrijdagochtendsessie mogelijk.
+- 23 nov: feedbackkanaal = route A (Christian): Worker → GitHub-issues; e-mail optioneel, privé opgeslagen (niet in het openbare issue), gewist na afhandeling/≤90 d; verduidelijkingsmails pas na Christians ja.
