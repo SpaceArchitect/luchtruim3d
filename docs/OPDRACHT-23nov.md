@@ -99,3 +99,7 @@ Overnemen:
 - **Bing Webmaster Tools** heeft prioriteit (Microsofts filters leunen op Bing-signalen); login = Christian.
 - **Microsoft Security Intelligence-indieningsportaal** (URL indienen als website-eigenaar): proberen, maar het effect op de categorie van de Defender-webfilter is niet zeker; de dispute blijft via IT lopen. Sessie: het actuele formulier opzoeken en het stappenplan in STATUS zetten.
 Demo-tip voor nu: op de telefoon via mobiele data (niet het bedrijfsnetwerk) werkt de site gewoon.
+
+### J-besluit auteur (Christian 23 nov)
+- Auteur = **Christian Niemeijer** (volledige naam) in metadata (JSON-LD `author` als `Person`, `<meta name="author">`), op `over.html` en in de privacytekst (verwerkingsverantwoordelijke).
+- **Verder niets openbaar:** geen e-mailadres, telefoon, woonplaats of werkgever. Contact en privacyverzoeken (inzage/verwijderen) lopen via het feedbackkanaal in de app. Nergens in repo, site of metadata persoonlijke contactgegevens zetten.
