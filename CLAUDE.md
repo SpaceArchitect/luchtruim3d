@@ -62,6 +62,12 @@ Is iets in deze briefing in de weg voor de noordster? Pas de briefing dan aan en
   Missie geslaagd/mislukt met de reden erbij. Grond raken = leermoment, geen explosie.
 - **Alles standaard aan.** Elke groep kan uit in ⚙ Weergave.
 - **Toegankelijk:** WCAG 2.2 AA waar het kan, knoppen ≥ 44 px, "minder beweging" respecteren.
+- **Spel met progressie (Christian 23 nov).** Missies lopen van makkelijk (opwarmen) via medium
+  (één instinker) naar lang en moeilijk (meerdere keerpunten). Langzaam genoeg voor beginners,
+  pittig genoeg om ervaren spelers vast te houden. Elke missie heeft één leerdoel.
+- **Privacy: geen cookiemelding, geen accounts met inloggen (Christian 23 nov).** localStorage
+  alleen functioneel en lokaal, zonder ID's. Analytics alleen anoniem en cookieloos, binnen AVG en
+  Telecommunicatiewet; bij twijfel de strengste variant (minder meten > een melding).
 
 ## 🧰 Omgeving: overal hetzelfde
 
@@ -122,6 +128,7 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
 
 ## 🤖 Zelfstandig werken (afspraak 22 nov)
 
+- **Afgerond:** kantelen op mobiel (Christian 23 nov). Niet meer aan sleutelen, alleen bij een bug.
 - **Koers:** game-ervaring · procedureel landschap · uitbreiden naar heel NL (later BE/DE) ·
   missies voor motor, zweef en ballon · live eAIP/AIRAC/NOTAM. Alle even zwaar; **bronnen moeten
   kloppen** (harde eis, zie grens 1).
@@ -141,6 +148,10 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
 
 - `docs/STATUS.md`: **lees dit als eerste.** Wat er live staat, wat er half af is en
   wat de top 5 is. Houd het kort (≤ 1 scherm) en herschrijf het aan het eind van elke sessie.
+- `docs/OPDRACHT-<datum>.md`: een uitgewerkte opdracht van Christian. De nieuwste waar STATUS naar
+  verwijst, is leidend; lees hem na STATUS. Nu: `docs/OPDRACHT-23nov.md`.
+- Input van Christian buiten een werksessie (bijv. in een chat) komt altijd in de repo
+  (STATUS/OPDRACHT/LOG), niet alleen in een projectdoc: geplande sessies lezen alleen de repo.
 - `docs/LOG.md`: beslissingen en lessen, één regel per stuk, met datum. Alleen toevoegen.
 - De claude.ai-projectdocs (`claude/0x-…`) zijn **archief**: achtergrond, geen opdracht.
 

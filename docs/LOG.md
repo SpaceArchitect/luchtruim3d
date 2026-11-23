@@ -46,3 +46,7 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 22 nov: Christian maakte publieke repo SpaceArchitect/claude-usage (branch meta/usage, usage.json) voor de weeklimiet. 22 nov nog leeg. Commando in briefing + geplande taak.
 - 22 nov: claude-usage-repo vervallen (Cloudflare blokkeert bots op claude.ai; repo verwijderd). Weeklimiet blijft een voorzichtige schatting, max ±25% per geplande sessie.
 - 22 nov: live gezet (main 0b0ae88, Pages OK). Vorige live bewaard als release/2026-11-22 (c7d5b62). luchtruim3d.nl is vanuit de cloudwerkplek niet bereikbaar (curl 000) → deploy via GitHub gecontroleerd.
+- 23 nov: input Christian (chat) vastgelegd in `docs/OPDRACHT-23nov.md`: feedback release 22 nov (A50-brug gedraaid, lieren als één cilinder, modelveld Malden overlapt zweefveld, Vught P-gebied 's avonds onzichtbaar, missies te makkelijk), doelstelling game-ervaring met progressie, UX-flow met AIRAC-rondleiding "Wat is er veranderd?", dagelijkse uitdaging (favoriet), quiz later, IGC/MSFS geparkeerd.
+- 23 nov: kantelen op mobiel = afgerond (Christian). Sneltoetskaart desktop = goed.
+- 23 nov: privacy (Christian): geen cookiemelding, geen accounts met inloggen; analytics alleen anoniem/cookieloos binnen AVG + Telecommunicatiewet; bij twijfel strengste variant. In CLAUDE.md onder Smaak.
+- 23 nov: les: input uit een chat stond eerst alleen in projectdoc claude/11-…; geplande sessies lezen alleen de repo. Regel in CLAUDE.md: Christians input altijd in de repo vastleggen.
