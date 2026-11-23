@@ -58,3 +58,4 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 23 nov: harde regel: geen 'spel'/'game' in metadata (webfilter-categorie). In CLAUDE.md + test in opdracht J.
 - 23 nov: Gemini-advies over Defender-categorisering gewogen en in opdracht J gezet (geen '(LVNL)' in titel i.v.m. schijn van officiële site; spel-taal uit kruipbare tekst; Bing Webmaster Tools eerst).
 - 23 nov: auteur in metadata = Christian Niemeijer; geen verdere persoonlijke gegevens openbaar, contact via feedbackkanaal.
+- 23 nov: projectdocs opgeruimd: 9 verouderde/dubbele docs verwijderd (inhoud staat in repo: OPDRACHT-21nov, OPDRACHT-23nov, archief/). Over in project als archief: 03-beslissingen-log, 04-gebruikerstest, 05-aip-check, 06-backlog, 09-feedback-gebruikers. Artifact 'Luchtruim 3D – sprintbord' verwijderd.

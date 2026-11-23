@@ -103,3 +103,4 @@ Demo-tip voor nu: op de telefoon via mobiele data (niet het bedrijfsnetwerk) wer
 ### J-besluit auteur (Christian 23 nov)
 - Auteur = **Christian Niemeijer** (volledige naam) in metadata (JSON-LD `author` als `Person`, `<meta name="author">`), op `over.html` en in de privacytekst (verwerkingsverantwoordelijke).
 - **Verder niets openbaar:** geen e-mailadres, telefoon, woonplaats of werkgever. Contact en privacyverzoeken (inzage/verwijderen) lopen via het feedbackkanaal in de app. Nergens in repo, site of metadata persoonlijke contactgegevens zetten.
+- Co-auteur: op `over.html` een regel "Gebouwd met Claude (Anthropic)". Niet als `Person`-auteur in de JSON-LD (auteur blijft alleen Christian Niemeijer). Het e-mailadres voor het feedbackkanaal stellen Christian en Claude later samen in.
