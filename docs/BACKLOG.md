@@ -15,6 +15,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 4. [M] Herkenningspunten: oriëntatie (A50-brug gedraaid) + bruggen/knooppunten uit `wip/herkenning-22nov` afmaken — Christian 22–23 nov → A1, `docs/herkenningspunten-voorstel.md`
 5. [S] Voorbeeldcircuit Eindhoven + missie "Land op Eindhoven" uit de app — Christian 23 nov
 6. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
+   - Opzet (akkoord 23 nov): vaste reeks van ±6 handgemaakte missies (elk één regel: CTR, TMA, P-gebied, TMZ, lier, tijden), daarna een **oneindige generator** met oplopende moeilijkheid (keerpunten, smalle gangen, hoogtebanden, wind, tijdsgebonden gebieden) tot een plafond. Elke gegenereerde missie eerst valideren (er bestaat een route zonder overtreding); leerdoel achteraf uit de geraakte gebieden. Dezelfde generator + datum-seed = dagelijkse uitdaging.
 
 ## P2 — daarna
 - [L] UX-flow: rondleiding + "Wat is er veranderd?" na AIRAC → keuzescherm (Kaart / Missies / Verkenningsvlucht / Dagelijkse uitdaging), toestelkeuze, menu herindelen; eerst mock — Christian 21+23 nov → C (vervangt OPDRACHT-21nov blok 5)
@@ -45,8 +46,12 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - Status/klasse van een CTR buiten de openingstijden · Niederrhein TMZ squawk/frequentie (DFS-AIP) · eerste oproep Arrival of Tower · Vught H24?
 
 ## Open vragen aan Christian
-- Ballon: W/↑ = branden, S/↓ = dalen? · Verkenningsvlucht: luchtruim standaard aan of uit? · Na de laatste missie: opnieuw of terug naar keuzescherm? (OPDRACHT-21nov)
 - Verduidelijkingsmails feedback: per stuk goedkeuren of vaste standaardvraag? → I
+
+## Besloten (23 nov)
+- Ballon: W/↑ = branden (omhoog), S/↓ = dalen; uitleg per toestel in de sneltoetskaart.
+- Verkenningsvlucht: standaard **met** luchtruim; laatste keuze onthouden (localStorage).
+- Na de vaste missies: oneindige generator (zie P1-6).
 
 ## Niet doen (besluit Christian)
 - Voorbeeldcircuit en circuits per zweefveld · thermiek/zweven · MSFS-export · accounts met inloggen · cookiemelding · "spel"/"game" in metadata · IGC op de openbare site · AR-bril (apart project)
