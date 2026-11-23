@@ -62,3 +62,4 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 23 nov: fout bij opruimen projectdocs: sprintverslagen 14/14b/15 nov, 00-projectprompt, 01-context en usage-meting verwijderd zonder te controleren of de inhoud in de repo stond (niet terug te draaien). Les: eerst per document aantonen waar de inhoud bewaard is (of eerst naar docs/archief/ kopiëren), pas dan verwijderen.
 - 23 nov: belangrijkste inhoud van projectdocs 03–09 (AIP-feiten, licenties, open ideeën, eerste feedback) naar CLAUDE.md 'Vastgelegde kennis'. Voorbeeldcircuit definitief geschrapt (Christian).
 - 23 nov: voorbeeldcircuit moet ook uit de app (Christian); taak in STATUS.
+- 23 nov: centrale backlog `docs/BACKLOG.md` (P0–P4) opgezet uit STATUS, OPDRACHT-21nov/23nov en CLAUDE.md; CLAUDE.md verwijst ernaar. GitHub Issues als werkvorm later testen (Christian).

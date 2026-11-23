@@ -1,6 +1,6 @@
 # Status — lees dit eerst
 
-*Bijgewerkt: 23 nov 2026, ochtend (chat met Christian: nieuwe input, alleen docs gewijzigd). Opdracht: **`docs/OPDRACHT-23nov.md`**.*
+*Bijgewerkt: 23 nov 2026, ochtend (chat met Christian: nieuwe input, alleen docs gewijzigd). Backlog: **`docs/BACKLOG.md`** (enige lijst); uitwerking: `docs/OPDRACHT-23nov.md`.*
 
 ## Live
 - https://luchtruim3d.nl = `main` = `wip/live-21nov` + fixes 22 nov (live 22 nov ±20:13, volledige suite groen, Pages OK).

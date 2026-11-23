@@ -149,7 +149,9 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
 ## 🗂 Geheugen tussen sessies
 
 - `docs/STATUS.md`: **lees dit als eerste.** Wat er live staat, wat er half af is en
-  wat de top 5 is. Houd het kort (≤ 1 scherm) en herschrijf het aan het eind van elke sessie.
+  de top 5 uit de backlog. Houd het kort (≤ 1 scherm) en herschrijf het aan het eind van elke sessie.
+- `docs/BACKLOG.md`: **de enige backlog**, op prioriteit (P0–P4, open vragen, niet doen). Alles wat nog moet of
+  kan, staat hier; nieuwe feedback (chat, app-issues, testers) eerst hier. Klaar = schrappen + regel in LOG.
 - `docs/OPDRACHT-<datum>.md`: een uitgewerkte opdracht van Christian. De nieuwste waar STATUS naar
   verwijst, is leidend; lees hem na STATUS. Nu: `docs/OPDRACHT-23nov.md`.
 - Input van Christian buiten een werksessie (bijv. in een chat) komt altijd in de repo
@@ -190,9 +192,7 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
 
 **Licenties:** LVNL Geoportaal CC BY 4.0 · OSM ODbL ("© OpenStreetMap-bijdragers") · three.js MIT · Natural Earth publiek domein.
 
-**Open ideeën (niet gepland):** LVNL-obstakellaag (masten, windmolens) · hoog contrast ook in de 3D-scène · IFR-naderingsgebieden
-(VAC) · doorsnede A→B · legenda/afkortingen · grensstrook DE (eerst labels, bron DFS-AIP).
-**Niet doen (Christian):** voorbeeldcircuit en circuits per zweefveld · thermiek/zweven. AR-bril = apart project.
+**Open ideeën en "niet doen":** staan in `docs/BACKLOG.md`.
 
 **Feedback eerste gebruikers (14 nov; geen vliegers):** Fleur (iPhone): tik op een melding = verder; toestel wisselen moeilijk te
 vinden; liggend minder overzichtelijk. Boyd: kon het doel van zijn opdracht niet vinden → doel altijd zichtbaar maken. Karen:
