@@ -1415,6 +1415,7 @@ const HAZ=new Set(['CTR','TMA','CTA','ATZ','P','R','D','TRA','TSA','PJA','UAS','
 const v=new THREE.Vector3();
 function placeLabels(){lmMinSize();
   const W=innerWidth,H=innerHeight,placed=[];const cam=camera.position;
+  for(const L of labels){L.prev=L.show;L.show=false;}// eerst: hysterese moet het vorige frame lezen, niet dat van twee frames terug (dat gaf knipperen 0101…, bug 24 nov Deelen)
   const list=labels.filter(L=>{
     if(L.ref&&(L.ref.hidden||!(vis[L.ref.group.id]||L.ref.forceShow)))return false;
     if(L.tickFt!==undefined&&L.tickFt>CAP)return false;
@@ -1434,7 +1435,6 @@ function placeLabels(){lmMinSize();
     if(L.isLm&&(!LM_ON||((typeof MODE==='undefined'||MODE!=='fly')&&L.pos3().distanceTo(cam)>LM_NEAR*(L.prev?1.15:1))))return false;
     if(typeof MODE!=='undefined'&&MODE==='fly'&&(L.tickFt!==undefined||L.isSlice))return false;
     return true;});
-  for(const L of labels){L.prev=L.show;L.show=false;}
   for(const L of list){const p=L.pos3();L.d=p.distanceTo(cam);v.copy(p).project(camera);L.sx=(v.x+1)/2*W;L.sy=(1-v.y)/2*H;L.ok=v.z<1&&L.sx>-50&&L.sx<W+50&&L.sy>-20&&L.sy<H+20;}
   list.sort((a,b)=>(a.prio-(a.prev?0.5:0))-(b.prio-(b.prev?0.5:0))||a.idx-b.idx);
   for(const L of list){if(!L.ok)continue;if(!L.w){L.w=L.el.offsetWidth||80;L.h=L.el.offsetHeight||16;}
@@ -2136,6 +2136,8 @@ function randomStart(ac){const nm=nextMission(ac);MISSION=null;WIND=null;
 const CALLSIGN='PH-ABC',ACNAME={glider:'glider',motor:'Cessna 172',balloon:'balloon'};
 function posEN(x,n){let b=null,bd=1e9;for(const c of [...CITYXY,...TOWNXY]){if(c.nm==='Lommel')continue;const d=Math.hypot(c.x-x,c.n-n);if(d<bd){bd=d;b=c;}}
   if(bd<1.5)return 'overhead '+b.nm;const br=(Math.atan2(x-b.x,n-b.n)*180/Math.PI+360)%360;return Math.round(bd)+' km '+['north','northeast','east','southeast','south','southwest','west','northwest'][Math.round(br/45)%8]+' of '+b.nm;}
+// 24 nov (Evoluon-bug): klaring aanvragen moet kunnen zolang je een klaringsgebied nadert of erin zit, niet alleen bij de eerste melding
+const clrBtn=f=>!RELAX&&f&&needsClr(f)&&!cleared(f)&&AIPINFO[f.ident]&&AIPINFO[f.ident].freq?` <button class="nt mini" data-rt="open:${f.ident}">📻 Klaring</button>`:'';
 function rtButton(f){return ` <button class="nt" data-rt="open:${f.ident}">📻 ${f.layer==='RMZ'?'Oproepen':'Klaring aanvragen'}</button>`;}
 const rmzLive=f=>f.layer==='RMZ'&&f.active!==false&&!!(AIPINFO[f.ident]&&AIPINFO[f.ident].freq);
 const rmzOk=(f,set)=>cleared(f)||set.some(g=>g!==f&&g.layer==='CTR'&&g.active!==false&&cleared(g));// Christian 21 nov: met klaring van de CTR-verkeersleiding (Deelen Tower) heb je al tweezijdig contact; dat dekt de RMZ die over de CTR ligt (vereenvoudigd)
@@ -2155,12 +2157,12 @@ function rtClick(k){const [act,arg]=k.split(':');
   if(act==='pick'&&RT){const o=RT.opts[+arg];
     if(o[1]!==1){NOTICE=`❌ Bijna. ${o[1]==='order'?'Eerst wie je roept (het station), dan wie je bent.':'Noem ook toestel, positie en hoogte: dan weet de verkeersleider waar hij je zoekt.'}<br><small>Volgorde: station · roepnaam · toestel · positie · hoogte · verzoek</small>`+RT.opts.map((q,j)=>rtBtn(q[0],'pick:'+j)).join('')+RTCLOSE;hudTick();return;}
     const f=RT.f;if(f.layer==='RMZ'){CLR.add(f.ident);WARNED.add(f.ident);NOTICE=`📻 <i>"${CALLSIGN}, ${RT.st}, roger"</i><br>✅ Opgeroepen. Blijf uitluisteren op <b>${(AIPINFO[f.ident]||{}).freq||''}</b> zolang je in ${short(f)} bent.<br><small>(vereenvoudigd) · ▶ = verder</small>`;RT=null;hudTick();return;}
-    {const c=RTOUT.get(f.ident);if(!c||performance.now()-c.t>45000)RTOUT.set(f.ident,{t:performance.now(),o:Math.random()<.65?'yes':['traffic','expect entry in 10 minutes','runway change in progress'][Math.floor(Math.random()*3)]});}const out=RTOUT.get(f.ident).o;// zelfde antwoord bij direct opnieuw vragen; na ~45 s mag je het opnieuw proberen
+    {const c=RTOUT.get(f.ident);if(!c||performance.now()-c.t>45000)RTOUT.set(f.ident,{t:performance.now(),o:(c&&c.o!=='yes')||Math.random()<.65?'yes':['traffic','expect entry in 10 minutes','runway change in progress'][Math.floor(Math.random()*3)]});}const out=RTOUT.get(f.ident).o;// zelfde antwoord bij direct opnieuw vragen; na ~45 s mag je het opnieuw proberen
     const area=f.layer==='CTR'?'control zone':'controlled airspace';
     if(out==='yes'){RT.clr=`cleared to enter ${area}, maintain altitude ${RT.alt} ft`;
       const rb=[[[`Cleared to enter ${area}`,`maintain altitude ${RT.alt} ft`,CALLSIGN],1],[['Roger',CALLSIGN],'roger'],[[`Cleared to enter ${area}`,CALLSIGN],'alt']].sort(()=>Math.random()-.5);RT.rb=rb;
       NOTICE=`📻 <i>"${CALLSIGN}, ${RT.st}, ${RT.clr}"</i><br>Lees de klaring terug:`+rb.map((o,j)=>rtBtn(o[0],'rb:'+j)).join('')+RTCLOSE;}
-    else{NOTICE=`🚫 📻 <i>"${CALLSIGN}, ${RT.st}, remain outside ${area}, ${out}"</i><br>Geweigerd. Dat gebeurt: vlieg eromheen${f.lo>0?' of eronder':''}, of probeer het later.<br><small>(vereenvoudigd)</small>`+RTCLOSE;RT=null;REFUSED.add(f.ident);REFW.delete(f.ident);}
+    else{NOTICE=`🚫 📻 <i>"${CALLSIGN}, ${RT.st}, remain outside ${area}, ${out}"</i><br>Geweigerd. Dat gebeurt: vlieg eromheen${f.lo>0?' of eronder':''}, of cirkel erbuiten en vraag het over een minuut opnieuw (📻 Klaring in de balk).<br><small>(vereenvoudigd)</small>`+RTCLOSE;RT=null;REFUSED.add(f.ident);REFW.delete(f.ident);}
     hudTick();return;}
   if(act==='rb'&&RT){const o=RT.rb[+arg];
     if(o[1]!==1){NOTICE=`❌ ${o[1]==='roger'?'"Roger" is niet genoeg: een klaring lees je terug.':'Ook de hoogte hoort in je readback.'}<br><i>"${CALLSIGN}, ${RT.st}, ${RT.clr}"</i>`+RT.rb.map((q,j)=>rtBtn(q[0],'rb:'+j)).join('')+RTCLOSE;hudTick();return;}
@@ -2258,7 +2260,7 @@ function status(inside,x,n){
   if(has('P')){cls='bad';tags.push(tag('bad','VERBODEN'));head=nm(has('P'));}
   else if(g&&g.cls==='A'){cls='bad';tags.push(tag('bad','GEEN VFR'));head=where;}
   else if(needsClr(g)&&cleared(g)){tags.push(tag('ok','✓ KLARING GEKREGEN'));head=where;}
-  else if(needsClr(g)){cls='clr';tags.push(tag('clr','🔶 KLARING'));head=where;}
+  else if(needsClr(g)){cls='clr';tags.push(clrBtn(g).trim()||tag('clr','🔶 KLARING'));head=where;}
   else if(!g&&!inNL(x,n)){cls='warn';tags.push(tag('warn','? BUITEN NL'));head='luchtruim van dit land staat niet in de app';}// geen klasse G claimen buiten NL (Christian 14 nov)
   else{tags.push(tag('ok','✓ VRIJ'));head=where;}
   if(has('R')){cls=cls==='ok'?'warn':cls;tags.push(tag('warn','BEPERKT'));}
@@ -2298,7 +2300,7 @@ function hudTick(){document.body.classList.toggle('menuopen',!$('panel').classLi
     if(ahead&&ahead.clr&&!cleared(ahead.f)&&ahead.d<=WD&&!WARNED.has(ahead.f.ident)&&!PAUSED){WARNED.add(ahead.f.ident);FIRST_WARN_DONE=true;PAUSED=true;{const ii=AIPINFO[ahead.f.ident];NOTICE=`🔶 Over ${ahead.d.toFixed(1).replace('.',',')} km: <b>${short(ahead.f)}</b> · klaring nodig${rtLine(ii)}<br><small>▶ = verder</small>${ii&&ii.freq&&!RELAX?rtButton(ahead.f):''}`;}}
     if(ahead&&ahead.call&&ahead.d<=WD&&!WARNED.has(ahead.f.ident)&&!PAUSED&&!RELAX){WARNED.add(ahead.f.ident);PAUSED=true;NOTICE=`📻 Over ${ahead.d.toFixed(1).replace('.',',')} km: <b>${short(ahead.f)}</b> · eerst oproepen${rtLine(AIPINFO[ahead.f.ident])}<br><small>▶ = verder</small>${rtButton(ahead.f)}`;}
     // D2: na een geweigerde klaring opnieuw waarschuwen vlak vóór de grens (anders kwam de eerste melding pas als je er al in zat)
-    if(ahead&&ahead.clr&&REFUSED.has(ahead.f.ident)&&!cleared(ahead.f)&&ahead.d<=Math.max(1,WD/2)&&!REFW.has(ahead.f.ident)&&!PAUSED&&!RELAX){REFW.add(ahead.f.ident);PAUSED=true;NOTICE=`🚫 <b>Geen klaring</b> voor ${short(ahead.f)} · nog ${ahead.d.toFixed(1).replace('.',',')} km<br>Draai weg${ahead.f.lo>0?` of daal onder ${fmtAlt(ahead.f.lo)}`:''}.<br><small>▶ = verder</small>`;}
+    if(ahead&&ahead.clr&&REFUSED.has(ahead.f.ident)&&!cleared(ahead.f)&&ahead.d<=Math.max(1,WD/2)&&!REFW.has(ahead.f.ident)&&!PAUSED&&!RELAX){REFW.add(ahead.f.ident);PAUSED=true;NOTICE=`🚫 <b>Geen klaring</b> voor ${short(ahead.f)} · nog ${ahead.d.toFixed(1).replace('.',',')} km<br>Draai weg${ahead.f.lo>0?` of daal onder ${fmtAlt(ahead.f.lo)}`:''}, of cirkel en vraag het straks opnieuw.<br><small>▶ = verder</small>${rtButton(ahead.f)}`;}
     if(!PAUSED&&!RELAX&&vis.gld&&PLANE.alt>0){for(const h of hgNear(PLANE.x,PLANE.n,2.2)){if(PLANE.alt>h.top+500||Math.hypot(h.x-PLANE.x,h.n-PLANE.n)>h.r+1.2)continue;if(WARNED.has('HG'+h.ident))continue;WARNED.add('HG'+h.ident);PAUSED=true;NOTICE=hgWarn(h);break;}}
     // opdracht: geslaagd of gefaald (Christian 11 nov): fout = verboden gebied, gecontroleerd luchtruim zonder klaring, para- of dronegebied
     if(GOAL&&!RELAX&&PLANE.alt>0){const gg=governing(INSIDE);for(const f of INSIDE){if(rmzLive(f)&&!rmzOk(f,INSIDE))FAILS.set(f.ident,short(f)+' zonder oproep');if(f.layer==='P'||f.layer==='PJA'||f.layer==='UAS')FAILS.set(f.ident,{P:'verboden gebied ',PJA:'paradropzone ',UAS:'dronegebied '}[f.layer]+nm(f).replace(/^(verboden|para|drones?)\s+/i,''));/* niet 'verboden gebied Verboden Vught' (Christian) */}
@@ -2327,7 +2329,7 @@ function hudTick(){document.body.classList.toggle('menuopen',!$('panel').classLi
       st.sub.unshift('Oranje lijn = drift 10 min');}
     const b=$('banner');b.className='banner '+st.cls+(BANNER_OPEN?' open':'')+(ahead?' hasAhead':'');
     if(NOTICE){b.className='banner noticeonly';const rz=!RELAX&&!/data-rt=/.test(NOTICE)&&INSIDE.find(f=>rmzLive(f)&&!rmzOk(f,INSIDE));/* 22 nov: een melding mag de RMZ-oproepknop niet verdringen */b.__html=`<div class="notice">${kbText(NOTICE)}${rz?'<br>'+rtButton(rz):''}</div>`;}else b.__html=(TASK?`<div class="task">🎯 ${TASK.replace(/<br>.*$/,'').replace(/<\/?b>/g,'').replace(/\s*\(\d+ km\)/,'')}${GOAL&&GOAL.d!=null?` · ${GOAL.arrow||''} nog ${GOAL.d<10?GOAL.d.toFixed(1).replace('.',','):Math.round(GOAL.d)} km`:''}${FAILS.size?' · ❌':''}${GOAL?'<span class="q"> · Luchtruim vrij?</span>':''}</div>`:'')+`<div class="head">${st.tags.join(' ')} ${st.head}${st.radio?` · <b>${st.radio}</b>`:''}</div>`+
-     (ahead?`<div class="ahead">⚠ ${ahead.drift?`Drift naar <b>${short(ahead.f)}</b> (${ahead.d.toFixed(1).replace('.',',')} km) · andere hoogte?`:`${ahead.d.toFixed(1).replace('.',',')} km: <b>${short(ahead.f)}</b>${ahead.clr&&AIPINFO[ahead.f.ident]?` · ${unitS(AIPINFO[ahead.f.ident].unit)} ${AIPINFO[ahead.f.ident].freq}`:''}`}</div>`:'')+
+     (ahead?`<div class="ahead">⚠ ${ahead.drift?`Drift naar <b>${short(ahead.f)}</b> (${ahead.d.toFixed(1).replace('.',',')} km) · andere hoogte?`:`${ahead.d.toFixed(1).replace('.',',')} km: <b>${short(ahead.f)}</b>${ahead.clr&&AIPINFO[ahead.f.ident]?` · ${unitS(AIPINFO[ahead.f.ident].unit)} ${AIPINFO[ahead.f.ident].freq}`:''}${clrBtn(ahead.f)}`}</div>`:'')+
      
      (AT_EDGE?'<div class="ahead">Rand van het kaartgebied: draai om.</div>':'');
     if(b.__html!==b.__last){b.__last=b.__html;b.innerHTML=b.__html;}// alleen herbouwen bij wijziging: anders vallen klikken op knoppen weg (bug 13 nov)
