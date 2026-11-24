@@ -7,6 +7,8 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 ## P0 — gaat altijd voor
 - [S] AIRAC-wissel 26 nov (AMDT 12-2026): data ophalen, `build_airspace.py --check`, `aip_check.py`, footer — CLAUDE.md
 - [S–M] Kapotte data-actie of live-bug — CLAUDE.md
+- [S–M] Live-bug: missie motorvliegtuig naar Evoluon onmogelijk, want er komt geen klaring voor Eindhoven CTR (07–24 lokaal, Tower 131.005). Klaringsflow voor deze CTR in de missie nalopen en een test die de missie uitvliegt — Christian 24 nov
+- [S] Live-bug: label Deelen CTR knippert in kaartmodus op mobiel (z-fighting of label dat aan/uit springt bij de overlapcheck?). Eerst reproduceren op Pixel 7 — Christian 24 nov
 
 ## P1 — nu (feedback release 22 nov, in deze volgorde) → OPDRACHT-23nov A
 1. [S] Vught P-gebied 's avonds onzichtbaar: ENR 5.1-tijden checken, tijdfilter of uitleg "niet actief, actief van…" — Christian 23 nov → A4
