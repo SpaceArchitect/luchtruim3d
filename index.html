@@ -2462,7 +2462,7 @@ const HG=document.getElementById('enr55').textContent.trim().split('\n').map(l=>
 const hgGroup=new THREE.Group();scene.add(hgGroup);const hgCyl=new THREE.Group();hgGroup.add(hgCyl);
 {const M={};for(const [k,t] of Object.entries(HGT))M[k]={ring:new THREE.MeshBasicMaterial({color:t.c,transparent:true,opacity:.55,depthWrite:false,side:THREE.DoubleSide}),
    cyl:new THREE.MeshBasicMaterial({color:t.c,transparent:true,opacity:.22,depthWrite:false,side:THREE.DoubleSide}),edge:new THREE.LineBasicMaterial({color:t.c,transparent:true,opacity:.9})};
- for(const h of HG){const m=M[h.typ],ri=Math.max(h.r,.85);const r=new THREE.Mesh(new THREE.RingGeometry(ri,ri+.15,40).rotateX(-Math.PI/2),m.ring);r.position.set(h.x,.05,-h.n);hgGroup.add(r);
+ for(const h of HG){const m=M[h.typ];const r=new THREE.Mesh(new THREE.RingGeometry(h.r*.8,h.r,40).rotateX(-Math.PI/2),m.ring);r.userData.hgR=h.r;/* Christian 23 nov: één cilinder met de AIP-straal; de ring is alleen de voet (was min. 850 m → leek een tweede, grotere cirkel) */r.position.set(h.x,.05,-h.n);hgGroup.add(r);
   const H=h.top*FT,c=new THREE.Mesh(new THREE.CylinderGeometry(h.r,h.r,H,32,1,true),m.cyl);c.position.set(h.x,H/2,-h.n);c.userData.hg=h.nm;c.userData.typ=h.typ;hgCyl.add(c);
   const top=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([...Array(32)].map((_,i)=>new THREE.Vector3(Math.cos(i/32*2*Math.PI)*h.r,0,Math.sin(i/32*2*Math.PI)*h.r))),m.edge);top.position.set(h.x,H,-h.n);hgCyl.add(top);
   if(h.typ==='gld')continue;/* zweefvliegvelden hebben al een veldlabel */

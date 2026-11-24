@@ -7,16 +7,13 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 ## P0 — gaat altijd voor
 - [S] AIRAC-wissel 26 nov (AMDT 12-2026): data ophalen, `build_airspace.py --check`, `aip_check.py`, footer — CLAUDE.md
 - [S–M] Kapotte data-actie of live-bug — CLAUDE.md
-- [S–M] Live-bug: missie motorvliegtuig naar Evoluon onmogelijk, want er komt geen klaring voor Eindhoven CTR (07–24 lokaal, Tower 131.005). Klaringsflow voor deze CTR in de missie nalopen en een test die de missie uitvliegt — Christian 24 nov
-- [S] Live-bug: label Deelen CTR knippert in kaartmodus op mobiel (z-fighting of label dat aan/uit springt bij de overlapcheck?). Eerst reproduceren op Pixel 7 — Christian 24 nov
 
 ## P1 — nu (feedback release 22 nov, in deze volgorde) → OPDRACHT-23nov A
-1. [S] Vught P-gebied 's avonds onzichtbaar: ENR 5.1-tijden checken, tijdfilter of uitleg "niet actief, actief van…" — Christian 23 nov → A4
-2. [S] Lieren para/scherm als één cilinder met AIP-maten — Christian 23 nov → A2
-3. [S] Malden: overlappende cilinders zweef/model → één volume of "gedeeld, niet gelijktijdig", één melding — Christian 23 nov → A3
-4. [M] Herkenningspunten: oriëntatie (A50-brug gedraaid) + bruggen/knooppunten uit `wip/herkenning-22nov` afmaken — Christian 22–23 nov → A1, `docs/herkenningspunten-voorstel.md`
-5. [S] Voorbeeldcircuit Eindhoven + missie "Land op Eindhoven" uit de app — Christian 23 nov
-6. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
+1. [S] Lieren para/scherm als één cilinder met AIP-maten — Christian 23 nov → A2
+2. [S] Malden: overlappende cilinders zweef/model → één volume of "gedeeld, niet gelijktijdig", één melding — Christian 23 nov → A3
+3. [M] Herkenningspunten: oriëntatie (A50-brug gedraaid) + bruggen/knooppunten uit `wip/herkenning-22nov` afmaken — Christian 22–23 nov → A1, `docs/herkenningspunten-voorstel.md`
+4. [S] Voorbeeldcircuit Eindhoven + missie "Land op Eindhoven" uit de app — Christian 23 nov
+5. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
    - Opzet (akkoord 23 nov): vaste reeks van ±6 handgemaakte missies (elk één regel: CTR, TMA, P-gebied, TMZ, lier, tijden), daarna een **oneindige generator** met oplopende moeilijkheid (keerpunten, smalle gangen, hoogtebanden, wind, tijdsgebonden gebieden) tot een plafond. Elke gegenereerde missie eerst valideren (er bestaat een route zonder overtreding); leerdoel achteraf uit de geraakte gebieden. Dezelfde generator + datum-seed = dagelijkse uitdaging.
 
 ## P2 — daarna
@@ -45,9 +42,10 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - IGC-import als lokale tool voor alleen Christian (niet op de site) → E
 
 ## Nog te verifiëren (AIP) — zie CLAUDE.md "Vastgelegde kennis"
-- Status/klasse van een CTR buiten de openingstijden · Niederrhein TMZ squawk/frequentie (DFS-AIP) · eerste oproep Arrival of Tower · Vught H24?
+- Status/klasse van een CTR buiten de openingstijden · Niederrhein TMZ squawk/frequentie (DFS-AIP) · eerste oproep Arrival of Tower
 
 ## Open vragen aan Christian
+- Vught 's avonds onzichtbaar: niet te reproduceren (EHP29 is H24 en in de app altijd actief). Zie je het nog, stuur dan een screenshot met tijd en modus.
 - Verduidelijkingsmails feedback: per stuk goedkeuren of vaste standaardvraag? → I
 
 ## Besloten (23 nov)

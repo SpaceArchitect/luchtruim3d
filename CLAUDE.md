@@ -208,6 +208,8 @@ vinden; liggend minder overzichtelijk. Boyd: kon het doel van zijn opdracht niet
 - Een tester die alleen de happy flow probeert, mist alles. Fuzz en randgevallen vinden de echte bugs.
 - Een sensorsimulatie zonder ruis bewijst niets (kantel-bug 15 nov).
 - Een fix ná de laatste test is een ongeteste fix.
+- Een test die zichzelf de oplossing geeft (klaring voor alles, teleporteren) bewijst niets: laat hem alleen doen wat de gebruiker via de knoppen kan, ook na een weigering of een weggetikte melding (Evoluon-bug 24 nov).
+- Toestand per frame (labels, hysterese) test je over meerdere frames, vanuit willekeurige voorgeschiedenis (knipperbug 24 nov).
 - Christian is opdrachtgever, geen bugjager. Vindt hij een open-deur-bug, dan is ons proces stuk.
 - Verwijderen pas nadat je per item hebt aangetoond waar de inhoud bewaard blijft (23 nov: projectdocs te snel gewist).
 - Christian vindt een idee goed als hij het ziet, niet als hij het leest: laat het hem zien (screenshot of preview).
