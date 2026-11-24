@@ -9,11 +9,10 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [S–M] Kapotte data-actie of live-bug — CLAUDE.md
 
 ## P1 — nu (feedback release 22 nov, in deze volgorde) → OPDRACHT-23nov A
-1. [S] Lieren para/scherm als één cilinder met AIP-maten — Christian 23 nov → A2
-2. [S] Malden: overlappende cilinders zweef/model → één volume of "gedeeld, niet gelijktijdig", één melding — Christian 23 nov → A3
-3. [M] Herkenningspunten: oriëntatie (A50-brug gedraaid) + bruggen/knooppunten uit `wip/herkenning-22nov` afmaken — Christian 22–23 nov → A1, `docs/herkenningspunten-voorstel.md`
-4. [S] Voorbeeldcircuit Eindhoven + missie "Land op Eindhoven" uit de app — Christian 23 nov
-5. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
+1. [S] Malden: overlappende cilinders zweef/model → één volume of "gedeeld, niet gelijktijdig", één melding — Christian 23 nov → A3
+2. [M] Herkenningspunten: oriëntatie (A50-brug gedraaid) + bruggen/knooppunten uit `wip/herkenning-22nov` afmaken — Christian 22–23 nov → A1, `docs/herkenningspunten-voorstel.md`
+3. [S] Voorbeeldcircuit Eindhoven + missie "Land op Eindhoven" uit de app — Christian 23 nov
+4. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
    - Opzet (akkoord 23 nov): vaste reeks van ±6 handgemaakte missies (elk één regel: CTR, TMA, P-gebied, TMZ, lier, tijden), daarna een **oneindige generator** met oplopende moeilijkheid (keerpunten, smalle gangen, hoogtebanden, wind, tijdsgebonden gebieden) tot een plafond. Elke gegenereerde missie eerst valideren (er bestaat een route zonder overtreding); leerdoel achteraf uit de geraakte gebieden. Dezelfde generator + datum-seed = dagelijkse uitdaging.
 
 ## P2 — daarna
