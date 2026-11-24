@@ -110,7 +110,12 @@ we zo op: **hoe dichter bij de gebruiker, hoe strenger.**
 | Nieuwe AIRAC (elke 28 dagen, donderdag) | `git fetch origin data/lvnl data/eaip` → `python tools/build_airspace.py --bbox … --check` en `python tools/aip_check.py` |
 | Na publicatie, als de pc bereikbaar is | open de live site in Chrome; anders controleer je de Pages-deploy via GitHub |
 
-Bug gevonden of gemeld? Eerst een test die faalt, dan de fix. Zo komt hij niet terug.
+Bug gevonden of gemeld? Een fix alleen is niet genoeg (Christian 24 nov). Doe per bug drie dingen:
+1. **Oorzaak:** hoe is de bug ontstaan? Welke aanname, welk gat in het ontwerp of welke wijziging?
+2. **Vangnet:** waarom hebben de tests hem niet gevangen? Schrijf eerst een test die faalt, dan de fix. Zo komt hij
+   niet terug. Kijk ook of je de **hele klasse** kunt vangen, bijvoorbeeld door elke missie automatisch uit te vliegen
+   of door alle labels op knipperen te controleren, en niet alleen dit ene geval.
+3. **Vastleggen:** zet oorzaak en vangnet als één regel in `docs/LOG.md`. Is het een structurele les, zet hem dan onder "Lessen".
 Wil je een kritische blik van buiten (toegankelijkheid, AIP-juistheid, beginnersgevoel)?
 Start dan een subagent met een duidelijke rol. Dat is gereedschap, geen verplichting.
 

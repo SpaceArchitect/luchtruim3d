@@ -64,3 +64,4 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 23 nov: voorbeeldcircuit moet ook uit de app (Christian); taak in STATUS.
 - 23 nov: centrale backlog `docs/BACKLOG.md` (P0–P4) opgezet uit STATUS, OPDRACHT-21nov/23nov en CLAUDE.md; CLAUDE.md verwijst ernaar. GitHub Issues als werkvorm later testen (Christian).
 - 23 nov: besloten: ballon W/↑ branden, S/↓ dalen; verkenningsvlucht standaard met luchtruim (keuze onthouden); na vaste missiereeks een oneindige, gevalideerde missiegenerator die ook de dagelijkse uitdaging maakt.
+- 24 nov: werkwijze bugs aangescherpt (Christian): per bug oorzaak, waarom de tests hem misten, een test voor de hele klasse, en dat vastleggen in LOG. Staat in CLAUDE.md 'Testen'.
