@@ -209,6 +209,7 @@
   body.tiltmode #ctrl,body.kbd #ctrl{grid-template-rows:46px!important}body.tiltmode #ctrl #tSlow,body.kbd #ctrl #tSlow{grid-row:1!important;grid-column:1!important}body.tiltmode #btnPause,body.kbd #btnPause{grid-row:1!important;grid-column:2!important}body.tiltmode #ctrl #tFast,body.kbd #ctrl #tFast{grid-row:1!important;grid-column:3!important}
   body.tiltmode #tChip{bottom:66px!important}
   .banner .nt.mini{display:inline-block;margin:0 4px 0 0;min-height:30px;padding:2px 8px;font-size:12.5px;background:#0b3a6e;color:#fff;vertical-align:middle}
+  .banner .ahead .nt.mini{min-height:26px;padding:0 7px;margin:-2px 0 -2px 4px;font-size:12px}/* klaringsknop in de waarschuwingsregel: compact, ≥ 24 px (WCAG 2.5.8) */
   /* S1: vliegbanner = vaste regels zonder uitklappen (D2) */
   .banner .head,.banner .task,.banner .ahead{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.banner:not(.open):not(.noticeonly) .head::after{content:none!important}
   @media (max-width:520px){.banner .task .q{display:none}}
@@ -2137,7 +2138,7 @@ const CALLSIGN='PH-ABC',ACNAME={glider:'glider',motor:'Cessna 172',balloon:'ball
 function posEN(x,n){let b=null,bd=1e9;for(const c of [...CITYXY,...TOWNXY]){if(c.nm==='Lommel')continue;const d=Math.hypot(c.x-x,c.n-n);if(d<bd){bd=d;b=c;}}
   if(bd<1.5)return 'overhead '+b.nm;const br=(Math.atan2(x-b.x,n-b.n)*180/Math.PI+360)%360;return Math.round(bd)+' km '+['north','northeast','east','southeast','south','southwest','west','northwest'][Math.round(br/45)%8]+' of '+b.nm;}
 // 24 nov (Evoluon-bug): klaring aanvragen moet kunnen zolang je een klaringsgebied nadert of erin zit, niet alleen bij de eerste melding
-const clrBtn=f=>!RELAX&&f&&needsClr(f)&&!cleared(f)&&AIPINFO[f.ident]&&AIPINFO[f.ident].freq?` <button class="nt mini" data-rt="open:${f.ident}">📻 Klaring</button>`:'';
+const clrBtn=(f,lbl)=>!RELAX&&f&&needsClr(f)&&!cleared(f)&&AIPINFO[f.ident]&&AIPINFO[f.ident].freq?` <button class="nt mini" data-rt="open:${f.ident}" aria-label="Klaring aanvragen bij ${unitS(AIPINFO[f.ident].unit)} ${AIPINFO[f.ident].freq}">📻 ${lbl||'Klaring'}</button>`:'';
 function rtButton(f){return ` <button class="nt" data-rt="open:${f.ident}">📻 ${f.layer==='RMZ'?'Oproepen':'Klaring aanvragen'}</button>`;}
 const rmzLive=f=>f.layer==='RMZ'&&f.active!==false&&!!(AIPINFO[f.ident]&&AIPINFO[f.ident].freq);
 const rmzOk=(f,set)=>cleared(f)||set.some(g=>g!==f&&g.layer==='CTR'&&g.active!==false&&cleared(g));// Christian 21 nov: met klaring van de CTR-verkeersleiding (Deelen Tower) heb je al tweezijdig contact; dat dekt de RMZ die over de CTR ligt (vereenvoudigd)
@@ -2329,7 +2330,7 @@ function hudTick(){document.body.classList.toggle('menuopen',!$('panel').classLi
       st.sub.unshift('Oranje lijn = drift 10 min');}
     const b=$('banner');b.className='banner '+st.cls+(BANNER_OPEN?' open':'')+(ahead?' hasAhead':'');
     if(NOTICE){b.className='banner noticeonly';const rz=!RELAX&&!/data-rt=/.test(NOTICE)&&INSIDE.find(f=>rmzLive(f)&&!rmzOk(f,INSIDE));/* 22 nov: een melding mag de RMZ-oproepknop niet verdringen */b.__html=`<div class="notice">${kbText(NOTICE)}${rz?'<br>'+rtButton(rz):''}</div>`;}else b.__html=(TASK?`<div class="task">🎯 ${TASK.replace(/<br>.*$/,'').replace(/<\/?b>/g,'').replace(/\s*\(\d+ km\)/,'')}${GOAL&&GOAL.d!=null?` · ${GOAL.arrow||''} nog ${GOAL.d<10?GOAL.d.toFixed(1).replace('.',','):Math.round(GOAL.d)} km`:''}${FAILS.size?' · ❌':''}${GOAL?'<span class="q"> · Luchtruim vrij?</span>':''}</div>`:'')+`<div class="head">${st.tags.join(' ')} ${st.head}${st.radio?` · <b>${st.radio}</b>`:''}</div>`+
-     (ahead?`<div class="ahead">⚠ ${ahead.drift?`Drift naar <b>${short(ahead.f)}</b> (${ahead.d.toFixed(1).replace('.',',')} km) · andere hoogte?`:`${ahead.d.toFixed(1).replace('.',',')} km: <b>${short(ahead.f)}</b>${ahead.clr&&AIPINFO[ahead.f.ident]?` · ${unitS(AIPINFO[ahead.f.ident].unit)} ${AIPINFO[ahead.f.ident].freq}`:''}${clrBtn(ahead.f)}`}</div>`:'')+
+     (ahead?`<div class="ahead">⚠ ${ahead.drift?`Drift naar <b>${short(ahead.f)}</b> (${ahead.d.toFixed(1).replace('.',',')} km) · andere hoogte?`:`${ahead.d.toFixed(1).replace('.',',')} km: <b>${short(ahead.f)}</b>${clrBtn(ahead.f)?clrBtn(ahead.f,AIPINFO[ahead.f.ident].freq)/* frequentie in de knop: past op één regel (iPhone SE) */:ahead.clr&&AIPINFO[ahead.f.ident]?` · ${unitS(AIPINFO[ahead.f.ident].unit)} ${AIPINFO[ahead.f.ident].freq}`:''}`}</div>`:'')+
      
      (AT_EDGE?'<div class="ahead">Rand van het kaartgebied: draai om.</div>':'');
     if(b.__html!==b.__last){b.__last=b.__html;b.innerHTML=b.__html;}// alleen herbouwen bij wijziging: anders vallen klikken op knoppen weg (bug 13 nov)
