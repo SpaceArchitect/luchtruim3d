@@ -1211,6 +1211,12 @@ async def d_bridges(a):  # Christian 21 nov: "bij Maas en Waal mis ik bruggen" �
     ok(len({(round(b['lo'], 2), round(b['la'], 2)) for b in br}) == len(br), 'dubbele bruggen (twee rijbanen?)')
     n = await a.v("v.labels.filter(L=>L.isLm&&L.el&&L.el.textContent.includes(\"🌉\")).length")
     ok(n >= len(br) or n == 0, f'niet elke brug heeft een label ({n}/{len(br)})')
+    # Christian 22 nov: A50-brug stond een kwartslag gedraaid. Klasse: de lange as van elk brugmodel ligt in de wegrichting (±10°)
+    bad = await a.ev('''()=>{const v=window.__vfr,T=v.THREE,out=[];for(const g of v.lmGroup.children){const b=g.userData.bridgeObj;if(!b)continue;
+      const z=new T.Vector3(0,0,1).applyQuaternion(g.quaternion),e=z.x,n=-z.z,re=Math.sin(b.dir),rn=Math.cos(b.dir);
+      const ang=Math.acos(Math.min(1,Math.abs(e*re+n*rn)))*180/Math.PI;if(ang>10)out.push(b.ref+" "+b.river+" "+Math.round(ang)+"°")}return out}''')
+    ok(await a.v('v.lmGroup.children.filter(g=>g.userData.bridgeObj).length') == len(br), 'niet elke brug heeft een model')
+    ok(not bad, f'brug dwars op de weg: {bad[:4]}')
     b = next(x for x in br if x['ref'] == 'A2' and x['river'] == 'Waal')
     await a.ev('()=>window.__vfr.setMode("fly","motor")'); await a.place(b['x'] - 2.5, b['n'] - 2.0, 1500, 50, paused=True); await a.frames(6); await a.shot('brug_a2_waal')
 
