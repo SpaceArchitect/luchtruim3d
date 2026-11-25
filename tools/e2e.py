@@ -1125,7 +1125,7 @@ async def d_menu_on_top(a):  # 25 nov: missiemelding lag óver het tijdmenu (wee
         if not await a.visible(btn): continue
         await a.hit(btn); await a.frames(2)
         hid = await a.ev("""(pop)=>{const P=document.querySelector(pop);if(!P||P.classList.contains('hidden'))return 'dicht';const bad=[];
-          for(const e of P.querySelectorAll('button,input,select,label')){const r=e.getBoundingClientRect();if(r.width<4||r.height<4||r.bottom<0||r.top>innerHeight)continue;
+          for(const e of P.querySelectorAll('button,input,select,label')){const r=e.getBoundingClientRect();const R=P.getBoundingClientRect(),cy=r.y+r.height/2,cx=r.x+r.width/2;if(r.width<4||r.height<4||r.bottom<0||r.top>innerHeight||cy<R.top||cy>R.bottom||cx<R.left||cx>R.right)continue;/* buiten het zichtbare (scroll)deel van het menu */
             const t=document.elementFromPoint(Math.min(innerWidth-1,r.x+r.width/2),Math.min(innerHeight-1,r.y+r.height/2));if(t&&!P.contains(t))bad.push((e.textContent||e.id||e.tagName).trim().slice(0,20)+' onder '+(t.id||t.className||t.tagName))}return bad}""", pop)
         ok(hid == 'dicht' or not hid, f'{pop}: bedekt door iets anders: {hid[:3] if hid != "dicht" else hid}')
         await a.hit(btn); await a.frames(2)
