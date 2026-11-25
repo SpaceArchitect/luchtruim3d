@@ -107,7 +107,7 @@ we zo op: **hoe dichter bij de gebruiker, hoe strenger.**
 | Commit op een werkbranch | `--quick` |
 | Publiceren naar `main` | de volledige suite (`e2e.py`, ±40 min), alle 4 schermvormen |
 | Raakt het sensoren of touch (kantelen, gebaren, draaien)? | test met *realistische* ruis (±5° trillende hand), en Christian test op zijn telefoon vóór of direct na live |
-| Nieuwe AIRAC (elke 28 dagen, donderdag) | `git fetch origin data/lvnl data/eaip` → `python tools/build_airspace.py --bbox … --check` en `python tools/aip_check.py` |
+| Nieuwe AIRAC (elke 28 dagen, donderdag) | `git fetch origin data/lvnl data/eaip` → `python tools/build_airspace.py --bbox … --check` en `python tools/aip_check.py`, daarna **`python tools/mission_report.py --fly --gen 8`** en `e2e.py -k "uitvliegen|generator"`: elke vaste missie moet nog gehaald worden (de app slaat een onhaalbare missie wel over, maar dan mist er een leerdoel) |
 | Na publicatie, als de pc bereikbaar is | open de live site in Chrome; anders controleer je de Pages-deploy via GitHub |
 
 Bug gevonden of gemeld? Een fix alleen is niet genoeg (Christian 24 nov). Doe per bug drie dingen:
@@ -131,6 +131,9 @@ de 2e waarde = sessie, de 3e = week). Kun je dat niet,
 schat dan voorzichtig, stop ruim op tijd en meld je schatting. De volledige suite en
 browser-screenshots zijn het duurst: gebruik ze bewust.
 
+**Meter in de cloud (25 nov): `npx -y ccusage@latest weekly --json`** toont de tokens van *deze* container (sessie).
+Draai het bij de start, na elk groot blok en aan het eind, en zet de totalen in de SP-regel. Zodra Christian het werkelijke %
+meldt, volgt de verhouding tokens ↔ % (zie LOG); daarmee stuur je zelf op ±25 SP.
 **Story points (Christian 25 nov):** 1 SP = 1% van de weeklimiet. Begin elke sessie met een
 schatting in `docs/LOG.md` (features + tests, met model); Christian meldt achteraf het werkelijke %.
 Doel: structureel ±25 SP per sessie. Te vroeg klaar? Pak het volgende punt uit de top 5.
@@ -166,6 +169,9 @@ Regel: `- <datum> SP: <model> · schatting X · werkelijk Y · <plan/les>`.
   (STATUS/OPDRACHT/LOG), niet alleen in een projectdoc: geplande sessies lezen alleen de repo.
 - `docs/LOG.md`: beslissingen en lessen, één regel per stuk, met datum. Alleen toevoegen.
 - De claude.ai-projectdocs (`claude/0x-…`) zijn **archief**: achtergrond, geen opdracht.
+- **Eindcontrole elke sessie (Christian 25 nov):** vraag jezelf vóór het eindbericht af: *zijn BACKLOG, STATUS en LOG up to date?*
+  Loop BACKLOG regel voor regel na tegen wat er deze sessie gebouwd, getest of gemeld is (klaar = schrappen + LOG-regel; nieuwe
+  feedback erin; volgorde klopt), herschrijf STATUS (live, half af, eerstvolgende stappen) en zet beslissingen/lessen in LOG.
 
 ## 💬 Met Christian
 
