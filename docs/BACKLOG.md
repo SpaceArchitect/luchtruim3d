@@ -9,9 +9,8 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [S–M] Kapotte data-actie of live-bug — CLAUDE.md
 
 ## P1 — nu (feedback release 22 nov, in deze volgorde) → OPDRACHT-23nov A
-1. [S] Malden: overlappende cilinders zweef/model → één volume of "gedeeld, niet gelijktijdig", één melding — Christian 23 nov → A3
-2. [M] Herkenningspunten: oriëntatie (A50-brug gedraaid) + bruggen/knooppunten uit `wip/herkenning-22nov` afmaken — Christian 22–23 nov → A1, `docs/herkenningspunten-voorstel.md`
-3. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
+1. [M] Herkenningspunten: oriëntatie (A50-brug gedraaid) + bruggen/knooppunten uit `wip/herkenning-22nov` afmaken — Christian 22–23 nov → A1, `docs/herkenningspunten-voorstel.md`
+2. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
    - Opzet (akkoord 23 nov): vaste reeks van ±6 handgemaakte missies (elk één regel: CTR, TMA, P-gebied, TMZ, lier, tijden), daarna een **oneindige generator** met oplopende moeilijkheid (keerpunten, smalle gangen, hoogtebanden, wind, tijdsgebonden gebieden) tot een plafond. Elke gegenereerde missie eerst valideren (er bestaat een route zonder overtreding); leerdoel achteraf uit de geraakte gebieden. Dezelfde generator + datum-seed = dagelijkse uitdaging.
 
 ## P2 — daarna
@@ -40,6 +39,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - IGC-import als lokale tool voor alleen Christian (niet op de site) → E
 
 ## Nog te verifiëren (AIP) — zie CLAUDE.md "Vastgelegde kennis"
+- Malden: model- en zweefvliegen nooit tegelijk (Christian, lokale afspraak; ENR 5.5 zegt niets) · Nistelrode: zweef + lier op één terrein, gelijktijdigheid onbekend
 - Status/klasse van een CTR buiten de openingstijden · Niederrhein TMZ squawk/frequentie (DFS-AIP) · eerste oproep Arrival of Tower
 
 ## Open vragen aan Christian
