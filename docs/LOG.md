@@ -73,3 +73,4 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 25 nov: live gezet (fixes Evoluon-klaring, knipperende labels, lieren als één cilinder); volledige suite 228/228 groen op 4 schermvormen. Vorige live bewaard als release/2026-11-25. Raakt geen kantelen/touch/sensoren.
 - 2026-11-25 Budget in story points: 1 SP = 1% weeklimiet; schatting vooraf in LOG, Christian meldt het werkelijke %, doel ±25 SP/sessie (aanleiding: nachtsessie 24 nov gebruikte maar 3%).
 - 2026-11-25 Briefing gecorrigeerd: tools/usage.py werkt niet (Christian); weeklimiet in de cloud niet af te lezen, SP-terugmelding van Christian is de meting.
+- 2026-11-25 Eenmalige reset weeklimiet (t/m 10 dec) inzetten voor de push naar heel NL: voorbereiden t/m 4 dec, resetten ± 7 dec bij hoge meter, extra sessies 7–9 dec, Christian test 10–14 dec.
