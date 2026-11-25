@@ -26,6 +26,9 @@
 ## Wacht op Christian
 - Vught 's avonds onzichtbaar: niet te reproduceren (EHP29 = H24 volgens ENR 5.1, in de app op elk tijdstip zichtbaar; test `d_h24_always`). Zie je het nog: screenshot met tijd en modus.
 
+## Reset-push (Christian 25 nov)
+- Christian heeft één volledige reset van de weeklimiet, geldig t/m 10 dec; gewone weekreset = vr 18:00. Plan: 27 nov–4 dec "heel NL" voorbereiden (data uit `index.html` naar `data/*.json`, landelijk luchtruim klaar). Week vr 4 dec 18:00: sessies vr 4, za 5, zo 6 dec (±75%) → Christian reset ma 7 dec → sessies ma 7–do 10 dec voor heel NL (±100%). Christian test 11–14 dec, vóór Mexico (15 dec).
+
 ## Werkwijze-notities
 - Cloud: `tools/e2e.py` valt terug op `/opt/pw-browsers/chromium`. Volledige suite duurt nu ±70 min (nieuwe missie-uitvliegtest).
 - Overpass/eAIP/Geoportaal alleen via GitHub Actions bereikbaar; luchtruim3d.nl niet vanuit de cloud (deploy via GitHub controleren).
