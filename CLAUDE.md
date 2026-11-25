@@ -122,16 +122,19 @@ Start dan een subagent met een duidelijke rol. Dat is gereedschap, geen verplich
 ## ⛽ Budget
 
 Christian geeft een plafond per sessie of per week op (bijv. "tot ±60% van de weeklimiet").
-**Overal, ook in de cloud: `python tools/usage.py`** leest de laatste meting (week- en sessie-%),
-die de pc elke 30 min via `tools/usage_probe.py` op branch `meta/usage` zet. Draai het bij de
-start en na elk groot blok; vraag Christian er niet naar. Meting ouder dan 3 uur of ontbrekend:
-schat voorzichtig (zie hieronder). Op de pc kun je ook zelf kijken (zelfde pagina).
-Kun je de meter aflezen, doe dat dan bij de start en af en toe tussendoor
+De weeklimiet is in de cloud **niet** af te lezen. `tools/usage.py`/`usage_probe.py` werken niet
+(Cloudflare blokkeert, zie LOG 22 nov); gebruik ze niet. De meting is Christians SP-terugmelding.
+Op de pc met ingelogde browser kun je de meter wel aflezen: doe dat bij de start en af en toe tussendoor
 (https://claude.ai/settings/usage; in de pagina:
 `[...document.querySelectorAll('[aria-valuenow]')].map(m=>m.getAttribute('aria-valuenow'))`,
 de 2e waarde = sessie, de 3e = week). Kun je dat niet,
 schat dan voorzichtig, stop ruim op tijd en meld je schatting. De volledige suite en
 browser-screenshots zijn het duurst: gebruik ze bewust.
+
+**Story points (Christian 25 nov):** 1 SP = 1% van de weeklimiet. Begin elke sessie met een
+schatting in `docs/LOG.md` (features + tests, met model); Christian meldt achteraf het werkelijke %.
+Doel: structureel ±25 SP per sessie. Te vroeg klaar? Pak het volgende punt uit de top 5.
+Regel: `- <datum> SP: <model> · schatting X · werkelijk Y · <plan/les>`.
 
 ## 🤖 Zelfstandig werken (afspraak 22 nov)
 
