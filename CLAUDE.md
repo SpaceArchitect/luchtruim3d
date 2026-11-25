@@ -161,6 +161,8 @@ Regel: `- <datum> SP: <model> · schatting X · werkelijk Y · <plan/les>`.
 
 - `docs/STATUS.md`: **lees dit als eerste.** Wat er live staat, wat er half af is en
   de top 5 uit de backlog. Houd het kort (≤ 1 scherm) en herschrijf het aan het eind van elke sessie.
+- **Volgorde van werken (Christian 25 nov): altijd eerst de AIRAC-wissel, dan bugfixes, dan de rest van de backlog.** Backlog-refinement
+  doe je zelfstandig: bij elk punt de vraag of het ons dichter bij de noordster brengt; zo niet, lager of naar "niet doen" (met LOG-regel).
 - `docs/BACKLOG.md`: **de enige backlog**, op prioriteit (P0–P4, open vragen, niet doen). Alles wat nog moet of
   kan, staat hier; nieuwe feedback (chat, app-issues, testers) eerst hier. Klaar = schrappen + regel in LOG.
 - `docs/OPDRACHT-<datum>.md`: een uitgewerkte opdracht van Christian. De nieuwste waar STATUS naar
