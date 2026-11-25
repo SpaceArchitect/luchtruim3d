@@ -87,3 +87,5 @@ Oudere geschiedenis: claude.ai-project `claude/03-beslissingen-log.md` en `claud
 - 25 nov: vaste eindcontrole per sessie (Christian): BACKLOG, STATUS en LOG nalopen vóór het eindbericht. In CLAUDE.md onder 'Geheugen tussen sessies'.
 - 25 nov: AIRAC-wissel staat als terugkerend P0-punt in BACKLOG (Christian): na elke wissel datum doorschuiven, nooit schrappen.
 - 25 nov: werkvolgorde vastgelegd (Christian): AIRAC-wissel → bugfixes → rest van de backlog; backlog-refinement volledig door Claude, getoetst aan de noordster. In CLAUDE.md en BACKLOG.
+- 25 nov: volledige suite liep na de missietests over de 2-uurslimiet van een achtergrondtaak en werd gestopt. **Oorzaak:** d_missions_flown + d_generator (±15–20 min) draaiden op alle 4 schermvormen. **Maatregel:** die twee (pure logica) alleen op desktop (LOGIC_ONLY in e2e.py); suite in twee helften parallel (desk,p7 | p7l,se, eigen poorten) met 4 kernen. Les: zware tests per vorm afwegen.
+- 25 nov: backlog-refinement: heel NL (reset-push) naar boven in P2, vóór landschap: Christians reset-plan 27 nov–14 dec heeft een vaste deadline (Mexico 15 dec) en landschap per regio bouwt erop voort.
