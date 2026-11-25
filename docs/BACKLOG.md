@@ -9,6 +9,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [S–M] Kapotte data-actie of live-bug — CLAUDE.md
 
 ## P1 — nu (feedback release 22 nov, in deze volgorde) → OPDRACHT-23nov A
+0. [S] Bug: vario toont altijd de vaste stijgsnelheid (bv. 400 ft/min); moet de werkelijke stijg-/daalsnelheid van het toestel tonen (afhankelijk van hoe hard het stijgt) — Christian 25 nov
 1. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
    - Opzet (akkoord 23 nov): vaste reeks van ±6 handgemaakte missies (elk één regel: CTR, TMA, P-gebied, TMZ, lier, tijden), daarna een **oneindige generator** met oplopende moeilijkheid (keerpunten, smalle gangen, hoogtebanden, wind, tijdsgebonden gebieden) tot een plafond. Elke gegenereerde missie eerst valideren (er bestaat een route zonder overtreding); leerdoel achteraf uit de geraakte gebieden. Dezelfde generator + datum-seed = dagelijkse uitdaging.
 
@@ -22,6 +23,8 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [S] Keerpunten met Spatie / tik (als nog niet volledig) — OPDRACHT-21nov blok 3
 - [S] UX-review door een losse subagent na elk zichtbaar blok — Christian 23 nov → G
 
+- [M] AIRAC-vangnet als GitHub Action: na `data-eaip`/`data-lvnl` automatisch `build_airspace.py --check` op een kopie + `e2e.py -k "missies echt uitvliegen|missiegenerator"`; bij falen een issue met welke missie/poot — Christian 25 nov (zie docs/MISSIES.md)
+- [S] Zweefkist: planner max ±1000 ft stijgen zonder thermiek (nu klimt hij 1000 → 3500 ft over Volkel) — 25 nov
 ## P3 — koers (top 5, even zwaar) en groter werk
 - [L] Procedureel landschap: bos, heide, stuifzand, reliëf Veluwe/stuwwal; proef Veluwezoom + Malden als kruis in het bos — Christian 22 nov
 - [XL] Kaart naar heel NL (luchtruim landelijk, landschap per regio), daarna BE/DE; eerst data uit `index.html` naar `data/*.json` — Christian 22 nov

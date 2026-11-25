@@ -1096,11 +1096,17 @@ async def d_generator(a):  # besluit 23 nov + Christian 25 nov: na 6 vaste missi
         ok(all(g), f'{ac}: generator gaf geen missie voor niveau {[i + 1 for i, x in enumerate(g) if not x]}')
         ok(g[0]['legs'] <= g[-1]['legs'] and g[0]['lvl'] <= g[-1]['lvl'], f'{ac}: niet oplopend: {g}')
         fixed = await a.ev('(ac)=>window.__vfr.misSeries(ac).map(m=>m.id)', ac)
+        bad = await a.ev('(ac)=>window.__vfr.misSeries(ac).filter(m=>!window.__vfr.misVerify(m,window.__vfr.misStart(m))).map(m=>m.id)', ac)
+        ok(not bad, f'{ac}: vaste missie haalt de eigen vlucht-check niet: {bad}')
         if (await a.v('v.ACTYPE')) != ac: await a.ev('(ac)=>window.__vfr.setMode("fly",ac)', ac); await a.frames(2)
         for L in (1, 4, 8):  # steekproef echt uitvliegen, zonder klaring
             st = {}
             await fly_mission(a, f'gen-{ac}-{L}', 'around', st, done=fixed + [f'gen-{ac}-{k}' for k in range(1, L)])
             ok(not st.get('needclr') and not st.get('opens'), f'gen-{ac}-{L}: had klaring nodig: {st}')
+    # AIRAC-vangnet: wordt een doel onbereikbaar (hier: doel ín P-gebied Vught), dan biedt de app de missie niet aan maar slaat hem over
+    r = await a.ev('''()=>{const v=window.__vfr;v.setMode("fly","glider");const m={id:'airac-test',ac:'glider',lvl:1,goal:'test',title:'Test',legs:['Vught'],les:null,alt:1000,brief:'x'};
+      v.MISSIONS.unshift(m);localStorage.setItem("l3d_missies","[]");v.newTask();const got=v.MISSION&&v.MISSION.id;v.MISSIONS.shift();return [got,v.misVerify(m,v.misStart(m)||{x:0,n:0,alt:1000})]}''')
+    ok(r[0] != 'airac-test' and r[1] is False, f'onhaalbare missie toch aangeboden: {r}')
 
 async def d_ctr_covers_rmz(a):  # Christian 21 nov: "missie mislukt, RMZ Deelen zonder oproep" terwijl hij klaring had voor Deelen CTR
     await a.hit('#modal [data-ac=motor]'); await a.frames(2)
