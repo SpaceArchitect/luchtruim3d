@@ -169,6 +169,9 @@ Regel: `- <datum> SP: <model> · schatting X · werkelijk Y · <plan/les>`.
   (STATUS/OPDRACHT/LOG), niet alleen in een projectdoc: geplande sessies lezen alleen de repo.
 - `docs/LOG.md`: beslissingen en lessen, één regel per stuk, met datum. Alleen toevoegen.
 - De claude.ai-projectdocs (`claude/0x-…`) zijn **archief**: achtergrond, geen opdracht.
+- **Eindcontrole elke sessie (Christian 25 nov):** vraag jezelf vóór het eindbericht af: *zijn BACKLOG, STATUS en LOG up to date?*
+  Loop BACKLOG regel voor regel na tegen wat er deze sessie gebouwd, getest of gemeld is (klaar = schrappen + LOG-regel; nieuwe
+  feedback erin; volgorde klopt), herschrijf STATUS (live, half af, eerstvolgende stappen) en zet beslissingen/lessen in LOG.
 
 ## 💬 Met Christian
 
