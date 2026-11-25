@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - run: python3 tools/fetch_osm.py arnhem-nijmegen
+      - run: python3 tools/fetch_osm.py arnhem-nijmegen herkenning
       - name: Naar branch data/osm
         run: |
           git config user.name "luchtruim3d-bot"; git config user.email "bot@luchtruim3d.nl"

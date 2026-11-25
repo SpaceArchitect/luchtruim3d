@@ -5,12 +5,20 @@ import json, os, sys, time, urllib.parse, urllib.request
 REGIONS = {  # zuid, west, noord, oost
     'eindhoven': (51.2, 4.75, 51.8, 6.15),
     'arnhem-nijmegen': (51.75, 4.75, 52.15, 6.2),  # hele noordrand van de regio (Rivierenland, Arnhem, Nijmegen, Veluwezoom)
+    'herkenning': (51.2, 4.75, 52.15, 6.25),  # hele app-regio, alleen herkenningspunten (QH)
+}
+# Herkenningspunten (voorstel 21 nov, akkoord Christian 22 nov): bruggen, knooppunten, vliegvelden.
+QH = {
+    'bridges': 'way["man_made"="bridge"]["name"]; relation["man_made"="bridge"]["name"]; way["bridge:name"]',
+    'junctions': 'node["highway"="motorway_junction"]["name"~"^(Knooppunt|Kp)"]; node["highway"="motorway_junction"]["name"~"Hooipolder|Empel|Zaarderheiken|Ewijk|Valburg|Grijsoord|Batadorp|Leenderheide|De Hogt|Ekkersweijer|Vught|Paalgraven|Rijkevoort|Noorderkroon|Neerbosch|Bankhoef|Deil|Velperbroek|Waterberg|Lunetten"]',
+    'aerodromes': 'way["aeroway"="aerodrome"]; relation["aeroway"="aerodrome"]; way["aeroway"="runway"]',
 }
 Q = {
     'motorways': 'way["highway"~"^(motorway|trunk)$"]',
     'rivers': 'way["waterway"~"^(river|canal)$"]',
     'water': 'way["natural"="water"]; relation["natural"="water"]; way["water"]',
     'urban': 'way["landuse"~"^(residential|commercial|retail|industrial)$"]',
+    'forest': 'way["landuse"="forest"]; way["natural"="wood"]; relation["landuse"="forest"]; relation["natural"="wood"]',  # landschap procedureel (Christian 22 nov)
     'heath_sand': 'way["natural"~"^(heath|sand)$"]; relation["natural"~"^(heath|sand)$"]',
     'aeroways': 'way["aeroway"~"^(runway|aerodrome)$"]; relation["aeroway"="aerodrome"]',
     'power': 'way["power"="line"]["voltage"~"^(150000|220000|380000)"]',
@@ -36,7 +44,7 @@ def overpass(q):
 for reg, (s, w, n, e) in REGIONS.items():
     if len(sys.argv) > 1 and reg not in sys.argv[1:]: continue
     out = os.path.join('osm', reg); os.makedirs(out, exist_ok=True)
-    for name, sel in Q.items():
+    for name, sel in (QH if reg == 'herkenning' else Q).items():
         parts = ''.join(f'{p.strip()}({s},{w},{n},{e});' for p in sel.split(';') if p.strip())
         d = overpass(f'[out:json][timeout:240];({parts});out geom;')
         if d is None: print(reg, name, 'MISLUKT'); continue
