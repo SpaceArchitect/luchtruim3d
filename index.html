@@ -2093,7 +2093,7 @@ const MIS_ST=new Map();function misStart(m){if(MIS_ST.has(m.id))return MIS_ST.ge
 function misStart0(m){const L=MPT(),g=L[m.legs[0]];if(!g)return null;const al=m.alt;
   for(let d=9;d<=18;d+=1.5)for(let k=0;k<36;k++){const brg=(k*10+(m.ac==='balloon'?0:5))%360;const to=(brg+180)%360;// brg = richting vanaf het doel naar de start
     if(m.ac==='balloon'&&!balloonReach(to))continue;const x=g[0]+Math.sin(brg*Math.PI/180)*d,n=g[1]+Math.cos(brg*Math.PI/180)*d;
-    if(!misFree(x,n,al)||!misFree(x+Math.sin(to*Math.PI/180)*1.5,n+Math.cos(to*Math.PI/180)*1.5,al))continue;
+    if(!misFree(x,n,al)||!misFree(x+Math.sin(to*Math.PI/180)*1.5,n+Math.cos(to*Math.PI/180)*1.5,al)||planBlocked(x,n,al,true,.6))continue;/* 25 nov: start ruim (0,6 km, ±150 ft) buiten klaringsgebieden: niet op de grens */
     if(m.ac==='balloon'){if(m.les&&!driftHits(x,n,300,d*1.2,m.les))continue;if(!balloonPlan(x,n,g,d,al))continue;return {x,n,alt:al,hdg:Math.round(to)};}
     let hit=!m.les;for(let s2=0;s2<=d&&!hit;s2+=.25){const px=x+(g[0]-x)*s2/d,pn=n+(g[1]-n)*s2/d;if(featsAt(px,pn).some(f=>f.ident===m.les&&f.lo<=al&&f.hi>al))hit=true;}
     if(hit)return {x,n,alt:al,hdg:Math.round(to)};}return null;}
@@ -2132,7 +2132,7 @@ function planRoute(from,to,alt0,opt={}){const S=.4,A=PLAN_ALTS(opt.ac||ACTYPE),K
     for(const dk of [-1,1])if(k+dk>=0&&k+dk<K&&!blk(i,j,k,.6)&&!blk(i,j,k+dk,.6))nb.push([i,j,k+dk,(dk>0?2.2:1.2)/S*(opt.vcost||1)]);// stijgen ±2,2 km, dalen ±1,2 km vliegen
     for(const [a,b,c,w] of nb){if(a<0||b<0||a>=W||b>=H||(c===k&&blk(a,b,c)))continue;const t=id(a,b,c),ng=gs+w+(c!==k0?.15*Math.abs(c-k0)*w:0);
       if(ng<(g.has(t)?g.get(t):Infinity)){g.set(t,ng);prev.set(t,s);push(ng+h(a,b),t);}}}
-  if(end===null)return null;const raw=[];for(let s=end;s!==undefined;s=prev.get(s)){const k=s%K,j=Math.floor(s/K)%H,i=Math.floor(s/K/H);const [x,n]=pos(i,j);raw.push({x,n,alt:A[k]});}raw.reverse();
+  if(end===null)return null;const raw=[];for(let s=end;s!==undefined;s=prev.get(s)){const k=s%K,j=Math.floor(s/K)%H,i=Math.floor(s/K/H);const [x,n]=pos(i,j);raw.push({x,n,alt:A[k]});}raw.reverse();raw[0]={x:from[0],n:from[1],alt:raw[0].alt};/* route begint op de echte positie, niet in het midden van het vakje */
   // inkorten: zelfde hoogte, rechte lijn vrij → tussenpunten weg
   const free=(a,b)=>{const d=Math.hypot(b.x-a.x,b.n-a.n);for(let t=0;t<=d;t+=.15){const x=a.x+(b.x-a.x)*t/(d||1),n=a.n+(b.n-a.n)*t/(d||1);if(blk(ci(x),cj(n),A.indexOf(a.alt)))return false;}return true;};
   const out=[raw[0]];let q=0;while(q<raw.length-1){let m=raw.length-1;while(m>q+1&&!(raw[m].alt===raw[q].alt&&raw.slice(q,m+1).every(r=>r.alt===raw[q].alt)&&free(raw[q],raw[m])))m--;out.push(raw[m]);q=m;}
