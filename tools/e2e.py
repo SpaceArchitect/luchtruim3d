@@ -1383,6 +1383,7 @@ async def main():
                 if o.only and o.only != layer: continue
                 for name, fn in tests:
                     if o.k and o.k.lower() not in name.lower() and o.k not in fn.__name__: continue
+                    if fn in LOGIC_ONLY and form != 'desk' and 'desk' in forms: continue  # pure logica (missies uitvliegen): één schermvorm is genoeg
                     a = await new_app(p, b, form, url); await run(layer, name, form, fn, a); await a.ctx.close()
             if (not o.only or o.only == 'fuzz') and not o.k:
                 for k in range(2):
@@ -1396,6 +1397,8 @@ async def main():
             if st != 'OK': nfail += 1; print(f'  ✗ [{f}] {n}: {msg}')
     print(f'\nseed={seed}  screenshots in {SHOTS}')
     sys.exit(1 if nfail else 0)
+
+LOGIC_ONLY = {d_missions_flown, d_generator}  # vormonafhankelijk en zwaar (±15 min per vorm)
 
 if __name__ == '__main__':
     asyncio.run(main())
