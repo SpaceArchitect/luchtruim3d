@@ -18,6 +18,11 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
    - Opzet (akkoord 23 nov): vaste reeks van ±6 handgemaakte missies (elk één regel: CTR, TMA, P-gebied, TMZ, lier, tijden), daarna een **oneindige generator** met oplopende moeilijkheid (keerpunten, smalle gangen, hoogtebanden, wind, tijdsgebonden gebieden) tot een plafond. Elke gegenereerde missie eerst valideren (er bestaat een route zonder overtreding); leerdoel achteraf uit de geraakte gebieden. Dezelfde generator + datum-seed = dagelijkse uitdaging.
 
 ## P2 — daarna
+- [L] Procedureel landschap: glooiend terrein + bos, heide, stuifzand — Christian 22 + 25 nov. Uitwerking:
+  - **Reliëf:** open hoogtedata (AHN via PDOK, CC0; of Copernicus GLO-30) via een GitHub Action naar een grof raster (±200 m, 8-bit, < 150 kB voor de regio), als vervormd grondvlak met lichte overdrijving (zelfde EXAG als het luchtruim). Eerst de plekken die je herkent: stuwwal Nijmegen/Berg en Dal, Veluwezoom/Posbank, Loonse en Drunense Duinen, Strabrechtse Heide, Kempen.
+  - **Bodemsoorten:** OSM `forest.json`/`heath_sand.json` (staat al op `data/osm`) → bos donkergroen met instanced boompjes (LOD: alleen dichtbij), heide paars-bruin, stuifzand licht beige met duinribbels; gedempt, zodat de luchtruimkleuren blijven winnen.
+  - **Luchtvaartkant:** met reliëf worden AGL-grenzen (bv. Malden 2300 ft AGL) en de grondafstand echt; landen/grond raken op terreinhoogte.
+  - **Licht genoeg:** pagina < 2 MB, ≥ 30 fps op een middenklasse-Android; meten vóór/na met een fps-test in e2e. Eerst een proef Nijmegen–Berg en Dal–Malden, screenshot aan Christian, dan uitrollen.
 - [L] UX-flow: rondleiding + "Wat is er veranderd?" na AIRAC → keuzescherm (Kaart / Missies / Verkenningsvlucht / Dagelijkse uitdaging), toestelkeuze, menu herindelen; eerst mock — Christian 21+23 nov → C (vervangt OPDRACHT-21nov blok 5)
 - [M] Dagelijkse uitdaging fase 1 (seed per datum, lokale score/streak, deeltekst) — Christian 23 nov → D
 - [M] Feedbackkanaal route A (Worker → GitHub-issues, e-mail privé, "Vlieg je zelf?") + stappenplan Cloudflare/token voor Christian — Christian 23 nov → I
@@ -30,11 +35,6 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [M] AIRAC-vangnet als GitHub Action: na `data-eaip`/`data-lvnl` automatisch `build_airspace.py --check` op een kopie + `e2e.py -k "missies echt uitvliegen|missiegenerator"`; bij falen een issue met welke missie/poot — Christian 25 nov (zie docs/MISSIES.md)
 - [S] Zweefkist: planner max ±1000 ft stijgen zonder thermiek (nu klimt hij 1000 → 3500 ft over Volkel) — 25 nov
 ## P3 — koers (top 5, even zwaar) en groter werk
-- [L] Procedureel landschap: glooiend terrein + bos, heide, stuifzand — Christian 22 + 25 nov. Uitwerking:
-  - **Reliëf:** open hoogtedata (AHN via PDOK, CC0; of Copernicus GLO-30) via een GitHub Action naar een grof raster (±200 m, 8-bit, < 150 kB voor de regio), als vervormd grondvlak met lichte overdrijving (zelfde EXAG als het luchtruim). Eerst de plekken die je herkent: stuwwal Nijmegen/Berg en Dal, Veluwezoom/Posbank, Loonse en Drunense Duinen, Strabrechtse Heide, Kempen.
-  - **Bodemsoorten:** OSM `forest.json`/`heath_sand.json` (staat al op `data/osm`) → bos donkergroen met instanced boompjes (LOD: alleen dichtbij), heide paars-bruin, stuifzand licht beige met duinribbels; gedempt, zodat de luchtruimkleuren blijven winnen.
-  - **Luchtvaartkant:** met reliëf worden AGL-grenzen (bv. Malden 2300 ft AGL) en de grondafstand echt; landen/grond raken op terreinhoogte.
-  - **Licht genoeg:** pagina < 2 MB, ≥ 30 fps op een middenklasse-Android; meten vóór/na met een fps-test in e2e. Eerst een proef Nijmegen–Berg en Dal–Malden, screenshot aan Christian, dan uitrollen.
 - [XL] Kaart naar heel NL (luchtruim landelijk, landschap per regio), daarna BE/DE; eerst data uit `index.html` naar `data/*.json` — Christian 22 nov
 - [M] Missies per toestel: lierstart naar Malden, ballon over de Waal met wind, RMZ/CTR-oproepen — Christian 22 nov
 - [L] Live NOTAM uit een primaire bron (LVNL → Eurocontrol NOP → EAD Basic); automatische AIRAC-check — Christian 22 nov
