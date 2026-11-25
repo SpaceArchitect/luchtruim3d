@@ -2066,17 +2066,26 @@ function towardTown(x0,n0,x,n){const br=(a,b)=>Math.atan2(a,b)*180/Math.PI,b0=br
 // Elke missie draait om één conflict uit de echte LVNL-data. De start wordt bij het laden berekend: vrij luchtruim,
 // en de rechte lijn naar het (eerste) doel gaat dóór het lesgebied. Zo blijft het kloppen als de data (AIRAC) wijzigt.
 const MISSIONS=[
- {id:'vught',ac:'glider',title:'Verboden terrein',legs:['Sint-Janskathedraal'],les:'EHP29',alt:1000,brief:'Vlieg naar de Sint-Jan in Den Bosch. Kijk eerst goed wat er op de rechte lijn ligt.'},
- {id:'volkel',ac:'glider',title:'Langs de vliegbasis',legs:['Stuw en brug Grave'],les:'EHVK',alt:1000,brief:'Vlieg naar de stuw bij Grave. Er ligt een militaire CTR in de buurt.'},
- {id:'torens',ac:'glider',title:'Drie torens',legs:['Westpoint','Efteling','Sint-Janskathedraal'],les:null,teach:['EHGR','EHP29'],alt:1000,brief:'Een driehoeksvlucht: Westpoint → Efteling → Sint-Jan. Elke poot heeft zijn eigen valkuil.'},
- {id:'lichtstad',ac:'motor',title:'Rondje Lichtstad',legs:['Evoluon','ASML Veldhoven'],les:'EHEH',alt:1000,brief:'Sightseeing boven Eindhoven: Evoluon en dan ASML. Daarvoor heb je klaring van Eindhoven Tower nodig.'},
- {id:'gilze',ac:'motor',title:'Kerktoren van Breda',legs:['Grote Kerk Breda'],les:'EHGR',alt:1000,brief:'Vlieg naar de Grote Kerk in Breda. Gilze-Rijen ligt op de route.'},
- {id:'bvught',ac:'balloon',title:'Ballon over Vught',tip:'Een ballon kan niet sturen, alleen kiezen welke wind hij pakt. Plan je hoogte vóór je bij het verboden gebied bent.',legs:['Sint-Janskathedraal'],les:'EHP29',alt:800,brief:'Drijf naar de Sint-Jan. Hoger waait het meer uit het westen: kies je hoogte zo dat je om het verboden gebied heen drijft.'},
- {id:'terlet',ac:'glider',title:'Naar de Veluwe',legs:['Vliegveld Terlet'],les:'EHDL',alt:1000,brief:'Vlieg naar zweefvliegveld Terlet op de Veluwezoom. Vliegbasis Deelen ligt er pal naast.'},
- {id:'arnhem',ac:'motor',title:'Over de Rijn',legs:['Nijmegen','Eusebiuskerk'],les:null,teach:['EHDL'],alt:1000,brief:'Van Nijmegen naar de Eusebiuskerk in Arnhem, de Waal en de Rijn over. Waar begint de CTR van Deelen?'},
- {id:'boost',ac:'balloon',title:'Oostenwind',legs:['Efteling'],les:null,alt:800,wind:{f0:60,f1:110,k0:6,k1:22},tip:'Met een ballon is hoogte je stuur: hier draait de wind met de hoogte mee van oost naar oost-zuidoost.',brief:'Vandaag waait het uit het oosten. Drijf naar de Efteling: laag drijf je meer naar het zuidwesten, hoog meer naar het westen.'},
+ {id:'vught',lvl:1,goal:'Een verboden gebied (P) vlieg je nooit in, op geen enkele hoogte.',ac:'glider',title:'Verboden terrein',legs:['Sint-Janskathedraal'],les:'EHP29',alt:1000,brief:'Vlieg naar de Sint-Jan in Den Bosch. Kijk eerst goed wat er op de rechte lijn ligt.'},
+ {id:'volkel',lvl:2,goal:'Een militaire CTR is op werkdagen open; daarbuiten geldt de RMZ.',ac:'glider',title:'Langs de vliegbasis',legs:['Stuw en brug Grave'],les:'EHVK',alt:1000,brief:'Vlieg naar de stuw bij Grave. Er ligt een militaire CTR in de buurt.'},
+ {id:'torens',lvl:3,goal:'Plan elke poot apart: elk stuk heeft zijn eigen valkuil.',ac:'glider',title:'Drie torens',legs:['Westpoint','Efteling','Sint-Janskathedraal'],les:null,teach:['EHGR','EHP29'],alt:1000,brief:'Een driehoeksvlucht: Westpoint → Efteling → Sint-Jan. Elke poot heeft zijn eigen valkuil.'},
+ {id:'lichtstad',lvl:2,goal:'Klaring aanvragen en de klaring goed teruglezen.',ac:'motor',title:'Rondje Lichtstad',legs:['Evoluon','ASML Veldhoven'],les:'EHEH',alt:1000,brief:'Sightseeing boven Eindhoven: Evoluon en dan ASML. Daarvoor heb je klaring van Eindhoven Tower nodig.'},
+ {id:'gilze',lvl:2,goal:'Een CTR vraagt klaring; eromheen vliegen mag zonder.',ac:'motor',title:'Kerktoren van Breda',legs:['Grote Kerk Breda'],les:'EHGR',alt:1000,brief:'Vlieg naar de Grote Kerk in Breda. Gilze-Rijen ligt op de route.'},
+ {id:'bvught',lvl:2,goal:'Een ballon stuur je met hoogte: kies je wind vóór het gebied.',ac:'balloon',title:'Ballon over Vught',tip:'Een ballon kan niet sturen, alleen kiezen welke wind hij pakt. Plan je hoogte vóór je bij het verboden gebied bent.',legs:['Sint-Janskathedraal'],les:'EHP29',alt:800,brief:'Drijf naar de Sint-Jan. Hoger waait het meer uit het westen: kies je hoogte zo dat je om het verboden gebied heen drijft.'},
+ {id:'terlet',lvl:2,goal:'Lees de CTR-grens af vóór je erbij bent.',ac:'glider',title:'Naar de Veluwe',legs:['Vliegveld Terlet'],les:'EHDL',alt:1000,brief:'Vlieg naar zweefvliegveld Terlet op de Veluwezoom. Vliegbasis Deelen ligt er pal naast.'},
+ {id:'peel',lvl:3,goal:'Meerdere CTR\'s op één vlucht: per gebied de juiste toren.',ac:'motor',title:'Langs de Peel',legs:['Evoluon','Helmond','Stuw en brug Grave'],les:'EHEH',teach:['EHEH','EHVK'],alt:1000,brief:'Van het Evoluon via Helmond naar de stuw bij Grave. Onderweg twee CTR\'s, elk met een eigen toren.'},
+ {id:'tmag',lvl:1,goal:'Een TMA zweeft: eronder mag je zonder klaring. Daal op tijd onder de ondergrens.',ac:'glider',title:'Onder de TMA door',legs:['Reusel'],les:'EHEH1',alt:2000,brief:'Glijd naar Reusel. Daar begint boven 1500 ft de TMA van Eindhoven (klasse C).'},
+ {id:'maldeng',lvl:3,goal:'Naar een zweefveld: let op de lierkabel en het gedeelde terrein.',ac:'glider',title:'Thuis in Malden',legs:['Ravenstein','Zweefveld Malden'],les:null,teach:['EHTRA72'],alt:1500,brief:'Via Ravenstein aan de Maas naar zweefveld Malden. Onderweg militaire oefengebieden.'},
+ {id:'tmam',lvl:1,goal:'Een TMA zweeft: eronder mag je zonder klaring. Daal op tijd onder de ondergrens.',ac:'motor',title:'Laag naar Reusel',legs:['Reusel'],les:'EHEH1',alt:2500,brief:'Vlieg naar Reusel. Boven 1500 ft ligt daar de TMA van Eindhoven (klasse C).'},
+ {id:'volkelm',lvl:1,goal:'Over een CTR heen mag zonder klaring, als je ruim boven de bovengrens blijft.',ac:'motor',title:'Hoog over Volkel',legs:['Ravenstein'],les:'EHVK',alt:1000,brief:'Vlieg naar Ravenstein. Volkel ligt ertussen: eromheen, eroverheen of klaring vragen.'},
+ {id:'bmaas',lvl:2,goal:'Een ballon drijft met de wind: hoogte kiezen is sturen.',ac:'balloon',title:'Naar de Maas',legs:['Ravenstein'],les:null,alt:1000,brief:'Drijf naar Ravenstein aan de Maas. Probeer een paar hoogtes en kijk hoe je koers verandert.'},
+ {id:'bgilze',lvl:3,goal:'Een CTR ontwijk je met een ballon door op tijd van hoogte te wisselen.',ac:'balloon',title:'Langs Gilze-Rijen',legs:['Hilvarenbeek'],les:'EHGR',alt:1000,brief:'Drijf naar Hilvarenbeek. De CTR van Gilze-Rijen ligt vlak naast je route, en boven 1500 ft de TMA van Eindhoven.'},
+ {id:'btra',lvl:3,goal:'Een militair oefengebied (TRA) kan actief zijn: drijf er niet in.',ac:'balloon',title:'Tussen de oefengebieden',legs:['Wijchen'],les:'EHTRA72',alt:1000,brief:'Drijf naar Wijchen. Langs de Waal liggen militaire oefengebieden (TRA): kies je hoogte zo dat je ertussendoor drijft.'},
+ {id:'bwaal',lvl:1,goal:'Rivieren zijn goede herkenningspunten: drijf erlangs en kijk vooruit.',ac:'balloon',title:'Over de Waal',legs:['Lent'],les:null,alt:1000,brief:'Drijf naar Lent, aan de overkant van de Waal bij Nijmegen.'},
+ {id:'arnhem',lvl:3,goal:'Waar begint de CTR? Kijk op tijd vooruit.',ac:'motor',title:'Over de Rijn',legs:['Nijmegen','Eusebiuskerk'],les:null,teach:['EHDL'],alt:1000,brief:'Van Nijmegen naar de Eusebiuskerk in Arnhem, de Waal en de Rijn over. Waar begint de CTR van Deelen?'},
+ {id:'boost',lvl:1,goal:'De wind draait met de hoogte: combineer hoogtes.',ac:'balloon',title:'Oostenwind',legs:['Efteling'],les:null,alt:800,wind:{f0:60,f1:110,k0:6,k1:22},tip:'Met een ballon is hoogte je stuur: hier draait de wind met de hoogte mee van oost naar oost-zuidoost.',brief:'Vandaag waait het uit het oosten. Drijf naar de Efteling: laag drijf je meer naar het zuidwesten, hoog meer naar het westen.'},
 ];
-const MPT=()=>{const L={};for(const f of TASKF)if(f.t==='L')L[f.name]=f.pts[0];for(const c of CITYXY)L[c.nm]=[c.x,c.n];for(const [ic,nm,lo,la,g] of FIELDS)L[(g?'Zweefveld ':'Vliegveld ')+nm]=proj(lo,la);return L;};
+const MPT=()=>{const L={};for(const f of TASKF)if(f.t==='L')L[f.name]=f.pts[0];for(const c of CITYXY)L[c.nm]=[c.x,c.n];for(const [ic,nm,lo,la,g] of FIELDS)L[(g?'Zweefveld ':'Vliegveld ')+nm]=proj(lo,la);for(const t of TOWNXY)if(!L[t.nm])L[t.nm]=[t.x,t.n];return L;};
 const misDone=()=>{try{return JSON.parse(localStorage.getItem('l3d_missies')||'[]')}catch(_){return []}};
 function misMark(id){try{const d=misDone();if(!d.includes(id)){d.push(id);localStorage.setItem('l3d_missies',JSON.stringify(d));}}catch(_){}}
 function misFree(x,n,alt){if(x<gx0+4||x>gx1-4||n<gn0+4||n>gn1-4||!inNL(x,n))return false;if(hgNear(x,n,2.6).some(h=>alt<=h.top+700))return false;/* niet starten naast een ENR 5.5-terrein: anders eerst een waarschuwing i.p.v. de opdracht (full suite 21 nov) */const fs=applies(featsAt(x,n),alt);return !needsClr(governing(fs))&&!fs.some(f=>['P','R','UAS','PJA','TRA','TSA'].includes(f.layer)||rmzLive(f));}
@@ -2085,23 +2094,99 @@ function misStart0(m){const L=MPT(),g=L[m.legs[0]];if(!g)return null;const al=m.
   for(let d=9;d<=18;d+=1.5)for(let k=0;k<36;k++){const brg=(k*10+(m.ac==='balloon'?0:5))%360;const to=(brg+180)%360;// brg = richting vanaf het doel naar de start
     if(m.ac==='balloon'&&!balloonReach(to))continue;const x=g[0]+Math.sin(brg*Math.PI/180)*d,n=g[1]+Math.cos(brg*Math.PI/180)*d;
     if(!misFree(x,n,al)||!misFree(x+Math.sin(to*Math.PI/180)*1.5,n+Math.cos(to*Math.PI/180)*1.5,al))continue;
-    if(m.ac==='balloon'){if(m.les&&!driftHits(x,n,300,d*1.2,m.les))continue;if(!balloonPlan(x,n,g,d))continue;return {x,n,alt:al,hdg:Math.round(to)};}
+    if(m.ac==='balloon'){if(m.les&&!driftHits(x,n,300,d*1.2,m.les))continue;if(!balloonPlan(x,n,g,d,al))continue;return {x,n,alt:al,hdg:Math.round(to)};}
     let hit=!m.les;for(let s2=0;s2<=d&&!hit;s2+=.25){const px=x+(g[0]-x)*s2/d,pn=n+(g[1]-n)*s2/d;if(featsAt(px,pn).some(f=>f.ident===m.les&&f.lo<=al&&f.hi>al))hit=true;}
     if(hit)return {x,n,alt:al,hdg:Math.round(to)};}return null;}
 function driftStep(x,n,a,ds){const to=(windAt(a).from+180)*Math.PI/180;return [x+Math.sin(to)*ds,n+Math.cos(to)*ds];}
 function driftHits(x,n,a,D,id){for(let s2=0;s2<D;s2+=.2){[x,n]=driftStep(x,n,a,.2);if(featsAt(x,n).some(f=>f.ident===id&&f.lo<=a&&f.hi>a))return true;}return false;}
-function balloonPlan(x0,n0,g,d){// bestaat er een hoogteplan (eerst a1, dan a2) dat binnen 1,2 km van het doel komt zonder P/R/CTR?
-  for(let a1=300;a1<=3000;a1+=300)for(let a2=300;a2<=3000;a2+=300)for(const fr of [.25,.5,.75]){let x=x0,n=n0,ok=true;const D=d*1.4;
-    for(let s2=0;s2<D&&ok;s2+=.2){const a=s2<d*fr?a1:a2;[x,n]=driftStep(x,n,a,.2);if(Math.hypot(g[0]-x,g[1]-n)<1.2)return [a1,a2,fr];if(featsAt(x,n).some(f=>f.lo<=a&&f.hi>a&&(['P','R'].includes(f.layer)||needsClr(f))))ok=false;}}
+function balloonPlan(x0,n0,g,d,a0=1000){// bestaat er een hoogteplan (eerst a1, dan a2) dat binnen 1,2 km van het doel komt zonder P/R/TRA/CTR?
+  // 25 nov: eerlijk gerekend: de ballon stijgt/daalt 500 ft/min vanaf de starthoogte en drijft intussen mee (was: direct op hoogte)
+  for(let a1=300;a1<=3000;a1+=300)for(let a2=300;a2<=3000;a2+=300)for(const fr of [.25,.5,.75]){const p=balloonSim(x0,n0,g,d,a0,a1,a2,fr);if(p)return [a1,a2,fr];}
   return null;}
-let MISSION=null;
-function nextMission(ac){if(RELAX)return null;const done=misDone();for(const m of MISSIONS){if(m.ac!==ac||done.includes(m.id))continue;const st=misStart(m);if(st)return {m,st};}return null;}
+function balloonSim(x0,n0,g,d,a0,a1,a2,fr,cb){let x=x0,n=n0,a=a0;const D=d*1.4;
+  for(let s2=0;s2<D;s2+=.2){const t=s2<d*fr?a1:a2,w=windAt(a),rate=AC.balloon.fpm/Math.max(1,w.kt*1.852/60);a+=Math.sign(t-a)*Math.min(Math.abs(t-a),rate*.2);
+    [x,n]=driftStep(x,n,a,.2);if(cb)cb(x,n,a);if(Math.hypot(g[0]-x,g[1]-n)<1.2)return true;
+    const col=featsAt(x,n);if([a-150,a,a+150].some(b=>col.some(f=>f.lo<=b&&f.hi>b&&f.layer!=='LFA'&&(PLAN_BAD.includes(f.layer)||needsClr(f)))))return false;}
+  return false;}
+// ---------- routeplanner (3D): bestaat er een route? Basis voor 'elke missie 100% haalbaar' en de missiegenerator ----------
+// Raster 0,4 km × hoogtebanden van 500 ft. Nooit in: P/R/UAS/PJA/TRA/TSA, ENR 5.5-terreinen (r + 0,4 km, tot top + 700 ft), buiten NL.
+// noClr: ook geen klaringsgebieden (CTR/TMA klasse A–D) → zo'n route lukt altijd, ook als de toren weigert. RMZ mag (oproepen kan altijd).
+// Hoogte wisselen = cirkelend stijgen/dalen op een plek waar beide banden ruim (0,6 km) vrij zijn.
+const PLAN_ALTS=ac=>ac==='motor'?[500,1000,1500,2000,2500,3000,3500,4500]:[500,1000,1500,2000,2500,3000,3500];
+const PLAN_BAD=['P','R','UAS','PJA','TRA','TSA'];
+function planBlocked(x,n,alt,noClr,m,goal){for(const [dx,dn] of [[0,0],[m,0],[-m,0],[0,m],[0,-m]]){const px=x+dx,pn=n+dn;
+  if(px<gx0+1||px>gx1-1||pn<gn0+1||pn>gn1-1||!inNL(px,pn))return true;const col=featsAt(px,pn);
+  for(const a of [alt-150,alt,alt+150]){const fs=applies(col,a);if(fs.some(f=>PLAN_BAD.includes(f.layer)))return true;if(noClr&&needsClr(governing(fs)))return true;}// ±150 ft marge: niet op de grens vliegen
+  if(HG.some(h=>Math.hypot(h.x-px,h.n-pn)<h.r+.4&&alt<=h.top+700&&!(goal&&Math.hypot(h.x-goal[0],h.n-goal[1])<1.5)))return true;}return false;}// terrein bij het doel telt niet: daar wil je juist heen
+function planRoute(from,to,alt0,opt={}){const S=.4,A=PLAN_ALTS(opt.ac||ACTYPE),K=A.length,pad=opt.pad||10;
+  const bx0=Math.min(from[0],to[0])-pad,bn0=Math.min(from[1],to[1])-pad,W=Math.ceil((Math.max(from[0],to[0])+pad-bx0)/S)+1,H=Math.ceil((Math.max(from[1],to[1])+pad-bn0)/S)+1;
+  const pos=(i,j)=>[bx0+i*S,bn0+j*S],ci=x=>Math.round((x-bx0)/S),cj=n=>Math.round((n-bn0)/S);
+  const memo=new Map(),blk=(i,j,k,m=.3)=>{const key=((i*H+j)*K+k)*2+(m>.4?1:0);let b=memo.get(key);if(b===undefined){const [x,n]=pos(i,j);b=planBlocked(x,n,A[k],opt.noClr,m,to);memo.set(key,b);}return b;};
+  const k0=A.reduce((b,a,k)=>Math.abs(a-alt0)<Math.abs(A[b]-alt0)?k:b,0),si=ci(from[0]),sj=cj(from[1]),ti=ci(to[0]),tj=cj(to[1]);
+  const id=(i,j,k)=>(i*H+j)*K+k,g=new Map(),prev=new Map(),heap=[],push=(f,s)=>{heap.push([f,s]);let c=heap.length-1;while(c>0){const p=(c-1)>>1;if(heap[p][0]<=heap[c][0])break;[heap[p],heap[c]]=[heap[c],heap[p]];c=p;}},
+    pop=()=>{const top=heap[0],last=heap.pop();if(heap.length){heap[0]=last;let c=0;for(;;){const l=2*c+1,r=l+1;let m=c;if(l<heap.length&&heap[l][0]<heap[m][0])m=l;if(r<heap.length&&heap[r][0]<heap[m][0])m=r;if(m===c)break;[heap[m],heap[c]]=[heap[c],heap[m]];c=m;}}return top;};
+  const h=(i,j)=>Math.hypot(i-ti,j-tj),s0=id(si,sj,k0);g.set(s0,0);push(h(si,sj),s0);let end=null,n=0;const lim=opt.limit||250000;
+  while(heap.length&&n++<lim){const [f,s]=pop(),gs=g.get(s);if(f-h(Math.floor(s/K/H),Math.floor(s/K)%H)>gs+1e-9)continue;
+    const k=s%K,j=Math.floor(s/K)%H,i=Math.floor(s/K/H);if(Math.hypot(i-ti,j-tj)*S<=(opt.reach||.8)){end=s;break;}
+    const nb=[];for(const [di,dj] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]])nb.push([i+di,j+dj,k,Math.hypot(di,dj)]);
+    for(const dk of [-1,1])if(k+dk>=0&&k+dk<K&&!blk(i,j,k,.6)&&!blk(i,j,k+dk,.6))nb.push([i,j,k+dk,(dk>0?2.2:1.2)/S*(opt.vcost||1)]);// stijgen ±2,2 km, dalen ±1,2 km vliegen
+    for(const [a,b,c,w] of nb){if(a<0||b<0||a>=W||b>=H||(c===k&&blk(a,b,c)))continue;const t=id(a,b,c),ng=gs+w+(c!==k0?.15*Math.abs(c-k0)*w:0);
+      if(ng<(g.has(t)?g.get(t):Infinity)){g.set(t,ng);prev.set(t,s);push(ng+h(a,b),t);}}}
+  if(end===null)return null;const raw=[];for(let s=end;s!==undefined;s=prev.get(s)){const k=s%K,j=Math.floor(s/K)%H,i=Math.floor(s/K/H);const [x,n]=pos(i,j);raw.push({x,n,alt:A[k]});}raw.reverse();
+  // inkorten: zelfde hoogte, rechte lijn vrij → tussenpunten weg
+  const free=(a,b)=>{const d=Math.hypot(b.x-a.x,b.n-a.n);for(let t=0;t<=d;t+=.15){const x=a.x+(b.x-a.x)*t/(d||1),n=a.n+(b.n-a.n)*t/(d||1);if(blk(ci(x),cj(n),A.indexOf(a.alt)))return false;}return true;};
+  const out=[raw[0]];let q=0;while(q<raw.length-1){let m=raw.length-1;while(m>q+1&&!(raw[m].alt===raw[q].alt&&raw.slice(q,m+1).every(r=>r.alt===raw[q].alt)&&free(raw[q],raw[m])))m--;out.push(raw[m]);q=m;}
+  out.len=out.reduce((t,p,k)=>k?t+Math.hypot(p.x-out[k-1].x,p.n-out[k-1].n):0,0);out.alts=[...new Set(out.map(p=>p.alt))];return out;}
+let MISSION=null,MDIST=0,MREF=0,MLAST=null;const LVL=['','makkelijk','medium','pittig'];
+function misRef(m,st){const L=MPT();let p=[st.x,st.n],d=0;for(const nm of m.legs){const q=L[nm];d+=Math.hypot(q[0]-p[0],q[1]-p[1]);p=q;}return d;}// rechte lijn start → keerpunten
+const misStars=()=>{try{return JSON.parse(localStorage.getItem('l3d_sterren')||'{}')}catch(_){return {}}};
+function misStar(id,n){try{const s=misStars();if(!(s[id]>=n)){s[id]=n;localStorage.setItem('l3d_sterren',JSON.stringify(s));}}catch(_){}}
+function misScore(fl){// opdracht B: ⭐ gehaald · ⭐ zonder overtreding · ⭐ strakke route (≤ 1,35× de rechte lijn; ballon 1,6×), los van het tempo
+  const r=MREF>0?MDIST/MREF:1,lim=ACTYPE==='balloon'?1.6:1.35,n=1+(fl?0:1)+(!fl&&r<=lim?1:0);
+  return {n,txt:'⭐'.repeat(n)+'☆'.repeat(3-n)+(fl?' · overtreding':r>lim?` · route ${r.toFixed(1).replace('.',',')}× de rechte lijn: plan strakker`:' · strakke route')};}
+const MIS_ORDER=['vught','tmag','terlet','volkel','maldeng','torens','volkelm','tmam','gilze','lichtstad','arnhem','peel','bwaal','boost','bvught','bmaas','bgilze','btra'];// gemeten zwaarte (25 nov): keerpunten + meldingen + klaring + hoogtewissel + afstand; zie docs/MISSIES.md
+const misSeries=ac=>MISSIONS.filter(m=>m.ac===ac).sort((a,b)=>a.lvl-b.lvl||MIS_ORDER.indexOf(a.id)-MIS_ORDER.indexOf(b.id));// opdracht B: makkelijk → medium → pittig
+function nextMission(ac){if(RELAX)return null;const done=misDone();for(const m of misSeries(ac)){if(m.ac!==ac||done.includes(m.id))continue;const st=misStart(m);if(st)return {m,st};}
+  // vaste reeks klaar → gegenereerde uitdagingen, oplopend (besluit 23 nov); alleen missies met een bewezen route zonder klaring
+  for(let L=1+done.filter(i=>i.startsWith('gen-'+ac+'-')).length,k=0;k<4;L++,k++){const g=genMission(ac,L);if(g)return {m:g,st:MIS_ST.get(g.id)};}return null;}
+// ---------- missiegenerator ----------
+// Elke uitdaging is 100% haalbaar: de 3D-planner vindt een route zónder klaring (omvliegen, stijgen of dalen), dus ook als de toren weigert.
+// Moeilijker per niveau: meer keerpunten, meer gebieden op de rechte lijn, hoogtewissels nodig, grotere omweg. Zelfde niveau = zelfde missie (seed).
+const GEN=new Map();
+function rng(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+function genPool(ac){const L=MPT(),out=[],nMax=proj(5.5,51.98)[1];for(const [nm,p] of Object.entries(L)){const [x,n]=p;if(/^(Lommel|Turnhout|Arendonk|Neerpelt|Hamont|Bimmen)$/.test(nm)/* buitenland: geen luchtruimdata */||n>nMax/* kerngebied: Brabant, Rivierenland, Arnhem–Nijmegen */||!inNL(x,n)||x<gx0+5||x>gx1-5||n<gn0+5||n>gn1-5)continue;
+  if(planBlocked(x,n,1000,true,.3,[x,n])&&planBlocked(x,n,500,true,.3,[x,n]))continue;out.push({nm,x,n});}return out;}// doelen buiten CTR's en verboden gebieden
+function lineAreas(a,b,alt){const d=Math.hypot(b[0]-a[0],b[1]-a[1]),on=new Map();for(let s2=0;s2<=d;s2+=.3){const x=a[0]+(b[0]-a[0])*s2/d,n=a[1]+(b[1]-a[1])*s2/d;
+  for(const f of applies(featsAt(x,n),alt))if(PLAN_BAD.includes(f.layer)||needsClr(f))on.set(f.ident,f);for(const h of HG)if(Math.hypot(h.x-x,h.n-n)<h.r+.3&&alt<=h.top+700&&Math.hypot(h.x-b[0],h.n-b[1])>1.5)on.set('HG'+h.nm,{ident:'HG'+h.ident,layer:'HG',name:h.nm});}return [...on.values()];}
+function genMission(ac,L){const key=ac+L;if(GEN.has(key))return GEN.get(key);const pool=genPool(ac);let best=null,spare=null;
+  for(let att=0;att<3&&!best&&!spare;att++){const r=rng(L*7919+{glider:11,motor:23,balloon:37}[ac]+att*104729);
+  const nl=ac==='balloon'?1:L<=2?1:L<=5?2:3,minC=ac==='balloon'?Math.min(1+Math.floor((L-1)/3),2):Math.min(1+Math.floor((L-1)/2),4),wantAlt=L>=3&&L%2===1&&ac!=='balloon',alts=ac==='motor'?[1000,1500,2000,2500]:[1000,1500,2000];
+  for(let tr=0,planned=0;tr<300&&planned<(ac==='balloon'?30:8)&&!best;tr++){const alt=alts[Math.floor(r()*alts.length)],legs=[];let p=pool[Math.floor(r()*pool.length)];legs.push(p);
+    for(let k=1;k<nl;k++){const c=pool.filter(q=>!legs.includes(q)&&Math.hypot(q.x-p.x,q.n-p.n)>6&&Math.hypot(q.x-p.x,q.n-p.n)<20);if(!c.length)break;p=c[Math.floor(r()*c.length)];legs.push(p);}
+    if(legs.length<nl)continue;{const pv=GEN.get(ac+(L-1));if(pv&&pv.legs[0]===legs[0].nm)continue;}/* niet twee keer achter elkaar hetzelfde doel */const W0=WIND;const wind=ac==='balloon'&&L>=3?{f0:180+r()*120,f1:240+r()*90,k0:6,k1:24}:null;if(ac==='balloon')WIND=wind;
+    const dd=8+r()*(6+Math.min(L,8)),b0=ac==='balloon'?windAt(alt).from-25:r()*360;let sx=null,sn=null;
+    for(let k=0;k<12&&sx===null;k++){const brg=(b0+(ac==='balloon'?k*5:k*30))*Math.PI/180,x=legs[0].x+Math.sin(brg)*dd,n=legs[0].n+Math.cos(brg)*dd;if(misFree(x,n,alt)&&!planBlocked(x,n,alt,true,.6))[sx,sn]=[x,n];}// ballon: bovenwinds van het doel
+    WIND=W0;if(sx===null)continue;
+    let a=[sx,sn],areas=new Map();for(const q of legs){for(const f of lineAreas(a,[q.x,q.n],alt))areas.set(f.ident,f);a=[q.x,q.n];}
+    if(areas.size<minC)continue;
+    if(ac==='balloon'){WIND=wind;const pl=balloonPlan(sx,sn,[legs[0].x,legs[0].n],dd,alt);WIND=W0;planned++;if(!pl)continue;
+      best={st:{x:sx,n:sn,alt,hdg:0},legs,areas:[...areas.values()],wind,plan:pl};break;}
+    planned++;let ok=true,len=0,ach=0,from=[sx,sn],al=alt;for(const q of legs){const pr=planRoute(from,[q.x,q.n],al,{ac,noClr:true,limit:120000});if(!pr){ok=false;break;}len+=pr.len;ach+=pr.alts.length-1;al=pr[pr.length-1].alt;from=[q.x,q.n];}
+    if(!ok)continue;const cand={st:{x:sx,n:sn,alt,hdg:Math.round((Math.atan2(legs[0].x-sx,legs[0].n-sn)*180/Math.PI+360)%360)},legs,areas:[...areas.values()],ach};if(wantAlt&&!ach){spare=spare||cand;continue;}best={st:{x:sx,n:sn,alt,hdg:Math.round((Math.atan2(legs[0].x-sx,legs[0].n-sn)*180/Math.PI+360)%360)},legs,areas:[...areas.values()],ach};}
+  }
+  best=best||spare;if(!best){GEN.set(key,null);return null;}
+  const ar=best.areas,has=l=>ar.some(f=>f.layer===l),nm=f=>f.layer==='HG'?f.name:short(f);
+  const goal=best.ach?'Hoogte als uitweg: daal onder een ondergrens of klim over een bovengrens (met marge).':has('P')||has('R')?'Om een verboden of beperkt gebied heen: plan je bocht op tijd.':has('TRA')||has('TSA')?'Militaire oefengebieden (TRA/TSA): als ze actief zijn, blijf je eruit; plan om of onderdoor.':ar.some(needsClr)?'Om een klaringsgebied heen, of erover/eronder: klaring is een keuze, geen moetje.':'Lees vooruit: wat ligt er op je route?';
+  const m={id:`gen-${ac}-${L}`,gen:true,lvl:Math.min(3,1+Math.floor((L-1)/3)),genL:L,ac,goal,title:`Uitdaging ${L}`,legs:best.legs.map(q=>q.nm),les:null,teach:ar.filter(f=>f.layer!=='HG').slice(0,2).map(f=>f.ident),alt:best.st.alt,wind:best.wind||undefined,
+    brief:`${best.legs.map(q=>q.nm).join(' → ')}. `+(L<=3?`Op de rechte lijn: ${[...new Set(ar.map(nm))].slice(0,3).join(', ')}${ar.length>3?' en meer':''}. `:`Kijk zelf wat er op de rechte lijn ligt (${ar.length} gebieden). `)+(ac==='balloon'?'Er is altijd een hoogteplan dat het haalt.':'Er is altijd een route zonder klaring: om, over of onder.')};
+  MIS_ST.set(m.id,best.st);GEN.set(key,m);setTimeout(()=>{try{genMission(ac,L+1)}catch(_){}},1500);/* volgende alvast klaarzetten: geen hapering bij de start */return m;}
 function misLegGoal(m,i){const L=MPT(),p=L[m.legs[i]];return {x:p[0],n:p[1],name:m.legs[i]};}
 function misTask(m,i){const g=misLegGoal(m,i);return (m.ac==='balloon'?'Drijf naar ':'Vlieg naar ')+`<b>${g.name}</b>`+(m.legs.length>1?` (${i+1}/${m.legs.length})`:'');}
-function misLesson(m){const fs=[...new Set([...(m.teach||[m.les]),...[...FAILS.keys()]])].map(id=>LAYERS.find(f=>f.ident===id)).filter(Boolean).slice(0,2);
+function misLesson(m){return `<br>🎓 ${m.goal}`+misLesson0(m);}
+function misLesson0(m){const fs=[...new Set([...(m.teach||[m.les]),...[...FAILS.keys()]])].map(id=>LAYERS.find(f=>f.ident===id)).filter(Boolean).slice(0,2);
   return fs.map(f=>`<br>📘 <b>${short(f)}</b> · ${f.loTxt}–${f.hiTxt}: ${({P:'nooit in, op geen enkele hoogte binnen de grenzen',R:'beperkt gebied: alleen als het niet actief is',CTR:'klaring nodig'+(f.cls?' (klasse '+f.cls+')':''),TMA:'klaring nodig'+(f.cls?' (klasse '+f.cls+')':''),RMZ:'eerst oproepen op de radio',PJA:'parachutisten: status opvragen',UAS:'drones: blijf weg als het actief is'})[f.layer]||'check de AIP'}.`).join('')+(m.tip?`<br>📘 ${m.tip}`:'')+'<br><small>Vereenvoudigd; de AIP is leidend.</small>';}
 function randomStart(ac){const nm=nextMission(ac);MISSION=null;WIND=null;
-  if(nm){MISSION=nm.m;WIND=nm.m.wind||null;LASTGOAL={...misLegGoal(nm.m,0),mis:nm.m.id,li:0};return {...nm.st,task:misTask(nm.m,0)+`<br><b>${nm.m.title}</b> · ${nm.m.brief}`};}
+  if(nm){MISSION=nm.m;WIND=nm.m.wind||null;LASTGOAL={...misLegGoal(nm.m,0),mis:nm.m.id,li:0};MREF=misRef(nm.m,nm.st);MDIST=0;MLAST=null;const ser=misSeries(nm.m.ac);return {...nm.st,task:misTask(nm.m,0)+`<br><b>${nm.m.title}</b> · ${nm.m.brief}<br><small>${nm.m.gen?'uitdaging '+nm.m.genL+' (gegenereerd)':LVL[nm.m.lvl]+' · missie '+(ser.indexOf(nm.m)+1)+'/'+ser.length} · 🎓 ${nm.m.goal}</small>`};}
   const alt=ac==='balloon'?800:1000;
   for(let k=0;k<400;k++){const x=gx0+8+Math.random()*(gx1-gx0-16),n=gn0+8+Math.random()*(gn1-gn0-16);if(!inNL(x,n))continue;
     const hdg=ac==='balloon'?Math.round((windAt(alt).from+180)%360):Math.round(Math.random()*360);let ok=true;
@@ -2258,7 +2343,7 @@ function status(inside,x,n){
   if(!inNL(x,n))sub.push('Buiten NL: data onvolledig');
   return {cls,head,tags,sub,radio};
 }
-function hudTick(){document.body.classList.toggle('menuopen',!$('panel').classList.contains('hidden')||!$('a11y').classList.contains('hidden')||!$('timePop').classList.contains('hidden'));if(PAUSED&&TAKEOFF_ASKED&&PLANE.alt<=0&&NOTICE){const up=keys['arrowup']||keys['w']||keys['tu'];if(!up)TO_WAIT=false;else if(!TO_WAIT){PAUSED=false;NOTICE='';}}
+function hudTick(){if(MISSION&&MODE==='fly'){const p=[PLANE.x,PLANE.n];if(MLAST&&!PAUSED){const d=Math.hypot(p[0]-MLAST[0],p[1]-MLAST[1]);if(d<3)MDIST+=d;}MLAST=p;}document.body.classList.toggle('menuopen',!$('panel').classList.contains('hidden')||!$('a11y').classList.contains('hidden')||!$('timePop').classList.contains('hidden'));if(PAUSED&&TAKEOFF_ASKED&&PLANE.alt<=0&&NOTICE){const up=keys['arrowup']||keys['w']||keys['tu'];if(!up)TO_WAIT=false;else if(!TO_WAIT){PAUSED=false;NOTICE='';}}
   const px=MODE==='fly'?PLANE.x:PROBE.x,pn=MODE==='fly'?PLANE.n:PROBE.n,alt=curAlt();
   COLUMN=featsAt(px,pn);INSIDE=applies(COLUMN,alt).filter(f=>f.layer!=='LFA');
   const h=PLANE.hdg*Math.PI/180;let ahead=null;
@@ -2288,7 +2373,7 @@ function hudTick(){document.body.classList.toggle('menuopen',!$('panel').classLi
        if(dg>GOAL.min+2&&!GOAL.missed&&!PAUSED&&ACTYPE==='balloon'){PAUSED=true;NOTICE=`❌ <b>Missie mislukt</b>: je bent ${GOAL.name} voorbij gedreven. Een ballon kan niet omdraaien.<br><small>Tip: kies eerder een andere hoogte (andere wind) · ▶ = verder</small> <button class="nt">🎯 Nieuwe opdracht</button>`;GOAL=null;TASK='';}
        else if(dg>GOAL.min+(GOAL.mis?7:2)&&!GOAL.missed&&!PAUSED){GOAL.missed=true;PAUSED=true;NOTICE=`↩ <b>Doel gemist</b>: draai om (pijl ${GOAL.arrow} in de opdrachtregel)<br><small>▶ = verder</small>`;}if(GOAL&&dg<GOAL.min+0.5)GOAL.missed=false;}
       if(GOAL&&GOAL.mis&&MISSION&&dg<REACH&&!PAUSED&&GOAL.li<MISSION.legs.length-1){const li=GOAL.li+1;GOAL={...misLegGoal(MISSION,li),mis:MISSION.id,li};TASK=misTask(MISSION,li);PAUSED=true;NOTICE=`✓ Keerpunt ${li}/${MISSION.legs.length} gehaald. Nu: ${misTask(MISSION,li)}<br><small>▶ = verder</small>`;}
-      else if(GOAL&&dg<REACH&&!PAUSED){PAUSED=true;const fl=[...FAILS.values()];const M=GOAL.mis&&MISSION&&MISSION.id===GOAL.mis?MISSION:null;if(M&&!fl.length)misMark(M.id);NOTICE=fl.length?`❌ <b>Missie mislukt</b> bij ${GOAL.name}<br>Je vloog door: ${fl.slice(0,3).join(', ')}<br><small>Tip: kies een route of hoogte eromheen · ▶ = verder</small> <button class="nt">🎯 Nieuwe opdracht</button>`:`✅ <b>Missie geslaagd!</b> Doel bereikt (${GOAL.name}) ${CLR.size?'met klaring van de verkeersleiding ('+CLR.size+'×), zonder verboden gebied':'zonder klaring of verboden gebied'}<br><small>▶ = verder vliegen</small> <button class="nt">🎯 Nieuwe opdracht</button>`;if(M)NOTICE=NOTICE.replace('<br><small>',misLesson(M)+`<br>⭐ ${misDone().filter(i=>MISSIONS.some(x=>x.id===i&&x.ac===ACTYPE)).length}/${MISSIONS.filter(x=>x.ac===ACTYPE).length} missies met dit toestel<br><small>`);GOAL=null;TASK='';}}
+      else if(GOAL&&dg<REACH&&!PAUSED){PAUSED=true;const fl=[...FAILS.values()];const M=GOAL.mis&&MISSION&&MISSION.id===GOAL.mis?MISSION:null;let SC=null;if(M){SC=misScore(fl.length);misStar(M.id,SC.n);if(!fl.length)misMark(M.id);}NOTICE=fl.length?`❌ <b>Missie mislukt</b> bij ${GOAL.name}<br>Je vloog door: ${fl.slice(0,3).join(', ')}<br><small>Tip: kies een route of hoogte eromheen · ▶ = verder</small> <button class="nt">🎯 Nieuwe opdracht</button>`:`✅ <b>Missie geslaagd!</b> Doel bereikt (${GOAL.name}) ${CLR.size?'met klaring van de verkeersleiding ('+CLR.size+'×), zonder verboden gebied':'zonder klaring of verboden gebied'}<br><small>▶ = verder vliegen</small> <button class="nt">🎯 Nieuwe opdracht</button>`;if(M)NOTICE=NOTICE.replace('<br><small>',`<br><b>${SC.txt}</b>`+misLesson(M)+`<br>${misDone().filter(i=>MISSIONS.some(x=>x.id===i&&x.ac===ACTYPE)).length}/${MISSIONS.filter(x=>x.ac===ACTYPE).length} missies met dit toestel · ⭐ ${MISSIONS.filter(x=>x.ac===ACTYPE).reduce((t,x)=>t+(misStars()[x.id]||0),0)}<br><small>`);GOAL=null;TASK='';}}
     // verticaal: stijgen of dalen een gebied in (Christian 11-13 nov)
     {const cl=(keys['arrowup']||keys['w']||keys['tu']?1:0)-(keys['arrowdown']||keys['s']||keys['td']?1:0);
      if(cl&&PLANE.alt>0&&!PAUSED&&!RELAX&&!NOTICE){const dz=Math.max(150,Math.min(3000,AC[ACTYPE].fpm/60*TEMPO()*6)),here2=applies(COLUMN,Math.max(0,PLANE.alt+cl*dz)),g2=governing(here2),gN=governing(INSIDE);let vf=null;
@@ -2482,7 +2567,7 @@ let last=performance.now(),acc=0;
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   goalVizTick(now);renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+window.__vfr={get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 </script>
 </body>
