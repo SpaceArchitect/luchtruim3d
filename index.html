@@ -202,7 +202,9 @@
   @media (max-width:700px) and (orientation:portrait){.banner{max-height:calc(100vh - 310px);overflow:auto}}/* radiomelding scrollt binnen de banner i.p.v. over de stuurknoppen */
   .banner .ahead{white-space:normal!important}/* S1b Noor: frequentie nooit afkappen */
   .banner .notice [data-rt=close]{position:sticky;bottom:0;box-shadow:0 -4px 8px rgba(11,58,110,.6)}@media (max-height:500px),(max-width:700px){.banner .rtnote{display:none}}
-  @media (max-height:500px),(max-width:700px){body.menuopen .banner,body.menuopen #compass{visibility:hidden}}/* één ding tegelijk: menu open = melding even weg (Fatima) */
+  @media (max-height:500px),(max-width:700px){body.menuopen #compass{visibility:hidden}}
+  body.menuopen .banner{visibility:hidden}
+  @media (max-height:500px),(max-width:400px){.banner .mlvl{display:none}}/* klein scherm: niveau/leerdoel-regel weg, anders bedekt de startmelding het midden (knijpen faalde, 25 nov); leerdoel staat ook in de uitleg na afloop *//* één ding tegelijk: menu open = melding even weg (Fatima); 25 nov ook op desktop: melding lag óver het tijdmenu */
   /* S1c: kantelmodus (sensor geeft data): stuurknoppen weg, alleen ⏪ ❚❚ ⏩ in één rij */
   body.tiltmode #ctrl [data-k],body.tiltmode #btnLoop,body.kbd #ctrl [data-k],body.kbd #btnLoop{display:none!important}
   body.tiltmode #ctrl,body.kbd #ctrl{grid-template-rows:46px!important}body.tiltmode #ctrl #tSlow,body.kbd #ctrl #tSlow{grid-row:1!important;grid-column:1!important}body.tiltmode #btnPause,body.kbd #btnPause{grid-row:1!important;grid-column:2!important}body.tiltmode #ctrl #tFast,body.kbd #ctrl #tFast{grid-row:1!important;grid-column:3!important}
@@ -2148,7 +2150,7 @@ const MIS_ORDER=['vught','tmag','terlet','volkel','maldeng','torens','volkelm','
 const misSeries=ac=>MISSIONS.filter(m=>m.ac===ac).sort((a,b)=>a.lvl-b.lvl||MIS_ORDER.indexOf(a.id)-MIS_ORDER.indexOf(b.id));// opdracht B: makkelijk → medium → pittig
 function nextMission(ac){if(RELAX)return null;const done=misDone();for(const m of misSeries(ac)){if(m.ac!==ac||done.includes(m.id))continue;const st=misStart(m);if(st&&misVerify(m,st))return {m,st};}/* na een AIRAC onhaalbaar? overslaan, nooit aanbieden */
   // vaste reeks klaar → gegenereerde uitdagingen, oplopend (besluit 23 nov); alleen missies met een bewezen route zonder klaring
-  for(let L=1+done.filter(i=>i.startsWith('gen-'+ac+'-')).length,k=0;k<4;L++,k++){const g=genMission(ac,L);if(g)return {m:g,st:MIS_ST.get(g.id)};}return null;}
+  for(let L=1+done.filter(i=>i.startsWith('gen-'+ac+'-')).length,k=0;k<4;L++,k++){if(!GEN.has(ac+L))return {pending:ac+L,ac,L};const g=GEN.get(ac+L);if(g)return {m:g,st:MIS_ST.get(g.id)};}return null;}
 // ---------- missie eerst zelf volledig vliegen (Christian 25 nov) ----------
 // Loopt de route van de planner af in stappen van 0,1 km (stijgen/dalen op de plek, zoals cirkelen) en past dezelfde regels toe als
 // FAILS in de app: nooit in P/PJA/UAS, geen klaringsgebied zonder klaring (allowClr: klaring mag, alleen voor vaste klaringsmissies),
@@ -2159,6 +2161,8 @@ function misVerify(m,st){if(MIS_OK.has(m.id))return MIS_OK.get(m.id);const L=MPT
   try{for(const nm of m.legs){const g=L[nm];if(!g){ok=false;break;}
     if(m.ac==='balloon'){const d=Math.hypot(g[0]-from[0],g[1]-from[1]),pl=balloonPlan(from[0],from[1],g,d,alt);if(!pl){ok=false;break;}
       let bad=false;if(!balloonSim(from[0],from[1],g,d,alt,...pl,(x,n,a)=>{if(misFailAt(x,n,a,false))bad=true;})||bad){ok=false;break;}from=g;continue;}
+    {const d=Math.hypot(g[0]-from[0],g[1]-from[1]);let ok2=true;for(let t=0;t<=d&&ok2;t+=.1)if(misFailAt(from[0]+(g[0]-from[0])*t/d,from[1]+(g[1]-from[1])*t/d,alt,!m.gen))ok2=false;
+      if(ok2){from=g;continue;}}// snel: de rechte lijn kan al (vaste missies: klaring mag) → geen planner nodig
     let r=planRoute(from,g,alt,{ac:m.ac,noClr:true}),clr=false;if(!r&&!m.gen){r=planRoute(from,g,alt,{ac:m.ac});clr=true;}// vaste klaringsmissie: klaring lukt altijd (opnieuw vragen)
     if(!r){ok=false;break;}
     for(let k=1;k<r.length&&ok;k++){const a=r[k-1],b=r[k],d=Math.hypot(b.x-a.x,b.n-a.n);
@@ -2175,10 +2179,10 @@ function genPool(ac){const L=MPT(),out=[],nMax=proj(5.5,51.98)[1];for(const [nm,
   if(planBlocked(x,n,1000,true,.3,[x,n])&&planBlocked(x,n,500,true,.3,[x,n]))continue;out.push({nm,x,n});}return out;}// doelen buiten CTR's en verboden gebieden
 function lineAreas(a,b,alt){const d=Math.hypot(b[0]-a[0],b[1]-a[1]),on=new Map();for(let s2=0;s2<=d;s2+=.3){const x=a[0]+(b[0]-a[0])*s2/d,n=a[1]+(b[1]-a[1])*s2/d;
   for(const f of applies(featsAt(x,n),alt))if(PLAN_BAD.includes(f.layer)||needsClr(f))on.set(f.ident,f);for(const h of HG)if(Math.hypot(h.x-x,h.n-n)<h.r+.3&&alt<=h.top+700&&Math.hypot(h.x-b[0],h.n-b[1])>1.5)on.set('HG'+h.nm,{ident:'HG'+h.ident,layer:'HG',name:h.nm});}return [...on.values()];}
-function genMission(ac,L){const key=ac+L;if(GEN.has(key))return GEN.get(key);const pool=genPool(ac);let best=null,spare=null;
+function* genSteps(ac,L){const key=ac+L;if(GEN.has(key))return GEN.get(key);const pool=genPool(ac);yield 0;let best=null,spare=null;
   for(let att=0;att<3&&!best&&!spare;att++){const r=rng(L*7919+{glider:11,motor:23,balloon:37}[ac]+att*104729);
   const nl=ac==='balloon'?1:L<=2?1:L<=5?2:3,minC=ac==='balloon'?Math.min(1+Math.floor((L-1)/3),2):Math.min(1+Math.floor((L-1)/2),4),wantAlt=L>=3&&L%2===1&&ac!=='balloon',alts=ac==='motor'?[1000,1500,2000,2500]:[1000,1500,2000];
-  for(let tr=0,planned=0;tr<300&&planned<(ac==='balloon'?30:8)&&!best;tr++){const alt=alts[Math.floor(r()*alts.length)],legs=[];let p=pool[Math.floor(r()*pool.length)];legs.push(p);
+  for(let tr=0,planned=0;tr<300&&planned<(ac==='balloon'?30:8)&&!best;tr++){if(tr%15===14)yield 0;const alt=alts[Math.floor(r()*alts.length)],legs=[];let p=pool[Math.floor(r()*pool.length)];legs.push(p);
     for(let k=1;k<nl;k++){const c=pool.filter(q=>!legs.includes(q)&&Math.hypot(q.x-p.x,q.n-p.n)>6&&Math.hypot(q.x-p.x,q.n-p.n)<20);if(!c.length)break;p=c[Math.floor(r()*c.length)];legs.push(p);}
     if(legs.length<nl)continue;{const pv=GEN.get(ac+(L-1));if(pv&&pv.legs[0]===legs[0].nm)continue;}/* niet twee keer achter elkaar hetzelfde doel */const W0=WIND;const wind=ac==='balloon'&&L>=3?{f0:180+r()*120,f1:240+r()*90,k0:6,k1:24}:null;if(ac==='balloon')WIND=wind;
     const dd=8+r()*(6+Math.min(L,8)),b0=ac==='balloon'?windAt(alt).from-25:r()*360;let sx=null,sn=null;
@@ -2186,10 +2190,10 @@ function genMission(ac,L){const key=ac+L;if(GEN.has(key))return GEN.get(key);con
     WIND=W0;if(sx===null)continue;
     let a=[sx,sn],areas=new Map();for(const q of legs){for(const f of lineAreas(a,[q.x,q.n],alt))areas.set(f.ident,f);a=[q.x,q.n];}
     if(areas.size<minC)continue;
-    if(ac==='balloon'){WIND=wind;const pl=balloonPlan(sx,sn,[legs[0].x,legs[0].n],dd,alt);WIND=W0;planned++;if(!pl)continue;
+    if(ac==='balloon'){WIND=wind;const pl=balloonPlan(sx,sn,[legs[0].x,legs[0].n],dd,alt);WIND=W0;planned++;yield 0;if(!pl)continue;
       const cb={id:'v'+tr+att+L+ac,ac,gen:true,legs:legs.map(q=>q.nm),wind};MIS_OK.delete(cb.id);if(!misVerify(cb,{x:sx,n:sn,alt}))continue;
       best={st:{x:sx,n:sn,alt,hdg:0},legs,areas:[...areas.values()],wind,plan:pl};break;}
-    planned++;let ok=true,len=0,ach=0,from=[sx,sn],al=alt;for(const q of legs){const pr=planRoute(from,[q.x,q.n],al,{ac,noClr:true,limit:120000});if(!pr){ok=false;break;}len+=pr.len;ach+=pr.alts.length-1;al=pr[pr.length-1].alt;from=[q.x,q.n];}
+    planned++;yield 0;let ok=true,len=0,ach=0,from=[sx,sn],al=alt;for(const q of legs){const pr=planRoute(from,[q.x,q.n],al,{ac,noClr:true,limit:120000});if(!pr){ok=false;break;}len+=pr.len;ach+=pr.alts.length-1;al=pr[pr.length-1].alt;from=[q.x,q.n];}
     if(!ok)continue;const cand={st:{x:sx,n:sn,alt,hdg:Math.round((Math.atan2(legs[0].x-sx,legs[0].n-sn)*180/Math.PI+360)%360)},legs,areas:[...areas.values()],ach};{const cv={id:'v'+tr+att+L+ac,ac,gen:true,legs:legs.map(q=>q.nm)};MIS_OK.delete(cv.id);if(!misVerify(cv,cand.st))continue;}if(wantAlt&&!ach){spare=spare||cand;continue;}best={st:{x:sx,n:sn,alt,hdg:Math.round((Math.atan2(legs[0].x-sx,legs[0].n-sn)*180/Math.PI+360)%360)},legs,areas:[...areas.values()],ach};}
   }
   best=best||spare;if(!best){GEN.set(key,null);return null;}
@@ -2197,14 +2201,22 @@ function genMission(ac,L){const key=ac+L;if(GEN.has(key))return GEN.get(key);con
   const goal=best.ach?'Hoogte als uitweg: daal onder een ondergrens of klim over een bovengrens (met marge).':has('P')||has('R')?'Om een verboden of beperkt gebied heen: plan je bocht op tijd.':has('TRA')||has('TSA')?'Militaire oefengebieden (TRA/TSA): als ze actief zijn, blijf je eruit; plan om of onderdoor.':ar.some(needsClr)?'Om een klaringsgebied heen, of erover/eronder: klaring is een keuze, geen moetje.':'Lees vooruit: wat ligt er op je route?';
   const m={id:`gen-${ac}-${L}`,gen:true,lvl:Math.min(3,1+Math.floor((L-1)/3)),genL:L,ac,goal,title:`Uitdaging ${L}`,legs:best.legs.map(q=>q.nm),les:null,teach:ar.filter(f=>f.layer!=='HG').slice(0,2).map(f=>f.ident),alt:best.st.alt,wind:best.wind||undefined,
     brief:`${best.legs.map(q=>q.nm).join(' → ')}. `+(L<=3?`Op de rechte lijn: ${[...new Set(ar.map(nm))].slice(0,3).join(', ')}${ar.length>3?' en meer':''}. `:`Kijk zelf wat er op de rechte lijn ligt (${ar.length} gebieden). `)+(ac==='balloon'?'Er is altijd een hoogteplan dat het haalt.':'Er is altijd een route zonder klaring: om, over of onder.')};
-  MIS_ST.set(m.id,best.st);GEN.set(key,m);setTimeout(()=>{try{genMission(ac,L+1)}catch(_){}},1500);/* volgende alvast klaarzetten: geen hapering bij de start */return m;}
+  MIS_ST.set(m.id,best.st);GEN.set(key,m);return m;}
+function genMission(ac,L){const it=genSteps(ac,L);let r;do{r=it.next();}while(!r.done);return r.value;}// synchroon (tests, rapport)
+// in de app: in plakjes van ±25 ms rekenen, zodat de pagina (knijpen, knoppen, 60 fps) nooit vastzit (25 nov: suite ving haperen)
+const GEN_RUN=new Map(),GEN_WAIT='🛠 Nieuwe uitdaging wordt gemaakt en eerst zelf uitgevlogen…<br><small>Even geduld, hij start vanzelf.</small>';
+function genAsync(ac,L,cb){const key=ac+L;if(GEN.has(key)){if(cb)cb(GEN.get(key));return;}if(GEN_RUN.has(key)){if(cb)GEN_RUN.get(key).push(cb);return;}
+  const cbs=cb?[cb]:[];GEN_RUN.set(key,cbs);const it=genSteps(ac,L);
+  const tick=()=>{const t0=performance.now();let r;do{r=it.next();}while(!r.done&&performance.now()-t0<25);
+    if(!r.done){setTimeout(tick,0);return;}GEN_RUN.delete(key);for(const f of cbs)try{f(r.value)}catch(_){}};setTimeout(tick,0);}
 function misLegGoal(m,i){const L=MPT(),p=L[m.legs[i]];return {x:p[0],n:p[1],name:m.legs[i]};}
 function misTask(m,i){const g=misLegGoal(m,i);return (m.ac==='balloon'?'Drijf naar ':'Vlieg naar ')+`<b>${g.name}</b>`+(m.legs.length>1?` (${i+1}/${m.legs.length})`:'');}
 function misLesson(m){return `<br>🎓 ${m.goal}`+misLesson0(m);}
 function misLesson0(m){const fs=[...new Set([...(m.teach||[m.les]),...[...FAILS.keys()]])].map(id=>LAYERS.find(f=>f.ident===id)).filter(Boolean).slice(0,2);
   return fs.map(f=>`<br>📘 <b>${short(f)}</b> · ${f.loTxt}–${f.hiTxt}: ${({P:'nooit in, op geen enkele hoogte binnen de grenzen',R:'beperkt gebied: alleen als het niet actief is',CTR:'klaring nodig'+(f.cls?' (klasse '+f.cls+')':''),TMA:'klaring nodig'+(f.cls?' (klasse '+f.cls+')':''),RMZ:'eerst oproepen op de radio',PJA:'parachutisten: status opvragen',UAS:'drones: blijf weg als het actief is'})[f.layer]||'check de AIP'}.`).join('')+(m.tip?`<br>📘 ${m.tip}`:'')+'<br><small>Vereenvoudigd; de AIP is leidend.</small>';}
 function randomStart(ac){const nm=nextMission(ac);MISSION=null;WIND=null;
-  if(nm){MISSION=nm.m;WIND=nm.m.wind||null;LASTGOAL={...misLegGoal(nm.m,0),mis:nm.m.id,li:0};MREF=misRef(nm.m,nm.st);MDIST=0;MLAST=null;const ser=misSeries(nm.m.ac);return {...nm.st,task:misTask(nm.m,0)+`<br><b>${nm.m.title}</b> · ${nm.m.brief}<br><small>${nm.m.gen?'uitdaging '+nm.m.genL+' (gegenereerd)':LVL[nm.m.lvl]+' · missie '+(ser.indexOf(nm.m)+1)+'/'+ser.length} · 🎓 ${nm.m.goal}</small>`};}
+  if(nm&&nm.pending){genAsync(nm.ac,nm.L,()=>{if(MODE==='fly'&&ACTYPE===nm.ac&&!MISSION&&NOTICE.includes('wordt gemaakt'))newTask();});return {x:PLANE.x,n:PLANE.n,alt:PLANE.alt||1000,hdg:PLANE.hdg,task:null,pending:true};}
+  if(nm){MISSION=nm.m;WIND=nm.m.wind||null;LASTGOAL={...misLegGoal(nm.m,0),mis:nm.m.id,li:0};MREF=misRef(nm.m,nm.st);MDIST=0;MLAST=null;{const d=misDone().filter(i=>i.startsWith('gen-'+ac+'-')).length;setTimeout(()=>genAsync(ac,d+(nm.m.gen?2:1)),2000);}const ser=misSeries(nm.m.ac);return {...nm.st,task:misTask(nm.m,0)+`<br><b>${nm.m.title}</b> · ${nm.m.brief}<br class="mlvl"><small class="mlvl">${nm.m.gen?'uitdaging '+nm.m.genL+' (gegenereerd)':LVL[nm.m.lvl]+' · missie '+(ser.indexOf(nm.m)+1)+'/'+ser.length} · 🎓 ${nm.m.goal}</small>`};}
   const alt=ac==='balloon'?800:1000;
   for(let k=0;k<400;k++){const x=gx0+8+Math.random()*(gx1-gx0-16),n=gn0+8+Math.random()*(gn1-gn0-16);if(!inNL(x,n))continue;
     const hdg=ac==='balloon'?Math.round((windAt(alt).from+180)%360):Math.round(Math.random()*360);let ok=true;
@@ -2248,7 +2260,7 @@ function rtClick(k){const [act,arg]=k.split(':');
   if(act==='rb'&&RT){const o=RT.rb[+arg];
     if(o[1]!==1){NOTICE=`❌ ${o[1]==='roger'?'"Roger" is niet genoeg: een klaring lees je terug.':'Ook de hoogte hoort in je readback.'}<br><i>"${CALLSIGN}, ${RT.st}, ${RT.clr}"</i>`+RT.rb.map((q,j)=>rtBtn(q[0],'rb:'+j)).join('')+RTCLOSE;hudTick();return;}
     CLR.add(RT.f.ident);WARNED.add(RT.f.ident);NOTICE=`✅ Klaring voor <b>${short(RT.f)}</b>. Blijf op ${RT.alt} ft: hoger of lager kan ander luchtruim zijn.<br><small>(vereenvoudigd) · ▶ = verder</small>`;RT=null;hudTick();}}
-function newTask(){const st=randomStart(ACTYPE);if(TILT)TILT.hist=[];/* geen koers/hoogte van de vorige opdracht terugzetten */Object.assign(PLANE,{x:st.x,n:st.n,alt:st.alt,hdg:st.hdg,bank:0,pitch:0});WARNED.clear();FAILS.clear();CLR.clear();REFUSED.clear();REFW.clear();
+function newTask(){const st=randomStart(ACTYPE);if(st.pending){TASK='';GOAL=null;PAUSED=true;NOTICE=GEN_WAIT;hudTick();return;}if(TILT)TILT.hist=[];/* geen koers/hoogte van de vorige opdracht terugzetten */Object.assign(PLANE,{x:st.x,n:st.n,alt:st.alt,hdg:st.hdg,bank:0,pitch:0});WARNED.clear();FAILS.clear();CLR.clear();REFUSED.clear();REFW.clear();
   TASK=st.task||'';GOAL=st.task?{...LASTGOAL}:null;PAUSED=true;NOTICE=(st.task?`🎯 ${st.task}<br>`:'')+'<small>▶ = start</small>';chase(0,true);hudTick();}
 function setHTML(el,h){if(el.__last!==h){el.__last=h;el.innerHTML=h;}}
 function setMode(m,ac){
@@ -2278,8 +2290,8 @@ $('btnPause').onclick=togglePause;
 function openChooser(){oneMenu('modal');$('modal').style.display='flex';}
 document.querySelectorAll('[data-ac]').forEach(b=>b.onclick=()=>{if(b.dataset.ac!=='map')autoTilt();$('modal').style.display='none';document.body.classList.remove('welcome');$('btnMode').style.visibility='visible';$('panel').classList.add('hidden');let a=b.dataset.ac;if(a!=='map'){const want=$('relaxBox').checked;if(want!==RELAX)setTimeout(()=>setRelax(want),0);}
   if(a==='map'){setMode('map');setView('schuin');showProbe();return;}
-  let task=null;if(a!=='map'&&!PROBE.user){const st=randomStart(a);task=st.task;GOAL=task&&!$('relaxBox').checked?{...LASTGOAL}:null;FAILS.clear();CLR.clear();Object.assign(PLANE,{x:st.x,n:st.n,alt:st.alt,hdg:st.hdg,bank:0,pitch:0});FIRST_WARN_DONE=false;WARNED.clear();}
-  TASK=task&&!$('relaxBox').checked?task:'';PAUSED=true;NOTICE=(task&&!$('relaxBox').checked?`🎯 ${task}<br>`:'')+'<small>▶ = start</small>';setMode('fly',a);});
+  let task=null,pend=false;if(a!=='map'&&!PROBE.user){const st=randomStart(a);task=st.task;pend=!!st.pending;GOAL=task&&!$('relaxBox').checked?{...LASTGOAL}:null;FAILS.clear();CLR.clear();Object.assign(PLANE,{x:st.x,n:st.n,alt:st.alt,hdg:st.hdg,bank:0,pitch:0});FIRST_WARN_DONE=false;WARNED.clear();}
+  TASK=task&&!$('relaxBox').checked?task:'';PAUSED=true;NOTICE=pend?GEN_WAIT:(task&&!$('relaxBox').checked?`🎯 ${task}<br>`:'')+'<small>▶ = start</small>';setMode('fly',a);});
 
 // ---------- sonde ----------
 function probeAt(e){const v=new THREE.Vector2(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(v,camera);
@@ -2585,7 +2597,7 @@ let last=performance.now(),acc=0;
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   goalVizTick(now);renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,MPT_EXTRA,misVerify,MIS_OK,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+window.__vfr={get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,MPT_EXTRA,genAsync,GEN_RUN,misVerify,MIS_OK,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 </script>
 </body>

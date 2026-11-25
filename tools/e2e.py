@@ -895,7 +895,7 @@ async def d_missions(a):  # Christian 21 nov: interessantere missies; elk rond e
     for m in ms:
         if m['ac'] != 'balloon': continue
         plan = await a.ev('''(id)=>{const v=window.__vfr,m=v.MISSIONS.find(x=>x.id===id),st=v.misStart(m),L={};for(const f of v.TASKF)if(f.t==="L")L[f.name]=f.pts[0];
-          const g=L[m.legs[0]];const W=v.windAt;return v.balloonPlan(st.x,st.n,g,Math.hypot(g[0]-st.x,g[1]-st.n))}''', m['id'])
+          const g=v.MPT()[m.legs[0]];const W=v.windAt;return v.balloonPlan(st.x,st.n,g,Math.hypot(g[0]-st.x,g[1]-st.n))}''', m['id'])
         ok(plan or m['id'] == 'boost', f'ballonmissie {m["id"]}: geen hoogteplan haalt het doel')
     await a.shot('missions')
 
@@ -1107,6 +1107,28 @@ async def d_generator(a):  # besluit 23 nov + Christian 25 nov: na 6 vaste missi
     r = await a.ev('''()=>{const v=window.__vfr;v.setMode("fly","glider");const p=v.LAYERS.find(f=>f.ident==="EHP29"),hi0=p.hi;p.hi=1e6;/* 'nieuwe AIRAC': P-gebied zonder bovengrens */v.MPT_EXTRA["Testdoel P"]=p.lp;v.MIS_OK.delete("airac-test");const m={id:'airac-test',ac:'glider',lvl:1,goal:'test',title:'Test',legs:['Testdoel P'],les:null,alt:1000,brief:'x'};
       v.MISSIONS.unshift(m);localStorage.setItem("l3d_missies","[]");v.newTask();const got=v.MISSION&&v.MISSION.id;const ver=v.misVerify(m,v.misStart(m)||{x:0,n:0,alt:1000});v.MISSIONS.shift();p.hi=hi0;v.MIS_OK.clear();return [got,ver]}''')
     ok(r[0] != 'airac-test' and r[1] is False, f'onhaalbare missie toch aangeboden: {r}')
+
+async def d_no_freeze(a):  # 25 nov: generator/vlucht-check blokkeerden de pagina seconden lang → knijpen en tijdknoppen faalden. Klasse: geen lange blokkade
+    await a.hit('#modal [data-ac=glider]'); await a.frames(3)
+    ms = await a.ev('()=>{const v=window.__vfr;v.MIS_OK.clear();localStorage.setItem("l3d_missies","[]");const t=performance.now();v.newTask();return performance.now()-t}')
+    ok(ms < 600, f'missiestart (vaste missie) duurt {ms:.0f} ms')
+    r = await a.ev('''()=>new Promise(res=>{const v=window.__vfr;v.GEN.clear();localStorage.setItem("l3d_missies",JSON.stringify(v.misSeries("glider").map(m=>m.id)));
+      const t0=performance.now();v.newTask();const wait=v.NOTICE;let last=performance.now(),gap=0;
+      const f=()=>{const n=performance.now();gap=Math.max(gap,n-last);last=n;const m=v.MISSION;if(m&&m.gen||n-t0>90000)return res({gap,wait,id:m&&m.id,ms:n-t0});requestAnimationFrame(f)};requestAnimationFrame(f)})''')
+    ok('wordt gemaakt' in r['wait'], f'geen wachtmelding tijdens het maken: {r["wait"][:80]}')
+    ok(r['id'] == 'gen-glider-1', f'uitdaging start niet vanzelf: {r}')
+    ok(r['gap'] < 700, f'pagina zat {r["gap"]:.0f} ms vast tijdens het maken van een uitdaging (max 700)')
+
+async def d_menu_on_top(a):  # 25 nov: missiemelding lag óver het tijdmenu (weekend niet aan te tikken). Klasse: open menu = bovenop, overal
+    await a.hit('#modal [data-ac=glider]'); await a.frames(2)
+    for btn, pop in (('#timeBtn', '#timePop'), ('#btnPanel', '#panel')):
+        if not await a.visible(btn): continue
+        await a.hit(btn); await a.frames(2)
+        hid = await a.ev("""(pop)=>{const P=document.querySelector(pop);if(!P||P.classList.contains('hidden'))return 'dicht';const bad=[];
+          for(const e of P.querySelectorAll('button,input,select,label')){const r=e.getBoundingClientRect();if(r.width<4||r.height<4||r.bottom<0||r.top>innerHeight)continue;
+            const t=document.elementFromPoint(Math.min(innerWidth-1,r.x+r.width/2),Math.min(innerHeight-1,r.y+r.height/2));if(t&&!P.contains(t))bad.push((e.textContent||e.id||e.tagName).trim().slice(0,20)+' onder '+(t.id||t.className||t.tagName))}return bad}""", pop)
+        ok(hid == 'dicht' or not hid, f'{pop}: bedekt door iets anders: {hid[:3] if hid != "dicht" else hid}')
+        await a.hit(btn); await a.frames(2)
 
 async def d_ctr_covers_rmz(a):  # Christian 21 nov: "missie mislukt, RMZ Deelen zonder oproep" terwijl hij klaring had voor Deelen CTR
     await a.hit('#modal [data-ac=motor]'); await a.frames(2)
@@ -1369,7 +1391,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('toetsen zoals MSFS', d_msfs_keys), ('sneltoetskaart', d_keycard), ('spatie bij keerpunten', d_space_waypoints), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('missiegenerator', d_generator), ('gedeelde ENR 5.5-terreinen (Malden)', d_shared_sites), ('geen voorbeeldcircuit', d_no_circuit), ('P-gebieden H24 zichtbaar', d_h24_always), ('labels knipperen niet', d_labels_steady), ('missies echt uitvliegen', d_missions_flown), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('bruggen Maas/Waal', d_bridges), ('doorsnede', d_cross_section), ('rondleiding', d_tour), ('herkenningspunten', d_landmarks)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('toetsen zoals MSFS', d_msfs_keys), ('sneltoetskaart', d_keycard), ('spatie bij keerpunten', d_space_waypoints), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('open menu ligt bovenop', d_menu_on_top), ('niet haperen bij missies', d_no_freeze), ('missiegenerator', d_generator), ('gedeelde ENR 5.5-terreinen (Malden)', d_shared_sites), ('geen voorbeeldcircuit', d_no_circuit), ('P-gebieden H24 zichtbaar', d_h24_always), ('labels knipperen niet', d_labels_steady), ('missies echt uitvliegen', d_missions_flown), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('bruggen Maas/Waal', d_bridges), ('doorsnede', d_cross_section), ('rondleiding', d_tour), ('herkenningspunten', d_landmarks)]
     async with async_playwright() as p:
         try:
             b = await p.chromium.launch(args=ARGS)
