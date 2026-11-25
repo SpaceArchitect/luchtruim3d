@@ -1007,7 +1007,7 @@ async def fly_mission(a, mid, mode, stats=None, done=None):  # één missie éch
                 await a.ev('(id)=>window.__vfr.RTOUT.set(id,{t:performance.now(),o:"traffic"})', r['open'].split(':')[1])
             else:  # verder vast: klaring (geen toeval in de test)
                 await a.ev('(id)=>{const R=window.__vfr.RTOUT;if(!R.has(id))R.set(id,{t:performance.now(),o:"yes"})}', r['open'].split(':')[1])
-            await a.ev('k=>document.querySelector(`#banner [data-rt="${k}"]`).click()', r['open'])
+            if not await a.ev('k=>{const e=document.querySelector(`#banner [data-rt="${k}"]`);if(e)e.click();return !!e}', r['open']): continue  # balk net herbouwd: volgende stap opnieuw
             for _ in range(4):
                 ks = await a.ev('()=>[...document.querySelectorAll("#banner [data-rt^=pick],#banner [data-rt^=rb]")].map(e=>e.dataset.rt)')
                 if not ks: break
