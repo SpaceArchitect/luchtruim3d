@@ -886,7 +886,7 @@ async def d_missions(a):  # Christian 21 nov: interessantere missies; elk rond e
         await a.ev('()=>window.__vfr.newTask()'); await a.frames(2)
         ok((await a.v('v.MISSION||{}')).get('id') == m['id'], f'missie {m["id"]} niet gekozen')
         for i in range(m['legs']):
-            await a.ev('()=>{const v=window.__vfr,g=v.GOAL;Object.assign(v.PLANE,{x:g.x+.5,n:g.n,alt:1000});v.FAILS.clear();v.CLR.clear();for(const f of v.LAYERS)v.CLR.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.NOTICE="";v.PAUSED=false;v.hudTick()}')
+            await a.ev('()=>{const v=window.__vfr,g=v.GOAL;Object.assign(v.PLANE,{x:g.x+.5,n:g.n,alt:1000});v.FAILS.clear();v.CLR.clear();for(const f of v.LAYERS){v.CLR.add(f.ident);v.WARNED.add(f.ident);}for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.NOTICE="";v.PAUSED=false;v.hudTick()}')
             n = await a.v('v.NOTICE') or ''
             if i < m['legs'] - 1: ok('Keerpunt' in n, f'{m["id"]}: keerpunt {i+1} niet gemeld: {n[:80]}')
             else: ok('geslaagd' in n and '📘' in n and '⭐' in n, f'{m["id"]}: geen geslaagd + les + ster: {n[:120]}')
@@ -1012,7 +1012,7 @@ async def fly_mission(a, mid, mode, stats=None, done=None):  # één missie éch
                 ks = await a.ev('()=>[...document.querySelectorAll("#banner [data-rt^=pick],#banner [data-rt^=rb]")].map(e=>e.dataset.rt)')
                 if not ks: break
                 for k in ks:
-                    await a.ev('k=>document.querySelector(`#banner [data-rt="${k}"]`).click()', k)
+                    await a.ev('k=>{const e=document.querySelector(`#banner [data-rt="${k}"]`);if(e)e.click()}', k)
                     if '❌' not in (await a.v('v.NOTICE') or ''): break
             n = await a.v('v.NOTICE') or ''
             if 'Geweigerd' in n:

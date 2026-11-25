@@ -134,6 +134,7 @@ browser-screenshots zijn het duurst: gebruik ze bewust.
 **Meter in de cloud (25 nov): `npx -y ccusage@latest weekly --json`** toont de tokens van *deze* container (sessie).
 Draai het bij de start, na elk groot blok en aan het eind, en zet de totalen in de SP-regel. Zodra Christian het werkelijke %
 meldt, volgt de verhouding tokens ↔ % (zie LOG); daarmee stuur je zelf op ±25 SP.
+**Kalibratie 25 nov: 1% ≈ 7,3 M tokens (ccusage totalTokens) ≈ $2,3 API-waarde → 25 SP ≈ 180 M tokens.** Herijk bij elke terugmelding.
 **Story points (Christian 25 nov):** 1 SP = 1% van de weeklimiet. Begin elke sessie met een
 schatting in `docs/LOG.md` (features + tests, met model); Christian meldt achteraf het werkelijke %.
 Doel: structureel ±25 SP per sessie. Te vroeg klaar? Pak het volgende punt uit de top 5.
