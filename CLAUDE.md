@@ -133,6 +133,11 @@ de 2e waarde = sessie, de 3e = week). Kun je dat niet,
 schat dan voorzichtig, stop ruim op tijd en meld je schatting. De volledige suite en
 browser-screenshots zijn het duurst: gebruik ze bewust.
 
+**Story points (Christian 25 nov):** 1 SP = 1% van de weeklimiet. Begin elke sessie met een
+schatting in `docs/LOG.md` (features + tests, met model); Christian meldt achteraf het werkelijke %.
+Doel: structureel ±25 SP per sessie. Te vroeg klaar? Pak het volgende punt uit de top 5.
+Regel: `- <datum> SP: <model> · schatting X · werkelijk Y · <plan/les>`.
+
 ## 🤖 Zelfstandig werken (afspraak 22 nov)
 
 - **Afgerond:** kantelen op mobiel (Christian 23 nov). Niet meer aan sleutelen, alleen bij een bug.
