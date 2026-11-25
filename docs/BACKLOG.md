@@ -1,11 +1,11 @@
 # Backlog — de enige centrale lijst
 
 *Opgezet 23 nov 2026. Alles wat nog moet of kan staat hier, op prioriteit. STATUS toont alleen de top 5.*
-**Regels:** één regel per punt: `[grootte S/M/L/XL] wat — bron, datum → uitwerking`. Klaar = schrappen + één regel in `docs/LOG.md`.
+**Regels:** één regel per punt: `[grootte S/M/L/XL] wat — bron, datum → uitwerking`. Klaar = schrappen + één regel in `docs/LOG.md` (behalve terugkerende punten: datum doorschuiven).
 Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedback` worden hier opgenomen en gesloten.
 
 ## P0 — gaat altijd voor
-- [S] AIRAC-wissel 26 nov (AMDT 12-2026): data ophalen, `build_airspace.py --check`, `aip_check.py`, footer — CLAUDE.md
+- [S] **Terugkerend — nooit schrappen:** AIRAC-wissel elke 28 dagen (do). Eerstvolgende: **26 nov 2026** (AMDT 12-2026), daarna 24 dec 2026, 21 jan 2027, 18 feb 2027. Stappen: data ophalen, `build_airspace.py --check`, `aip_check.py`, footer, `mission_report.py --fly --gen 8` + missietests. Na afloop alleen de datum doorschuiven en een LOG-regel — CLAUDE.md, Christian 25 nov
 - [S–M] Kapotte data-actie of live-bug — CLAUDE.md
 
 ## P1 — nu (live-feedback Christian 25 nov, in deze volgorde)
