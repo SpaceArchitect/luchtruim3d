@@ -9,6 +9,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [S–M] Kapotte data-actie of live-bug — CLAUDE.md
 
 ## P1 — nu (feedback release 22 nov, in deze volgorde) → OPDRACHT-23nov A
+0. [S] Bug: ▶ Start na een afgeronde missie moet direct de volgende missie starten (Start = doorgaan met de huidige missie, of na geslaagd/mislukt de volgende). Nu vlieg je verder zonder opdracht — Christian 25 nov
 0. [S] Bug: vario toont altijd de vaste stijgsnelheid (bv. 400 ft/min); moet de werkelijke stijg-/daalsnelheid van het toestel tonen (afhankelijk van hoe hard het stijgt) — Christian 25 nov
 1. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
    - Opzet (akkoord 23 nov): vaste reeks van ±6 handgemaakte missies (elk één regel: CTR, TMA, P-gebied, TMZ, lier, tijden), daarna een **oneindige generator** met oplopende moeilijkheid (keerpunten, smalle gangen, hoogtebanden, wind, tijdsgebonden gebieden) tot een plafond. Elke gegenereerde missie eerst valideren (er bestaat een route zonder overtreding); leerdoel achteraf uit de geraakte gebieden. Dezelfde generator + datum-seed = dagelijkse uitdaging.
