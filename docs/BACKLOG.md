@@ -9,6 +9,8 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [S–M] Kapotte data-actie of live-bug — CLAUDE.md
 
 ## P1 — nu (feedback release 22 nov, in deze volgorde) → OPDRACHT-23nov A
+0. [M] Elk luchtruim aanklikbaar voor info, ook ENR 5.5-terreinen (lier, zweef, model, ULV), paradropzones e.d. Nu raakt de klik alleen `airGroup` (regel ±1499: `ray.intersectObjects(airGroup…)`), niet `hgCyl`. Mobiel: alleen de highlights (naam · grenzen · wat moet je doen · frequentie), details achter "meer" — Christian 25 nov
+0. [S] Bug: grondring van ENR 5.5-terreinen zweeft boven de grond: ring op y = 0,05 (50 m) terwijl de cilinder op 0 begint en de grond nog lager ligt → ring en cilindervoet op dezelfde grondhoogte; test: ringhoogte = cilindervoet — Christian 25 nov (screenshot)
 0. [S] Live-bug: ballon geland aan de Maas (5 km ZO van Dreumel, wo 11:03) maar opdracht 'Drijf naar de Maas' niet geslaagd; doelbaken zegt nog 1,4 km. Vermoeden: doel = één OSM-stuk van de rivier (`LASTGOAL.pts=f.pts`, regel ±2059) i.p.v. de hele Maas (OSM knipt rivieren op, net als bij de bruggen), en/of REACH 0,5 km bij een lijn te krap. Test: elke rivier-/wegopdracht halen op een willekeurig punt langs de héle rivier — Christian 25 nov (screenshot in chat)
 0. [S] Bug: ▶ Start na een afgeronde missie moet direct de volgende missie starten (Start = doorgaan met de huidige missie, of na geslaagd/mislukt de volgende). Nu vlieg je verder zonder opdracht — Christian 25 nov
 0. [S] Bug: vario toont altijd de vaste stijgsnelheid (bv. 400 ft/min); moet de werkelijke stijg-/daalsnelheid van het toestel tonen (afhankelijk van hoe hard het stijgt) — Christian 25 nov
