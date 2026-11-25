@@ -1,10 +1,10 @@
 # Status — lees dit eerst
 
-*Bijgewerkt: 24 nov 2026, nacht (geplande sessie). Backlog: **`docs/BACKLOG.md`** (enige lijst); uitwerking: `docs/OPDRACHT-23nov.md`.*
+*Bijgewerkt: 25 nov 2026, nacht (geplande sessie). Backlog: **`docs/BACKLOG.md`** (enige lijst); uitwerking: `docs/OPDRACHT-23nov.md`.*
 
 ## Live
-- https://luchtruim3d.nl = `main` = live-gang 24/25 nov (zie LOG): fixes Evoluon-klaring, knipperende labels, lieren als één cilinder.
-  Terugdraaien: `release/2026-11-24` (= live van 22 nov), daarvoor `release/2026-11-22`, `release/2026-11-21`, `release/2026-11-15`.
+- https://luchtruim3d.nl = `main` = live-gang 25 nov (zie LOG): fixes Evoluon-klaring, knipperende labels, lieren als één cilinder.
+  Terugdraaien: `release/2026-11-25` (= live van 22 nov + docs), daarvoor `release/2026-11-22`, `release/2026-11-21`, `release/2026-11-15`.
 - Regio: Eindhoven + Arnhem–Nijmegen tot 52.15 N, AIRAC 11-2026.
 - **Afgerond (Christian 23 nov):** kantelen op mobiel → niet meer aanpassen, alleen bij een bug.
 
