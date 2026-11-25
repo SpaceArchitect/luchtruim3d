@@ -15,6 +15,10 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 3. [M] Elk luchtruim aanklikbaar voor info, ook ENR 5.5-terreinen (lier, zweef, model, ULV), paradropzones e.d. Nu raakt de klik alleen `airGroup` (regel ±1499: `ray.intersectObjects(airGroup…)`), niet `hgCyl`. Mobiel: alleen de highlights (naam · grenzen · wat moet je doen · frequentie), details achter "meer" — Christian 25 nov
 4. [S] Bug: grondring van ENR 5.5-terreinen zweeft boven de grond: ring op y = 0,05 (50 m) terwijl de cilinder op 0 begint en de grond nog lager ligt → ring en cilindervoet op dezelfde grondhoogte; test: ringhoogte = cilindervoet — Christian 25 nov (screenshot)
 5. [S] Bug: vario toont altijd de vaste stijgsnelheid (bv. 400 ft/min); moet de werkelijke stijg-/daalsnelheid van het toestel tonen (afhankelijk van hoe hard het stijgt) — Christian 25 nov
+6. [S–M] Bug (sensor → Christian test vóór live): tilt kalibreert opnieuw als er een melding komt terwijl je in een bocht hangt; de bocht is daarna niet voort te zetten. Kalibreren = één keer bij de start + een expliciete knop; bij draaien van staand naar liggend niet stil herkalibreren maar kort vragen. Vermoeden: melding → resize/re-init → kalibratie. Test: met ±5° ruis een bocht vliegen, midden in de bocht een melding (en een resize) forceren → nulstand ongewijzigd — Christian 25 nov
+7. [S] Bug mobiel: labels bedekken het eigen toestel (vliegmodus). Vrije zone rond de schermpositie van het toestel waarin labels wegvallen/vervagen; test: alle schermvormen, over meerdere frames, geen label-rect overlapt het toestel — Christian 25 nov (screenshot, Pixel liggend)
+8. [S] Bug mobiel liggend: chase-camera te ver weg, toestel nauwelijks zichtbaar. Camera-afstand laten afhangen van schermhoogte/beeldverhouding; test: toestelgrootte in px liggend ≈ staand (±25%) — Christian 25 nov
+9. [M] Militaire gebieden (TRA/TSA/EHR): gebruiker weet niet wat hij moet doen. Eerst begrip: bij aanraken/naderen uitleggen wat het gebied is, dat het actief kán zijn en hoe je dat checkt (NOTAM, Eurocontrol AUP/UUP) met link. Daarna echte activering tonen via het P3-punt Live NOTAM (primaire bron, met tijdstempel en "alleen educatie") — Christian 25 nov
 
 ## P2 — daarna
 - [XL] **Heel NL (reset-push, zie STATUS):** 27 nov–4 dec voorbereiden: data uit `index.html` naar `data/*.json` (laden + cache, pagina < 2 MB), `build_airspace.py` landelijk (bbox NL) + `aip_check.py`, AIP SUP 03/2022 (Lelystad/Nieuw Milligen), labels/prestaties met landelijke dichtheid, missiepool landelijk. 7–10 dec bouwen, 11–14 dec test Christian. Daarna BE/DE — Christian 22 + 25 nov
@@ -34,7 +38,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 
 ## P3 — koers (top 5, even zwaar) en groter werk
 - [M] Generator v2: smalle gangen tussen gebieden, wind voor zweef/motor, tijdsgebonden gebieden (CTR open/dicht), RMZ-oproep als opdracht, plafond aan de moeilijkheid; leerdoel uit de werkelijk geraakte gebieden — Christian 22–25 nov (v1 staat, zie docs/MISSIES.md)
-- [L] Live NOTAM uit een primaire bron (LVNL → Eurocontrol NOP → EAD Basic); automatische AIRAC-check — Christian 22 nov
+- [L] Live NOTAM uit een primaire bron (LVNL → Eurocontrol NOP → EAD Basic); automatische AIRAC-check. Eerste toepassing: TRA/TSA/EHR-activering (AUP/UUP) zichtbaar bij de militaire gebieden (zie P1-9) — Christian 22 + 25 nov
 - [M] Ballon realistischer: traagheid, dagdeel/thermiek-uren (eerst AIP checken). Gedaan 25 nov: stijgen/dalen 500 ft/min in het hoogteplan, missie langs een CTR — OPDRACHT-21nov blok 6
 - [M] "Waar ben ik?"-quiz — Christian 23 nov → E
 - [S] Test GitHub Issues als backlog-werkvorm (naast dit bestand) — Christian 23 nov
