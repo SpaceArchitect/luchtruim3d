@@ -1209,6 +1209,7 @@ async def d_bridges(a):  # Christian 21 nov: "bij Maas en Waal mis ik bruggen" �
     for ref, river, lo, la in (('A2', 'Waal', 5.258, 51.818), ('A50', 'Waal', 5.738, 51.885), ('A2', 'Maas', 5.306, 51.740), ('A73', 'Maas', 5.840, 51.759)):
         ok(any(b['ref'] == ref and b['river'] == river and abs(b['lo'] - lo) < .01 and abs(b['la'] - la) < .01 for b in br), f'brug {ref} over de {river} ontbreekt')
     ok(len({(round(b['lo'], 2), round(b['la'], 2)) for b in br}) == len(br), 'dubbele bruggen (twee rijbanen?)')
+    for nm in ('Waalbrug', 'De Oversteek', 'John Frostbrug'): ok(any(b['ref'] == nm for b in br), f'stadsbrug {nm} ontbreekt (A1 herkenningspunten)')
     n = await a.v("v.labels.filter(L=>L.isLm&&L.el&&L.el.textContent.includes(\"🌉\")).length")
     ok(n >= len(br) or n == 0, f'niet elke brug heeft een label ({n}/{len(br)})')
     # Christian 22 nov: A50-brug stond een kwartslag gedraaid. Klasse: de lange as van elk brugmodel ligt in de wegrichting (±10°)

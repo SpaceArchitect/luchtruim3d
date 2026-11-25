@@ -1671,6 +1671,8 @@ const BRIDGES=(()=>{const big=/^(Maas|Waal|Nederrijn|Lek|Bergsche Maas|Amer|Bove
     const u=((x3-x1)*(y4-y3)-(y3-y1)*(x4-x3))/d,v=((x3-x1)*(y2-y1)-(y3-y1)*(x2-x1))/d;if(u<0||u>1||v<0||v>1)continue;
     const lo=x1+u*(x2-x1),la=y1+u*(y2-y1);if(out.some(b=>Math.abs(b.lo-lo)<.015&&Math.abs(b.la-la)<.01))continue;
     const [ax,an]=proj(x1,y1),[bx,bn]=proj(x2,y2),[x,n]=proj(lo,la);out.push({ref:r.ref,river:w.nm,lo,la,x,n,dir:Math.atan2(bx-ax,bn-an)});}
+  // stadsbruggen (geen snelweg): as = verste twee punten van de OSM-brugdelen (data/osm osm/herkenning, 22 nov; akkoord Christian 22 nov)
+  for(const [nm,river,lo,la,brg] of [['Waalbrug','Waal',5.87028,51.85309,161],['De Oversteek','Waal',5.84193,51.85915,28],['John Frostbrug','Nederrijn',5.91113,51.97431,31]]){const [x,n]=proj(lo,la);out.push({ref:nm,river,lo,la,x,n,dir:brg*Math.PI/180,city:true});}
   return out;})();
 {const deckM=new THREE.MeshBasicMaterial({color:0x5b6168}),pierM=new THREE.MeshBasicMaterial({color:0x9aa1a8}),edge=new THREE.LineBasicMaterial({color:0x3a3f45,transparent:true,opacity:.6});
  for(const b of BRIDGES){const g=new THREE.Group();g.rotation.y=-b.dir;/* three.js: lokale z wijst naar het zuiden; met +dir stond een NNO-brug bijna dwars (A50, Christian 22 nov) */

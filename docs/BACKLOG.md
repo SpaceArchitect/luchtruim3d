@@ -9,8 +9,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [S–M] Kapotte data-actie of live-bug — CLAUDE.md
 
 ## P1 — nu (feedback release 22 nov, in deze volgorde) → OPDRACHT-23nov A
-1. [M] Herkenningspunten: oriëntatie (A50-brug gedraaid) + bruggen/knooppunten uit `wip/herkenning-22nov` afmaken — Christian 22–23 nov → A1, `docs/herkenningspunten-voorstel.md`
-2. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
+1. [M] Missies: progressie easy → medium → lang/moeilijk, sterren, leerdoel, doel altijd zichtbaar (Boyd) — Christian 23 nov → B
    - Opzet (akkoord 23 nov): vaste reeks van ±6 handgemaakte missies (elk één regel: CTR, TMA, P-gebied, TMZ, lier, tijden), daarna een **oneindige generator** met oplopende moeilijkheid (keerpunten, smalle gangen, hoogtebanden, wind, tijdsgebonden gebieden) tot een plafond. Elke gegenereerde missie eerst valideren (er bestaat een route zonder overtreding); leerdoel achteraf uit de geraakte gebieden. Dezelfde generator + datum-seed = dagelijkse uitdaging.
 
 ## P2 — daarna
@@ -33,6 +32,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [S] Test GitHub Issues als backlog-werkvorm (naast dit bestand) — Christian 23 nov
 
 ## P4 — open ideeën (niet gepland)
+- Nelson Mandelabrug Arnhem en Maasbrug Venlo als herkenningspunt (ontbreken in data/osm herkenning; query uitbreiden)
 - LVNL-obstakellaag (masten, windmolens) · hoog contrast in de 3D-scène · IFR-naderingsgebieden (VAC) · doorsnede A→B · legenda/afkortingen · grensstrook DE (eerst labels, DFS-AIP)
 - Highscorelijst met bijnaam (alleen na akkoord Christian + privacycheck) → D
 - Anonieme terugkeer-gebeurtenissen (pas na juridische check) → F
