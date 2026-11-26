@@ -42,6 +42,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [M] Ballon realistischer: traagheid, dagdeel/thermiek-uren (eerst AIP checken). Gedaan 25 nov: stijgen/dalen 500 ft/min in het hoogteplan, missie langs een CTR — OPDRACHT-21nov blok 6
 - [M] "Waar ben ik?"-quiz — Christian 23 nov → E
 - [S] Test GitHub Issues als backlog-werkvorm (naast dit bestand) — Christian 23 nov
+- [M] RT per blok: in het infopaneel (en bij naderen in vliegmodus) wat je op de radio/transponder doet — CTR: klaring van Tower, ±2 min vooraf oproepen met route + hoogte; FMC: listening squawk, alleen uitluisteren; RMZ/TMZ; Dutch Mil klasse D boven FL045/055 voor zweef. Later: VFR-routes in/uit CTR's als laag, BE (LFA(G)) en DE (TMZ mit Hörbereitschaft). Achtergrond: KNVvL-syllabus VFR RT v5.2 (projectbestand, © KNVvL: niet in de repo, niet citeren); waarden altijd uit de AIP — Christian 26 nov
 
 ## P4 — open ideeën (niet gepland)
 - Nelson Mandelabrug Arnhem en Maasbrug Venlo als herkenningspunt (ontbreken in data/osm herkenning; query uitbreiden)
@@ -53,6 +54,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 ## Nog te verifiëren (AIP) — zie CLAUDE.md "Vastgelegde kennis"
 - TRA/TSA-activering: planner en missies rekenen ze als altijd actief; echte status via Eurocontrol AUP/UUP (zie NOTAM-punt P3)
 - Malden: model- en zweefvliegen nooit tegelijk (Christian, lokale afspraak; ENR 5.5 zegt niets) · Nistelrode: zweef + lier op één terrein, gelijktijdigheid onbekend
+- **FMC (Frequency Monitoring Code)**: KNVvL-syllabus noemt listening squawks in NL (7020 rond Schiphol/Amsterdam Info, 7010 Rotterdam TMA1) — botst met "NL kent geen aparte uitluistersquawk" in CLAUDE.md; toetsen aan AIP ENR 1.6 / LVNL (26 nov)
 - Status/klasse van een CTR buiten de openingstijden · Niederrhein TMZ squawk/frequentie (DFS-AIP) · eerste oproep Arrival of Tower
 
 ## Open vragen aan Christian

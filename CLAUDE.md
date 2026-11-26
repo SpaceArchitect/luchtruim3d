@@ -201,7 +201,7 @@ Regel: `- <datum> SP: <model> · schatting X · werkelijk Y · <plan/les>`.
 - CTR's (klasse D): Eindhoven en De Peel 07–24 lokaal (Eindhoven Tower 131.005); Volkel en Gilze-Rijen ma–vr 08:00–16:45, niet op
   feestdagen; daarbuiten de RMZ. Eindhoven TMA oversteken: Eindhoven Arrival 132.530.
 - In een CTR is klaring nodig; uitluisteren is niet genoeg. VFR-transponder 7000 tenzij ATC anders zegt; NL kent geen aparte
-  uitluistersquawk. **Squawk 7000 alleen tonen bij een TMZ** (Christian: anders lijkt het alsof je erin mag).
+  uitluistersquawk (**nog te verifiëren**: KNVvL-syllabus noemt FMC-codes 7020/7010, zie BACKLOG). **Squawk 7000 alleen tonen bij een TMZ** (Christian: anders lijkt het alsof je erin mag).
 - Feestdagen: AIP GEN 2.1 §6 (11 dagen; Pasen en Pinksteren berekend). AIP SUP 03/2022 (Lelystad TMA 3–5, Nieuw Milligen TMA
   B/C2/E) inbouwen zodra de regio die TMA's bevat.
 - **Nog te verifiëren:** status/klasse van een CTR buiten de openingstijden (nu afgeleid: niet actief, RMZ wel); Niederrhein TMZ
