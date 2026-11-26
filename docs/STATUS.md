@@ -6,7 +6,7 @@
 - https://luchtruim3d.nl = `main` (25 nov). AIRAC 12-2026 (26 nov) gecontroleerd: **geen wijziging in de regio** (LOG). Terugdraaien: `release/2026-11-25-3`, `-25-2`, `-25`, `-22`, `-21`, `-15`.
 
 ## Klaar maar nog niet live (branches)
-- **`wip/sessie-26nov`** (gepusht): AIRAC-footer 12-2026 + 7 P1-bugs (Start = volgende missie, ballon/Maas, alles aanklikbaar, grondring, vario, labels over toestel, camera liggend), elk met test. Volledige suite liep 26 nov (zie LOG voor de uitslag). Groen → `release/<datum>` maken en naar `main`.
+- **`wip/sessie-26nov`** (gepusht): AIRAC-footer 12-2026 + 7 P1-bugs (Start = volgende missie, ballon/Maas, alles aanklikbaar, grondring, vario, labels over toestel, camera liggend), elk met test. Volledige suite 26 nov: **278/278 groen**. Gaat live via wip/tilt-26nov (bevat dit).
 - **`wip/tilt-26nov`** (gepusht; **Christian heeft getest en akkoord gegeven op 26 nov: live na de volledige suite**). Bevat ook wip/sessie-26nov. kantelen ijkt alleen bij start/nieuwe opdracht en na draaien. Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/tilt-26nov/index.html — test: in een bocht een melding laten komen, ▶, bocht moet doorgaan.
 - **`wip/spike-mil-26nov`** (gepusht): TRA/TSA-uitleg volgens ENR 5.2 + probe-Action. Meenemen bij de volgende live-gang.
 - **`wip/osm-nl-26nov`** (gepusht): Action `data-osm-nl` (17 tegels, compact → branch `data/osm-nl`). Liep 26 nov nog.
