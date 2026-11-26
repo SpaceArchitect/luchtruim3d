@@ -815,7 +815,7 @@ async def d_start_next(a):  # Christian 25 nov: ▶ Start na geslaagd/mislukt = 
         for i in range(5):  # alle keerpunten (+ de directe foutmelding bij 'mislukt', 26 nov)
             if not await a.v('v.GOAL'): break
             await a.ev(reach.replace('v.FAILS.clear();', 'v.FAILS.clear();v.FAILS.set("X","verboden gebied X");') if fail else reach); await a.frames(2)
-            if await a.v('v.GOAL') and ('Keerpunt' in await a.v('v.NOTICE') or 'Toch doorvliegen' in await a.v('v.NOTICE')): await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.PAUSED=false}')
+            if await a.v('v.GOAL') and ('Keerpunt' in await a.v('v.NOTICE') or '↻ Opnieuw' in await a.v('v.NOTICE')): await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.PAUSED=false}')
         n = await a.v('v.NOTICE'); ok(('mislukt' if fail else 'geslaagd') in n, f'geen einde-melding: {n[:80]}')
         ok('volgende opdracht' in n or '▶ = opnieuw' in n, f'einde-melding zegt niet wat ▶ doet: {n[:120]}')
         await a.ev('()=>localStorage.setItem("l3d_missies",JSON.stringify(window.__vfr.MISSIONS.filter(x=>x.ac==="glider"&&x.id!=="vught").map(x=>x.id)))')
@@ -945,17 +945,19 @@ async def d_fail_restart(a):  # Christian 26 nov: fout vóór keerpunt 1 (verbod
     m0 = (await a.v('v.MISSION||{}')).get('id'); st0 = await a.v('[v.PLANE.x,v.PLANE.n]')
     await a.ev(bad); await a.frames(3)
     n = await a.v('v.NOTICE'); ok(await a.v('v.PAUSED') and 'mislukt' in n and 'verboden' in n, f'geen directe melding met reden na verboden gebied: {n[:120]}')
-    ok('Opnieuw' in n and 'Toch doorvliegen' in n, f'melding mist ↻ Opnieuw / Toch doorvliegen: {n[:200]}')
+    ok('Opnieuw' in n, f'melding mist ↻ Opnieuw: {n[:200]}')
     await a.hit('#btnPause'); await a.frames(2)
     m1 = (await a.v('v.MISSION||{}')).get('id'); p1 = await a.v('[v.PLANE.x,v.PLANE.n]')
     ok(m1 == m0 and abs(p1[0] - st0[0]) < .5 and abs(p1[1] - st0[1]) < .5, f'▶ herstart de missie niet vanaf de start: {m0}→{m1}, {st0}→{p1}')
     ok(not await a.v('v.FAILS.size'), 'na opnieuw staan de fouten er nog')
-    # toch doorvliegen: fout blijft, geen tweede melding
+    # Christian 26 nov: geen 'Toch doorvliegen'; tik op de melding = ook opnieuw
     await a.ev(start); await a.frames(2); await a.ev(bad); await a.frames(3)
-    await a.hit('#banner .nt.cont'); await a.frames(3)
-    ok(not await a.v('v.PAUSED') and await a.v('v.FAILS.size'), 'toch doorvliegen: gepauzeerd of fout vergeten')
-    await a.frames(5); n = await a.v('v.NOTICE') or ''
-    ok('Missie mislukt' not in n, f'na toch doorvliegen opnieuw dezelfde melding: {n[:80]}')
+    n = await a.v('v.NOTICE'); ok('Toch doorvliegen' not in n, 'knop "Toch doorvliegen" staat er weer')
+    b = await a.pg.locator('#banner .notice').first.bounding_box()
+    if a.touch: await a.pg.touchscreen.tap(b['x'] + 12, b['y'] + 10)
+    else: await a.pg.mouse.click(b['x'] + 12, b['y'] + 10, delay=90)
+    await a.wait(300); await a.frames(2)
+    p2 = await a.v('[v.PLANE.x,v.PLANE.n]'); ok(abs(p2[0] - st0[0]) < .5 and abs(p2[1] - st0[1]) < .5 and not await a.v('v.FAILS.size'), f'tik op de foutmelding herstart niet: {p2}')
 
 async def d_tap_notice(a):  # Fleur 14 nov: tik op een melding = verder (nu "lege melding onderin")
     await a.hit('#modal [data-ac=glider]'); await a.frames(3)
