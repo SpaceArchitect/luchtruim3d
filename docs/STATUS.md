@@ -10,11 +10,12 @@
 - **`wip/tilt-26nov`** (gepusht, **sensor → Christian test eerst**): kantelen ijkt alleen bij start/nieuwe opdracht en na draaien. Preview: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/tilt-26nov/index.html — test: in een bocht een melding laten komen, ▶, bocht moet doorgaan.
 - **`wip/spike-mil-26nov`** (gepusht): TRA/TSA-uitleg volgens ENR 5.2 + probe-Action. Meenemen bij de volgende live-gang.
 - **`wip/osm-nl-26nov`** (gepusht): Action `data-osm-nl` (17 tegels, compact → branch `data/osm-nl`). Liep 26 nov nog.
-- **Alleen lokaal, NIET gepusht** (Christian 26 nov: vandaag geen commits): worktrees `/home/user/l3d-nl` (heel NL: 259 volumes, FIR-grens, 40 velden, 214 ENR 5.5-terreinen, AIPINFO 90 volumes uit eAIP, TMZ-tijden landelijk, klasse A lichter, labeldichtheid, verre volumes niet tekenen, CLAUDE.md-FMC-correctie) en `/home/user/l3d-day` (dagelijkse uitdaging + test d_daily, zweefkist-klimlimiet). Patches: scratchpad `l3d-nl.patch`, `l3d-day.patch`. **Gaan verloren als de container stopt** → eerst pushen (vraag aan Christian).
+- **`wip/heelnl`** (gepusht, nog niet getest): heel NL begin — 259 volumes, FIR-grens, 40 velden, 214 ENR 5.5-terreinen, AIPINFO 90 volumes uit eAIP (aip_check 0 afwijkingen), TMZ-tijden landelijk, klasse A lichter, labeldichtheid, verre volumes niet tekenen, CLAUDE.md-FMC-correctie. De push start ook data-eaip met de bredere paginaset (AD 2 alle velden).
+- **`wip/dagelijks`** (gepusht, nog niet getest): dagelijkse uitdaging + test d_daily, zweefkist-klimlimiet (+1000 ft).
 
 ## Eerstvolgende sessie (vr 27 nov 22:47) — AIRAC → bugs → rest
 1. Uitslag suite `wip/sessie-26nov` → live (release-branch eerst).
-2. Heel NL verder (als de lokale branches gepusht zijn): suite draaien op `wip/heelnl`; data/osm-nl samenvoegen (plaatsen, wegen, rivieren landelijk); eAIP-ophaal verbreden (AD 2 alle velden: torenfrequenties Schiphol/Rotterdam/Eelde/Beek/De Kooy ontbreken nog); `mission_report --fly` na de zweefkist-klimlimiet.
+2. Heel NL verder: suite draaien op `wip/heelnl`; data/osm-nl samenvoegen (plaatsen, wegen, rivieren landelijk); eAIP-ophaal verbreden (AD 2 alle velden: torenfrequenties Schiphol/Rotterdam/Eelde/Beek/De Kooy ontbreken nog); `mission_report --fly` na de zweefkist-klimlimiet.
 3. Militaire gebieden: beslissing Christian over NM B2B (P1-2).
 
 ## Reset-push (Christian 25 nov)
