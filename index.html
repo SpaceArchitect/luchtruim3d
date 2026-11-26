@@ -1409,6 +1409,10 @@ const tickLabels=TICKS.map(t=>{const L=addLabel(t[2]||t[0]+' ft','tick'+(t[1]?' 
 
 const HAZ=new Set(['CTR','TMA','CTA','ATZ','P','R','D','TRA','TSA','PJA','UAS','LFA']);
 const v=new THREE.Vector3();
+const _ab=new THREE.Box3(),_av=new THREE.Vector3();
+function acRect(){const o=models[ACTYPE];if(!o||!o.visible)return null;o.updateMatrixWorld(true);_ab.setFromObject(o);if(_ab.isEmpty())return null;let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+  for(let i=0;i<8;i++){_av.set(i&1?_ab.max.x:_ab.min.x,i&2?_ab.max.y:_ab.min.y,i&4?_ab.max.z:_ab.min.z).project(camera);if(_av.z>1)return null;const sx=(_av.x+1)/2*innerWidth,sy=(1-_av.y)/2*innerHeight;x0=Math.min(x0,sx);x1=Math.max(x1,sx);y0=Math.min(y0,sy);y1=Math.max(y1,sy);}
+  return [x0,y0,x1,y1];}
 function placeLabels(){lmMinSize();
   const W=innerWidth,H=innerHeight,placed=[];const cam=camera.position;
   for(const L of labels){L.prev=L.show;L.show=false;}// eerst: hysterese moet het vorige frame lezen, niet dat van twee frames terug (dat gaf knipperen 0101…, bug 24 nov Deelen)
@@ -1432,9 +1436,11 @@ function placeLabels(){lmMinSize();
     return true;});
   for(const L of list){const p=L.pos3();L.d=p.distanceTo(cam);v.copy(p).project(camera);L.sx=(v.x+1)/2*W;L.sy=(1-v.y)/2*H;L.ok=v.z<1&&L.sx>-50&&L.sx<W+50&&L.sy>-20&&L.sy<H+20;}
   list.sort((a,b)=>(a.prio-(a.prev?0.5:0))-(b.prio-(b.prev?0.5:0))||a.idx-b.idx);
+  const AR=typeof MODE!=='undefined'&&MODE==='fly'?acRect():null;// Christian 25 nov: labels bedekten het eigen toestel → vrije zone; hysterese (al getoond = kleinere marge) tegen knipperen
   for(const L of list){if(!L.ok)continue;if(!L.w){L.w=L.el.offsetWidth||80;L.h=L.el.offsetHeight||16;}
     const isTick=L.tickFt!==undefined;const x0=isTick?L.sx:L.sx-L.w/2,y0=L.sy-L.h/2;const r=[x0-2,y0-2,x0+L.w+2,y0+L.h+2];
     if(placed.some(q=>r[0]<q[2]&&r[2]>q[0]&&r[1]<q[3]&&r[3]>q[1]))continue;
+    if(AR){const m=L.prev?2:14;if(r[0]<AR[2]+m&&r[2]>AR[0]-m&&r[1]<AR[3]+m&&r[3]>AR[1]-m)continue;}
     if(L.prio>=9&&L.d>140)continue;
     placed.push(r);L.show=true;L.el.style.transform=`translate(${Math.round(x0)}px,${Math.round(y0)}px)`;}
   for(const L of labels){const disp=L.show?'block':'none';if(L.el.style.display!==disp)L.el.style.display=disp;}
@@ -2022,7 +2028,8 @@ let camTween=null;
 function tweenCam(p1,t1,ms=800){if(matchMedia('(prefers-reduced-motion: reduce)').matches)ms=1;camTween={p0:camera.position.clone(),t0:controls.target.clone(),p1,t1,st:performance.now(),ms};}
 let LASTAHEAD=null,CAMOFF_OK=false;const PLANEPOS=new THREE.Vector3(),CAMOFF=new THREE.Vector3(),CAMOFF_T=new THREE.Vector3();
 function chase(dt,instant){
-  const h=PLANE.hdg*Math.PI/180+camYaw,py=PLANE.alt*FT*EXAG,D0=(ACTYPE==='balloon'?7.5:6.5)*CAM.dist,H0=(ACTYPE==='balloon'?2.8:2.4)*CAM.dist;
+  /* Christian 25 nov: liggend op de telefoon was het toestel nauwelijks zichtbaar (vaste afstand, verticale FOV → half zo groot bij half zo hoog scherm); lage schermen: camera dichterbij */const CK=Math.min(1,Math.max(.5,innerHeight/700));
+  const h=PLANE.hdg*Math.PI/180+camYaw,py=PLANE.alt*FT*EXAG,D0=(ACTYPE==='balloon'?7.5:6.5)*CAM.dist*CK,H0=(ACTYPE==='balloon'?2.8:2.4)*CAM.dist*CK;
   // klimmen voelbaar (Boyd): camera zakt iets achter en onder het toestel als je stijgt, komt erboven als je daalt
   const vz=(LOOP||ACTYPE==="balloon")?0:PLANE.pitch/.32,// D2: beeld kantelt in hetzelfde tempo als het toestel (zelfde demping dt*4)
   // ballon: camera kantelt niet mee bij stijgen/dalen (Christian 14 nov)
@@ -2606,7 +2613,7 @@ let last=performance.now(),acc=0;
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   goalVizTick(now);renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={pickHits,ray,goalDist,decode,get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,MPT_EXTRA,genAsync,GEN_RUN,misVerify,MIS_OK,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+window.__vfr={acRect,chase,model:()=>models[ACTYPE],pickHits,ray,goalDist,decode,get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,MPT_EXTRA,genAsync,GEN_RUN,misVerify,MIS_OK,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 </script>
 </body>
