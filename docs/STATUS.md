@@ -11,12 +11,12 @@
 - **`wip/spike-mil-26nov`** (gepusht): TRA/TSA-uitleg volgens ENR 5.2 + probe-Action. Meenemen bij de volgende live-gang.
 - **`wip/osm-nl-26nov`** (gepusht): Action `data-osm-nl` (17 tegels, compact → branch `data/osm-nl`). Liep 26 nov nog.
 - **`wip/heelnl`** (gepusht, nog niet getest): heel NL begin — 259 volumes, FIR-grens, 40 velden, 214 ENR 5.5-terreinen, AIPINFO 90 volumes uit eAIP (aip_check 0 afwijkingen), TMZ-tijden landelijk, klasse A lichter, labeldichtheid, verre volumes niet tekenen, CLAUDE.md-FMC-correctie. De push start ook data-eaip met de bredere paginaset (AD 2 alle velden).
-- **`wip/opnieuw`** (gepusht, op basis van wip/tilt-26nov; akkoord Christian 26 nov): fout in missie → meteen stoppen met reden, ↻ Opnieuw of toch door. Mee live morgen na de volledige suite (dan deze branch i.p.v. wip/tilt-26nov).
+- **`wip/opnieuw`** (gepusht, op basis van wip/tilt-26nov; akkoord Christian 26 nov): fout in missie → meteen stoppen met reden, ↻ Opnieuw of toch door. Bevat ook (26 nov avond, na tests van Christian): bruggen/herkenningspunten niet te groot, spoor knippert niet (z-fighting), labelbudget + meetbug labels. Mee live morgen na de volledige suite (dan deze branch i.p.v. wip/tilt-26nov).
 - **`wip/dagelijks`** (gepusht, nog niet getest): dagelijkse uitdaging + test d_daily, zweefkist-klimlimiet (+1000 ft).
 
 ## Eerstvolgende sessie (vr 27 nov 22:47) — AIRAC → bugs → rest
 1. **Live:** volledige suite op `wip/opnieuw` (bevat wip/tilt-26nov) (bevat de 7 bugfixes + kantelfix, akkoord Christian 26 nov) + `wip/spike-mil-26nov` erbij mergen → groen → `release/<datum>` → `main`.
-2. Heel NL verder: suite draaien op `wip/heelnl`; data/osm-nl samenvoegen (plaatsen, wegen, rivieren landelijk); eAIP-ophaal verbreden (AD 2 alle velden: torenfrequenties Schiphol/Rotterdam/Eelde/Beek/De Kooy ontbreken nog); `mission_report --fly` na de zweefkist-klimlimiet.
+2. Heel NL verder: 5 regio-gebonden tests op `wip/heelnl` (LOG 26 nov) eerst; dan wip/opnieuw erin mergen; data/osm-nl samenvoegen (plaatsen, wegen, rivieren landelijk); eAIP-ophaal verbreden (AD 2 alle velden: torenfrequenties Schiphol/Rotterdam/Eelde/Beek/De Kooy ontbreken nog); `mission_report --fly` na de zweefkist-klimlimiet.
 3. NOTAM/AUP: **weekend 28–29 nov samen met Christian** uitwerken (spike in LOG 26 nov; opties NM B2B, EAD, FAA alleen ter vergelijking).
 
 ## Reset-push (Christian 25 nov)
