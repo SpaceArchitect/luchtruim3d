@@ -17,7 +17,8 @@
 ## Eerstvolgende sessie (vr 27 nov 22:47) — AIRAC → bugs → rest
 1. **Live:** volledige suite op `wip/opnieuw` (bevat wip/tilt-26nov) (bevat de 7 bugfixes + kantelfix, akkoord Christian 26 nov) + `wip/spike-mil-26nov` erbij mergen → groen → `release/<datum>` → `main`.
 2. Heel NL verder: 5 regio-gebonden tests op `wip/heelnl` (LOG 26 nov) eerst; dan wip/opnieuw erin mergen; data/osm-nl samenvoegen (plaatsen, wegen, rivieren landelijk); eAIP-ophaal verbreden (AD 2 alle velden: torenfrequenties Schiphol/Rotterdam/Eelde/Beek/De Kooy ontbreken nog); `mission_report --fly` na de zweefkist-klimlimiet.
-3. NOTAM/AUP: **weekend 28–29 nov samen met Christian** uitwerken (spike in LOG 26 nov; opties NM B2B, EAD, FAA alleen ter vergelijking).
+3. Stotter ½ s na missiestart (A55, Christian 26 nov): Christian meet met `?fps=1` (wip/opnieuw); daarna oorzaak gericht fixen.
+4. NOTAM/AUP: **weekend 28–29 nov samen met Christian** uitwerken (spike in LOG 26 nov; opties NM B2B, EAD, FAA alleen ter vergelijking).
 
 ## Reset-push (Christian 25 nov)
 - Eén volledige reset van de weeklimiet, geldig t/m 10 dec. 27 nov–4 dec "heel NL" voorbereiden; vr 4–zo 6 dec sessies; ma 7 dec reset; 7–10 dec heel NL bouwen. Christian test 11–14 dec, vóór Mexico (15 dec).
