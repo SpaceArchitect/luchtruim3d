@@ -1582,7 +1582,7 @@ const pwGroup=new THREE.Group();pwGroup.visible=true;scene.add(pwGroup);const wi
    g.add(rot);g.userData.rot=rot;windGroup.add(g);}}}
 let LM_ON=true,RELAX=false,HC=false;const LM_NEAR=35;// km camera-afstand waarbinnen labels van herkenningspunten op de kaart verschijnen
 function lmMinSize(){const S=Math.max(1,EXAG/2);if(pwGroup.visible){pwGroup.scale.y=S;for(const g of windGroup.children){g.scale.set(S,1,S);g.userData.rot.children.forEach(p=>p.rotation.z+=.03);}}if(!LM_ON)return;const H=innerHeight,P=document.body.classList.contains('big')?22:14,base=Math.max(1,EXAG/2),t=2*Math.tan(camera.fov*Math.PI/360);
-  for(const g of lmGroup.children){if(g.userData.flat)continue;const d=camera.position.distanceTo(g.position);g.scale.setScalar(Math.max(base,P*t*d/(0.1*H)));}}
+  for(const g of lmGroup.children){if(g.userData.flat)continue;const d=camera.position.distanceTo(g.position);g.scale.setScalar(Math.min(g.userData.bridge?base:base*3,Math.max(base,P*t*d/(0.1*H))));}}/* Christian 26 nov: bruggen werden op 80 km ×30 (een plaat van 21 km over het scherm). Plafond: brug nooit groter dan schaal 'base' (±2 km), andere punten ×3; ver weg vertelt het label het */
 function ribbon(pts,w,y,color,order){
   const P=pts,pos=[],idx=[];
   for(let i=0;i<P.length;i++){const a=P[Math.max(0,i-1)],b=P[Math.min(P.length-1,i+1)];let dx=b[0]-a[0],dy=b[1]-a[1];const L=Math.hypot(dx,dy)||1;dx/=L;dy/=L;
