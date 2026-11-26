@@ -1801,7 +1801,7 @@ function setRelax(on){RELAX=on;airGroup.visible=!on;vrpGroup.visible=!on;sliceGr
 let BANNER_OPEN=false,TASK='';$('banner').addEventListener('click',e=>{if(e.target.closest('a'))return;const rb=e.target.closest('[data-rt]');if(rb){e.stopPropagation();rtClick(rb.dataset.rt);return;}if(e.target.closest('.nt')){e.stopPropagation();newTask();return;}
   // Fleur 14 nov: tik op een melding = ▶ verder (niet bij radiokeuzes: die moeten bewust)
   if(e.target.closest('.notice')&&PAUSED&&MODE==='fly'&&!$('banner').querySelector('[data-rt]')&&!e.target.closest('button,input,select')){e.stopPropagation();playNext();hudTick();}});
-let VZ=0,VZ_S=0,LOOP=null,DRIFT_HIT=false,WAS_AIR=true,ACTYPE='glider',CHOSEN=false,MODE='map',TI=2,PAUSED=true,AT_EDGE=false,camYaw=0,dragging=false,lastPX=0,FIRST_WARN_DONE=false,NOTICE='';
+let VZ=0,VFPM=0,VZ_S=0,LOOP=null,DRIFT_HIT=false,WAS_AIR=true,ACTYPE='glider',CHOSEN=false,MODE='map',TI=2,PAUSED=true,AT_EDGE=false,camYaw=0,dragging=false,lastPX=0,FIRST_WARN_DONE=false,NOTICE='';
 const TEMPO=()=>TEMPOS[TI];
 const PROBE=(()=>{const [x,n]=proj(5.4697,51.4416);return {x,n,name:'Eindhoven'};})();
 let WIND=null;// missie kan de wind zetten: {f0,f1,k0,k1} (grond → 6000 ft)
@@ -1967,7 +1967,7 @@ function landText(){const x=PLANE.x,n=PLANE.n,f=nearField(x,n),r=nearRoad(x,n),g
   return `${SVG[ACTYPE]} ${t}`+(r&&!f?`<br>⚠ Snelweg ${r} dichtbij.`:'')+(needsClr(g)?`<br>⚠ Je staat in ${g.name}.`:'')+`<br>${UPK()} = ${ACTYPE==='glider'?'lierstart':'opstijgen'}.`;}
 // ---------- looping (Boyd): 3 s schermtijd, straal 300 ft, eindigt op dezelfde hoogte ----------
 function startLoop(){if(MODE!=='fly'||ACTYPE==='balloon'||LOOP)return;if(PAUSED&&NOTICE&&!/Te laag voor een looping/.test(NOTICE))return;/* S1b Daan: een open melding niet wegklikken met looping */if(PAUSED){PAUSED=false;NOTICE='';}/* looping-knop start ook vanuit pauze (eindtest 13 nov) */if(PLANE.alt<700){NOTICE='🔄 Te laag voor een looping: eerst boven 700 ft.<br><small>▶ = verder</small>';PAUSED=true;return;}
-  LOOP={t:0,alt0:PLANE.alt,x0:PLANE.x,n0:PLANE.n};VZ=0;}
+  LOOP={t:0,alt0:PLANE.alt,x0:PLANE.x,n0:PLANE.n};VZ=0;VFPM=0;}
 function loopStep(dt){const k=Math.min(1,(LOOP.t+=dt)/3),th=k*2*Math.PI,R=300,h=PLANE.hdg*Math.PI/180,fwd=R*Math.sin(th)*.0003048*EXAG/1;
   PLANE.pitch=th;PLANE.bank=0;PLANE.alt=LOOP.alt0+R*(1-Math.cos(th));PLANE.x=LOOP.x0+Math.sin(h)*fwd;PLANE.n=LOOP.n0+Math.cos(h)*fwd;
   if(k>=1){PLANE.pitch=0;PLANE.alt=LOOP.alt0;LOOP=null;LOOPS++;
@@ -1988,7 +1988,7 @@ function sim(dt){
     if(needsClr(g)||p){const i=needsClr(g)?AIPINFO[g.ident]:null;PAUSED=true;keys['arrowup']=keys['w']=false;TO_WAIT=true;
       NOTICE=needsClr(g)?`🔶 Opstijgen in <b>${short(g)}</b> · klaring nodig${rtLine(i)}<br><small>${UPK()} = toch opstijgen</small>`:`⛔ Opstijgen in <b>${short(p)}</b><br><small>${UPK()} = toch opstijgen</small>`;return;}}
   if(PLANE.alt>0)TAKEOFF_ASKED=false;
-  PLANE.alt=Math.max(0,Math.min(CAP-100,PLANE.alt+climb*ac.fpm/60*T*dt));
+  {const a0=PLANE.alt;PLANE.alt=Math.max(0,Math.min(CAP-100,PLANE.alt+climb*ac.fpm/60*T*dt));/* Christian 25 nov: vario = werkelijke stijgsnelheid (ft/min in vliegtijd), niet de vaste maximumwaarde */const vr=dt>0?(PLANE.alt-a0)/(T*dt)*60:0;VFPM+=(vr-VFPM)*Math.min(1,dt*6);}
   if(PLANE.alt<=0){kt=0;if(WAS_AIR){WAS_AIR=false;NOTICE=landText();}}else if(!WAS_AIR){WAS_AIR=true;NOTICE='';}
   const sp=kt*1.852/3600*T,h=PLANE.hdg*Math.PI/180;
   const x=PLANE.x+Math.sin(h)*sp*dt,n=PLANE.n+Math.cos(h)*sp*dt;
@@ -2052,7 +2052,7 @@ addEventListener('pointerup',e=>{PTR.delete(e.pointerId);if(PTR.size<2)pinch0=nu
 
 // ---------- willekeurige start + passende opdracht ----------
 const TASKF=(()=>{const out=[];for(const [t,name,a,b] of OSM){if(t==='L'){if(name==='Zweefveld Malden')continue;const [x,n]=proj(+a,+b);out.push({t,name,pts:[[x,n]]});}
-  else if(t==='R'||t==='W'){const pts=decode(a).map(([lo,la])=>proj(lo,la));out.push({t,name:name.replace('A ','A'),pts});}}return out;})();
+  else if(t==='R'||t==='W'){const pts=decode(a).map(([lo,la])=>proj(lo,la)),nm=name.replace('A ','A'),o=out.find(f=>f.t===t&&f.name===nm);/* Christian 25 nov (ballon aan de Maas): OSM knipt rivieren en wegen in stukken; doel = alle stukken met die naam */if(o){o.pts=o.pts.concat(pts);o.lines.push(pts);}else out.push({t,name:nm,pts,lines:[pts]});}}return out;})();
 let LASTGOAL=null,GOAL=null;const FAILS=new Map(),CLR=new Set();let RT=null;
 function balloonReach(brg){const off=[];for(let al=300;al<=3000;al+=100){const d=(windAt(al).from+180)%360;off.push((((brg-d)+540)%360)-180);}return Math.min(...off)<=6&&Math.max(...off)>=-6;}// bereikbaar = koers ligt tussen de driftrichtingen van 300–3000 ft (±6°)
 function pickTask(x,n,hdg,ac){let best=null;
@@ -2060,10 +2060,12 @@ function pickTask(x,n,hdg,ac){let best=null;
     const brg=(Math.atan2(px-x,pn-n)*180/Math.PI+360)%360,diff=Math.abs(((brg-hdg+540)%360)-180);if(diff>30)continue;if(ac==='balloon'&&!balloonReach(brg))continue;// S1 (Christian): ballondoel moet met de wind bereikbaar zijn
     const score=d+(f.t==='L'?-4:f.t==='R'?0:2)+diff/10;if(!best||score<best.score)best={f,d,score,px,pn};}}
   if(!best)return null;const f=best.f,km=Math.round(best.d);LASTGOAL={x:best.px,n:best.pn,name:f.name};
-  const Q='<br><small>Luchtruim vrij?</small>';if(f.t!=='L')LASTGOAL.pts=f.pts;// doel = de hele weg/rivier (D2: 'A2' telt als lijn)
+  const Q='<br><small>Luchtruim vrij?</small>';if(f.t!=='L'){LASTGOAL.pts=f.pts;LASTGOAL.lines=f.lines;}// doel = de hele weg/rivier (D2: 'A2' telt als lijn)
   if(f.t!=='L')LASTGOAL.name=`de ${f.name}`;
   if(ac==='balloon')return `Drijf naar <b>${f.name}</b> (${km} km)`+Q;
   return f.t==='L'?`Vlieg naar <b>${f.name}</b> (${km} km)`+Q:`Vlieg naar de <b>${f.name}</b> (${km} km)`+Q;}// D2: 'vlieg naar', geen 'volg'; richting staat al in de pijl
+const GLINES=g=>g.lines||[g.pts];function goalDist(g,x,n){return g.pts?Math.min(...GLINES(g).map(p=>distPoly(x,n,p))):Math.hypot(g.x-x,g.n-n);}
+function goalNear(g,x,n){return g.pts?GLINES(g).map(p=>nearestOn(p,x,n)).reduce((b,q)=>Math.hypot(q[0]-x,q[1]-n)<Math.hypot(b[0]-x,b[1]-n)?q:b):[g.x,g.n];}
 function distPoly(x,n,pts){let m=1e9;for(let i=0;i<pts.length;i++){const [ax,an]=pts[i];if(pts.length===1||i===pts.length-1){m=Math.min(m,Math.hypot(ax-x,an-n));continue;}const [bx,bn]=pts[i+1],dx=bx-ax,dn=bn-an,L=dx*dx+dn*dn||1e-9,t=Math.max(0,Math.min(1,((x-ax)*dx+(n-an)*dn)/L));m=Math.min(m,Math.hypot(ax+t*dx-x,an+t*dn-n));}return m;}
 function towardTown(x0,n0,x,n){const br=(a,b)=>Math.atan2(a,b)*180/Math.PI,b0=br(x-x0,n-n0);let b=null,bd=1e9;for(const c of [...CITYXY,...TOWNXY]){if(c.nm==='Lommel')continue;const df=Math.abs(((br(c.x-x0,c.n-n0)-b0)+540)%360-180),dd=Math.hypot(c.x-x0,c.n-n0);if(df>35||dd<3)continue;const d=Math.hypot(c.x-x,c.n-n);if(d<bd){bd=d;b=c;}}return b?b.nm:'het doel';}
 // ---------- MISSIES (Christian 21 nov: 'interessantere missies dan 5 km rechtuit') ----------
@@ -2400,8 +2402,8 @@ function hudTick(){if(MISSION&&MODE==='fly'){const p=[PLANE.x,PLANE.n];if(MLAST&
     // opdracht: geslaagd of gefaald (Christian 11 nov): fout = verboden gebied, gecontroleerd luchtruim zonder klaring, para- of dronegebied
     if(GOAL&&!RELAX&&PLANE.alt>0){const gg=governing(INSIDE);for(const f of INSIDE){if(rmzLive(f)&&!rmzOk(f,INSIDE))FAILS.set(f.ident,short(f)+' zonder oproep');if(f.layer==='P'||f.layer==='PJA'||f.layer==='UAS')FAILS.set(f.ident,{P:'verboden gebied ',PJA:'paradropzone ',UAS:'dronegebied '}[f.layer]+nm(f).replace(/^(verboden|para|drones?)\s+/i,''));/* niet 'verboden gebied Verboden Vught' (Christian) */}
       if(needsClr(gg)&&!cleared(gg))FAILS.set(gg.ident,short(gg)+' zonder klaring');
-      const dg=GOAL.pts?distPoly(PLANE.x,PLANE.n,GOAL.pts):Math.hypot(GOAL.x-PLANE.x,GOAL.n-PLANE.n),REACH=GOAL.pts?0.5:1.5;GOAL.min=Math.min(GOAL.min??dg,dg);GOAL.d=dg;
-      {const rel=(((Math.atan2(GOAL.x-PLANE.x,GOAL.n-PLANE.n)*180/Math.PI-PLANE.hdg)%360)+540)%360-180;GOAL.arrow=['⬇','↙','⬅','↖','⬆','↗','➡','↘','⬇'][Math.round((rel+180)/45)];
+      const dg=goalDist(GOAL,PLANE.x,PLANE.n),REACH=GOAL.pts?(ACTYPE==='balloon'?0.8:0.5):1.5;/* ballon stuurt niet: iets ruimer bij een lijn */GOAL.min=Math.min(GOAL.min??dg,dg);GOAL.d=dg;
+      {const [gnx,gnn]=goalNear(GOAL,PLANE.x,PLANE.n),rel=(((Math.atan2(gnx-PLANE.x,gnn-PLANE.n)*180/Math.PI-PLANE.hdg)%360)+540)%360-180;GOAL.arrow=['⬇','↙','⬅','↖','⬆','↗','➡','↘','⬇'][Math.round((rel+180)/45)];
        if(dg>GOAL.min+2&&!GOAL.missed&&!PAUSED&&ACTYPE==='balloon'){PAUSED=true;NOTICE=`❌ <b>Missie mislukt</b>: je bent ${GOAL.name} voorbij gedreven. Een ballon kan niet omdraaien.<br><small>Tip: kies eerder een andere hoogte (andere wind) · ▶ = volgende opdracht</small> <button class="nt">🎯 Nieuwe opdracht</button>`;GOAL=null;TASK='';}
        else if(dg>GOAL.min+(GOAL.mis?7:2)&&!GOAL.missed&&!PAUSED){GOAL.missed=true;PAUSED=true;NOTICE=`↩ <b>Doel gemist</b>: draai om (pijl ${GOAL.arrow} in de opdrachtregel)<br><small>▶ = verder</small>`;}if(GOAL&&dg<GOAL.min+0.5)GOAL.missed=false;}
       if(GOAL&&GOAL.mis&&MISSION&&dg<REACH&&!PAUSED&&GOAL.li<MISSION.legs.length-1){const li=GOAL.li+1;GOAL={...misLegGoal(MISSION,li),mis:MISSION.id,li};TASK=misTask(MISSION,li);PAUSED=true;NOTICE=`✓ Keerpunt ${li}/${MISSION.legs.length} gehaald. Nu: ${misTask(MISSION,li)}<br><small>▶ = verder</small>`;}
@@ -2428,7 +2430,7 @@ function hudTick(){if(MISSION&&MODE==='fly'){const p=[PLANE.x,PLANE.n];if(MLAST&
      
      (AT_EDGE?'<div class="ahead">Rand van het kaartgebied: draai om.</div>':'');
     if(b.__html!==b.__last){b.__last=b.__html;b.innerHTML=b.__html;}// alleen herbouwen bij wijziging: anders vallen klikken op knoppen weg (bug 13 nov)
-    setHTML($('loc'),`<button class="acsw" aria-label="Ander toestel kiezen" title="Ander toestel">${SVG[ACTYPE]}</button> <b>${fmtAlt(PLANE.alt)}</b>${VZ&&!PAUSED?` <b class="vario ${VZ>0?'up':'dn'}">${VZ>0?'↑':'↓'} ${AC[ACTYPE].fpm} ft/min</b>`:''}${ACTYPE==='balloon'?(()=>{const w=windAt(PLANE.alt);return ` · wind <span style="display:inline-block;transform:rotate(${Math.round(w.from+180)}deg)">⬆</span> ${Math.round(w.kt)} kt`;})():''}<span class="mh"> · ${ACTYPE==='balloon'&&PLANE.alt<1?'<b>geland</b>':(ACTYPE==='balloon'?'drift':'koers')+' '+String(Math.round(PLANE.hdg)%360).padStart(3,'0')+'°'} · tempo ×${TEMPO()}</span> · ${whereText(PLANE.x,PLANE.n)}<span class="mh">${extraWhere(PLANE.x,PLANE.n)}</span>${PAUSED?'<span class="pz"> · <b>PAUZE</b></span>':''}<span class="mh"> · ${TIMELABEL}</span>`);
+    setHTML($('loc'),`<button class="acsw" aria-label="Ander toestel kiezen" title="Ander toestel">${SVG[ACTYPE]}</button> <b>${fmtAlt(PLANE.alt)}</b>${Math.abs(VFPM)>=20&&!PAUSED&&!LOOP?` <b class="vario ${VFPM>0?'up':'dn'}">${VFPM>0?'↑':'↓'} ${Math.round(Math.abs(VFPM)/10)*10} ft/min</b>`:''}${ACTYPE==='balloon'?(()=>{const w=windAt(PLANE.alt);return ` · wind <span style="display:inline-block;transform:rotate(${Math.round(w.from+180)}deg)">⬆</span> ${Math.round(w.kt)} kt`;})():''}<span class="mh"> · ${ACTYPE==='balloon'&&PLANE.alt<1?'<b>geland</b>':(ACTYPE==='balloon'?'drift':'koers')+' '+String(Math.round(PLANE.hdg)%360).padStart(3,'0')+'°'} · tempo ×${TEMPO()}</span> · ${whereText(PLANE.x,PLANE.n)}<span class="mh">${extraWhere(PLANE.x,PLANE.n)}</span>${PAUSED?'<span class="pz"> · <b>PAUZE</b></span>':''}<span class="mh"> · ${TIMELABEL}</span>`);
     $('btnPause').innerHTML=PAUSED?'▶<small>Start</small>':'❚❚<small>Pauze</small>';
     SLICE=Math.floor(PLANE.alt/50)*50;
     {const up=document.querySelector('#ctrl [data-k="arrowup"]');if(up){const lab=PLANE.alt<=0?(ACTYPE==='glider'?'▲<small>lierstart</small>':'▲<small>opstijgen</small>'):'▲';if(up.innerHTML!==lab)up.innerHTML=lab;}}
@@ -2584,11 +2586,11 @@ function nearestOn(pts,x,n){let b=null,bd=1e9;for(let i=0;i+1<pts.length;i++){co
 function goalVizTick(t){const g=MODE==='fly'&&GOAL&&!RELAX?GOAL:null;
   if(g!==GVK){GVK=g;for(const c of [...goalViz.children]){goalViz.remove(c);if(c.userData.own){c.geometry.dispose();c.material.dispose();}}
     if(g){goalViz.add(beacon,ring,cap,ripple);
-      if(g.pts){const pos=[],W=.22;for(let i=0;i+1<g.pts.length;i++){const [ax,an]=g.pts[i],[bx,bn]=g.pts[i+1],L=Math.hypot(bx-ax,bn-an)||1,ox=-(bn-an)/L*W,on=(bx-ax)/L*W,y=.06;
+      if(g.pts){const pos=[],W=.22;for(const gp of GLINES(g))for(let i=0;i+1<gp.length;i++){const [ax,an]=gp[i],[bx,bn]=gp[i+1],L=Math.hypot(bx-ax,bn-an)||1,ox=-(bn-an)/L*W,on=(bx-ax)/L*W,y=.06;
           pos.push(ax+ox,y,-(an+on),bx+ox,y,-(bn+on),bx-ox,y,-(bn-on), ax+ox,y,-(an+on),bx-ox,y,-(bn-on),ax-ox,y,-(an-on));}
         const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));const rib=new THREE.Mesh(geo,gMat(.85));rib.userData.own=true;rib.renderOrder=2;goalViz.add(rib);}}}
   goalViz.visible=!!g;if(!g)return;
-  const [gx,gn]=g.pts?nearestOn(g.pts,PLANE.x,PLANE.n):[g.x,g.n],H=Math.max(1.2,(Math.max(PLANE.alt,0)+800)*FT*EXAG);// top net boven je eigen hoogte: op de horizon zichtbaar
+  const [gx,gn]=goalNear(g,PLANE.x,PLANE.n),H=Math.max(1.2,(Math.max(PLANE.alt,0)+800)*FT*EXAG);// top net boven je eigen hoogte: op de horizon zichtbaar
   beacon.position.set(gx,0,-gn);beacon.scale.y=H;ring.position.x=gx;ring.position.z=-gn;cap.position.set(gx,H,-gn);
   {const d=Math.hypot(gx-PLANE.x,gn-PLANE.n).toFixed(1).replace('.',',');const h=`🎯 ${g.name.replace(/^de /,'')} · ${d} km`;if(goalLbl.el.textContent!==h){goalLbl.el.textContent=h;goalLbl.w=0;}}
   const k=.5+.5*Math.sin(t/350);beacon.material.opacity=.75+.25*k;ring.scale.setScalar(1);const ph=(t/1600)%1;ripple.position.x=gx;ripple.position.z=-gn;ripple.scale.setScalar(1+ph*2.2);ripple.material.opacity=.7*(1-ph);cap.rotation.y=t/700;
@@ -2599,7 +2601,7 @@ let last=performance.now(),acc=0;
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   goalVizTick(now);renderer.render(scene,camera);placeLabels();drawCompass();drawTape();drawMini();})();
-window.__vfr={get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,MPT_EXTRA,genAsync,GEN_RUN,misVerify,MIS_OK,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
+window.__vfr={goalDist,decode,get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,MPT_EXTRA,genAsync,GEN_RUN,misVerify,MIS_OK,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine};
 
 </script>
 </body>

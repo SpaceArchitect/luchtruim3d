@@ -837,6 +837,56 @@ async def d_hg_ring_ground(a):  # Christian 25 nov: grondring van lier-/zweef-/m
     ok(r['n'] > 10, f'te weinig grondringen: {r["n"]}')
     ok(not r['bad'], f'ring niet op de cilindervoet/grond (naam, ring-y, voet-y in km): {r["bad"]}')
 
+async def d_vario_real(a):  # Christian 25 nov: vario toonde altijd de vaste stijgsnelheid (400 ft/min), niet hoe hard je echt stijgt
+    await a.hit('#modal [data-ac=glider]'); await a.frames(2)
+    st = await a.v('v.PLANE')
+    async def vario(p, n=40):
+        await a.place(st['x'], st['n'], 3000, st['hdg'])
+        await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS){v.WARNED.add(f.ident);v.CLR.add(f.ident)}for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.resetTilt()}')
+        for _ in range(n):
+            await a.ev('(p)=>{const v=window.__vfr;v.keys.tu=p>0;v.keys.td=p<0;v.TAX.p=p;v.NOTICE="";v.PAUSED=false}', p); await a.frames(1)
+        await a.ev('()=>window.__vfr.hudTick()')
+        t = await a.ev('()=>document.querySelector("#loc .vario")?.innerText||""')
+        await a.ev('()=>{const v=window.__vfr;v.keys.tu=v.keys.td=false;v.TAX.p=0}')
+        return t
+    full, half, down = await vario(1), await vario(.5), await vario(-.4)
+    num = lambda t: int(''.join(c for c in t if c.isdigit()) or 0)
+    ok('↑' in full and 370 <= num(full) <= 430, f'vol stijgen: verwacht ±400 ft/min, kreeg "{full}"')
+    ok('↑' in half and 170 <= num(half) <= 230, f'half stijgen (kantelen): verwacht ±200 ft/min, kreeg "{half}"')
+    ok('↓' in down and 130 <= num(down) <= 190, f'licht dalen: verwacht ±160 ft/min, kreeg "{down}"')
+    await a.place(st['x'], st['n'], 0, st['hdg'])
+    for _ in range(30):
+        await a.ev('()=>{const v=window.__vfr;v.keys.td=true;v.TAX.p=-1;v.NOTICE="";v.PAUSED=false}'); await a.frames(1)
+    await a.ev('()=>{const v=window.__vfr;v.keys.td=false;v.TAX.p=0;v.hudTick()}')
+    t = await a.ev('()=>document.querySelector("#loc .vario")?.innerText||""')
+    ok(not t, f'op de grond met "dalen" toont de vario nog "{t}"')
+
+async def d_line_goal_whole(a):  # Christian 25 nov: ballon geland aan de Maas, opdracht 'Drijf naar de Maas' niet geslaagd (doel = één OSM-stuk)
+    # klasse: elke rivier-/wegopdracht moet op élk OSM-stuk met die naam te halen zijn (grondwaarheid = de ruwe OSM-regels)
+    await a.hit('#modal [data-ac=balloon]'); await a.frames(2)
+    r = await a.ev('''()=>{const v=window.__vfr,raw={};
+      for(const l of document.getElementById('osm').textContent.trim().split('\\n').map(l=>l.split('|')))if(l[0]==='R'||l[0]==='W'){const k=l[0]+l[1].replace('A ','A');(raw[k]=raw[k]||[]).push(v.decode(l[2]).map(([lo,la])=>v.proj(lo,la)));}
+      const bad=[],seen=new Set();let rnd=1;const R=()=>(rnd=(rnd*16807)%2147483647)/2147483647;
+      for(let k=0;k<6000;k++){const [x0,n0,x1,n1]=v.BOUNDS,x=x0+R()*(x1-x0),n=n0+R()*(n1-n0),h=R()*360;
+        if(!v.pickTask(x,n,h,'motor'))continue;const g={...v.LASTGOAL};if(!g.pts)continue;const key=g.name.replace(/^de /,'');
+        const t=(raw['W'+key]?'W':'R')+key;if(seen.has(t)||!raw[t])continue;seen.add(t);
+        for(const pc of raw[t]){const m=pc[Math.floor(pc.length/2)],d=v.goalDist(g,m[0],m[1]);if(d>.3)bad.push(key+' '+d.toFixed(1)+' km');}}
+      return {seen:[...seen],multi:[...seen].filter(t=>raw[t].length>1).length,bad:bad.slice(0,6)};}''')
+    ok(r['multi'] >= 5, f'te weinig lijndoelen met meerdere OSM-stukken getest: {r["seen"]}')
+    ok(not r['bad'], f'lijndoel mist OSM-stukken met dezelfde naam (afstand tot het doel op dat stuk): {r["bad"]}')
+    # echt: ballon boven een ánder stuk van de Maas dan het gekozen doelpunt → geslaagd
+    g = await a.ev('''()=>{const v=window.__vfr,[x0,n0,x1,n1]=v.BOUNDS;let rnd=7;const R=()=>(rnd=(rnd*16807)%2147483647)/2147483647;
+      for(let k=0;k<20000;k++){const x=x0+R()*(x1-x0),n=n0+R()*(n1-n0),h=R()*360;if(v.pickTask(x,n,h,'balloon')&&v.LASTGOAL.name==='de Maas')break;}
+      if(v.LASTGOAL.name!=='de Maas')return null;const g={...v.LASTGOAL};let far=null;
+      for(const pc of document.getElementById('osm').textContent.trim().split('\\n').map(l=>l.split('|')).filter(l=>l[0]==='W'&&l[1]==='Maas').map(l=>v.decode(l[2]).map(([lo,la])=>v.proj(lo,la))))
+        for(const p of pc)if(Math.hypot(p[0]-g.x,p[1]-g.n)>6&&v.inNL(p[0],p[1])){far=p;break;}
+      return far&&{g,far};}''')
+    ok(g, 'geen ballonopdracht naar de Maas te maken')
+    await a.place(g['far'][0] + .3, g['far'][1], 300, 0)
+    await a.ev('''(g)=>{const v=window.__vfr;v.GOAL=g;v.TASK="Drijf naar de Maas";for(const f of v.LAYERS){v.WARNED.add(f.ident);v.CLR.add(f.ident)}for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.PAUSED=false;v.hudTick()}''', g['g'])
+    await a.frames(3)
+    n = await a.v('v.NOTICE'); ok('geslaagd' in n, f'ballon 300 m naast een ander stuk van de Maas: niet geslaagd: {n[:100]}')
+
 async def d_tap_notice(a):  # Fleur 14 nov: tik op een melding = verder (nu "lege melding onderin")
     await a.hit('#modal [data-ac=glider]'); await a.frames(3)
     st = await a.v('v.PLANE')
@@ -1423,7 +1473,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('toetsen zoals MSFS', d_msfs_keys), ('sneltoetskaart', d_keycard), ('spatie bij keerpunten', d_space_waypoints), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('Start na missie = volgende', d_start_next), ('grondring op de grond', d_hg_ring_ground), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('open menu ligt bovenop', d_menu_on_top), ('niet haperen bij missies', d_no_freeze), ('missiegenerator', d_generator), ('gedeelde ENR 5.5-terreinen (Malden)', d_shared_sites), ('geen voorbeeldcircuit', d_no_circuit), ('P-gebieden H24 zichtbaar', d_h24_always), ('labels knipperen niet', d_labels_steady), ('missies echt uitvliegen', d_missions_flown), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('bruggen Maas/Waal', d_bridges), ('doorsnede', d_cross_section), ('rondleiding', d_tour), ('herkenningspunten', d_landmarks)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('toetsen zoals MSFS', d_msfs_keys), ('sneltoetskaart', d_keycard), ('spatie bij keerpunten', d_space_waypoints), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('Start na missie = volgende', d_start_next), ('grondring op de grond', d_hg_ring_ground), ('vario = echte stijgsnelheid', d_vario_real), ('rivier-/wegdoel = hele rivier', d_line_goal_whole), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('open menu ligt bovenop', d_menu_on_top), ('niet haperen bij missies', d_no_freeze), ('missiegenerator', d_generator), ('gedeelde ENR 5.5-terreinen (Malden)', d_shared_sites), ('geen voorbeeldcircuit', d_no_circuit), ('P-gebieden H24 zichtbaar', d_h24_always), ('labels knipperen niet', d_labels_steady), ('missies echt uitvliegen', d_missions_flown), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('bruggen Maas/Waal', d_bridges), ('doorsnede', d_cross_section), ('rondleiding', d_tour), ('herkenningspunten', d_landmarks)]
     async with async_playwright() as p:
         try:
             b = await p.chromium.launch(args=ARGS)
