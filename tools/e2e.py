@@ -1306,6 +1306,16 @@ async def d_tilt_notice_bend(a):  # Christian 25 nov: melding midden in een boch
         dh = (((await a.v('v.PLANE.hdg')) - h0 + 540) % 360 - 180)
         ok(dh > 8 and await a.v('v.TAX.r') > .2, f'{cause}: na ▶ midden in de bocht gaat de bocht niet verder (Δkoers {dh:.0f}°, TAX.r {await a.v("v.TAX.r")})')
         await hold(0, 0, 900); ok(abs(await a.v('v.TAX.r')) < .01, f'{cause}: rechtop houden = niet meer rechtuit (nulstand verschoven)')
+    # Christian 26 nov: hetzelfde voor stijgen en dalen (telefoon naar je toe/van je af) midden in een klim of daling
+    for back, what in ((22, 'klim'), (-22, 'daling')):
+        for cause in ('melding', 'pauze'):
+            await hold(0, back, 900); p0 = await a.v('v.TAX.p'); ok(abs(p0) > .2, f'{what}/{cause}: {what} komt niet op gang (TAX.p {p0})')
+            if cause == 'melding':
+                await a.ev('()=>{const v=window.__vfr;v.NOTICE="🔶 Over 1,0 km: <b>CTR X</b> · klaring nodig<br><small>▶ = verder</small>";v.PAUSED=true;v.hudTick()}')
+            else: await a.hit('#btnPause')
+            await hold(0, back, 500); await a.hit('#btnPause'); await hold(0, back, 1200)
+            p1 = await a.v('v.TAX.p'); ok(abs(p1) > .2 and (p1 > 0) == (p0 > 0), f'{what}/{cause}: na ▶ midden in de {what} gaat die niet door (TAX.p {p0} → {p1})')
+            await hold(0, 0, 900); ok(abs(await a.v('v.TAX.p')) < .01, f'{what}/{cause}: telefoon terug in de starthouding = niet meer horizontaal (nulstand verschoven)')
     await a.sane()
 
 async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren/onpauzeren gaat het kantelen nu en dan de mist in"
