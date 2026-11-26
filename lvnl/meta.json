@@ -1,0 +1,781 @@
+{
+ "license": "CC BY 4.0 (LVNL Geoportaal)",
+ "services": {
+  "airspace": "https://services-eu1.arcgis.com/OtUwzhpKSdeXgRIB/arcgis/rest/services/Airspaces_data/FeatureServer",
+  "aerodrome": "https://services-eu1.arcgis.com/OtUwzhpKSdeXgRIB/arcgis/rest/services/Aerodrome_data/FeatureServer"
+ },
+ "layers": {
+  "airspace_0_FIR.geojson": {
+   "count": 2,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_1_Low_Flying_area_.geojson": {
+   "count": 21,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_19_Prohibited_area.geojson": {
+   "count": 4,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_18_Restricted_area.geojson": {
+   "count": 26,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_17_Danger_area.geojson": {
+   "count": 19,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_3_TSA.geojson": {
+   "count": 27,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_5_TRA.geojson": {
+   "count": 19,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_6_Parajump.geojson": {
+   "count": 21,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_16_Climb_area.geojson": {
+   "count": 18,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_7_ATZ.geojson": {
+   "count": 7,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_8_TMZ_RTMZ.geojson": {
+   "count": 21,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_9_HPZ_HTZ.geojson": {
+   "count": 52,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_10_RMZ.geojson": {
+   "count": 18,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_11_Glider_area.geojson": {
+   "count": 8,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_12_VFR_area.geojson": {
+   "count": 4,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_20_IFR_area.geojson": {
+   "count": 18,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_21_Delegated_area.geojson": {
+   "count": 11,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_23_ACC_sector_excluding_delegations.geojson": {
+   "count": 3,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_22_ACC_sector_including_delegations.geojson": {
+   "count": 7,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_13_CTA.geojson": {
+   "count": 6,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_14_TMA.geojson": {
+   "count": 42,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "airspace_15_CTR.geojson": {
+   "count": 16,
+   "fields": [
+    "BeginDate",
+    "Class",
+    "Designator",
+    "EffectiveDate",
+    "EndDate",
+    "Id",
+    "LocalType",
+    "LowerLimit",
+    "LowerLimitReference",
+    "LowerLimitUnit",
+    "Name",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type",
+    "UpperLimit",
+    "UpperLimitReference",
+    "UpperLimitUnit",
+    "ident_nl",
+    "part_nl"
+   ]
+  },
+  "aerodrome_0_Aerodrome_Civil.geojson": {
+   "count": 19,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_1_Aerodrome_Military.geojson": {
+   "count": 6,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_2_Aerodrome_Joint.geojson": {
+   "count": 2,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_3_Runway_direction.geojson": {
+   "count": 56,
+   "fields": [
+    "Aerodrome",
+    "Designator",
+    "EffectiveDate",
+    "OBJECTID",
+    "Source"
+   ]
+  },
+  "aerodrome_4_Runways.geojson": {
+   "count": 26,
+   "fields": [
+    "Aerodrome",
+    "Composition",
+    "Designator",
+    "EffectiveDate",
+    "NominalLength",
+    "NominalLengthUnit",
+    "NominalWidth",
+    "NominalWidthUnit",
+    "OBJECTID",
+    "Shape__Area",
+    "Shape__Length",
+    "Source",
+    "Type"
+   ]
+  },
+  "aerodrome_5_Heliport.geojson": {
+   "count": 33,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_6_Heliport_Offshore.geojson": {
+   "count": 89,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_7_Heliport_Pilotage.geojson": {
+   "count": 4,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_8_Heliport_Hospital.geojson": {
+   "count": 17,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_9_Microlight.geojson": {
+   "count": 20,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_10_Glider.geojson": {
+   "count": 13,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_11_Hangglider.geojson": {
+   "count": 63,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_12_Crop_Dusting.geojson": {
+   "count": 1,
+   "fields": [
+    "ControlType",
+    "Designator",
+    "EffectiveDate",
+    "MaxCableHeight",
+    "Name",
+    "OBJECTID",
+    "Source",
+    "Type",
+    "usage_nl"
+   ]
+  },
+  "aerodrome_14_Model_Flying_Site.geojson": {
+   "count": 0,
+   "fields": []
+  },
+  "aerodrome_13_Model_Flying_Area.geojson": {
+   "count": 0,
+   "fields": []
+  }
+ },
+ "airspace_info": {
+  "serviceDescription": "Airspaces within the Dutch FIR.",
+  "copyrightText": "Air Traffic Control the Netherlands",
+  "maxRecordCount": 2000
+ },
+ "aerodrome_info": {
+  "serviceDescription": "Aerodromes within the Dutch FIR.",
+  "copyrightText": "Air Traffic Control the Netherlands",
+  "maxRecordCount": 2000
+ }
+}
