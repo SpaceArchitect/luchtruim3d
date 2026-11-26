@@ -5,7 +5,7 @@ import datetime as dt, json, os, re, urllib.parse, urllib.request
 ROOT = 'https://eaip.lvnl.nl/'
 UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36 luchtruim3d',
       'Accept-Language': 'nl-NL,nl;q=0.9,en;q=0.8'}
-WANT = re.compile(r"^EH-(GEN 2\.1|ENR 1\.[1-6]|ENR 2\.[12]|ENR 5\.[1-6]|AD 2 (EHEH|EHTL|EHBD|EHSE|EHMZ|EHDR|EHLE|EHST) \d+)-en-GB\.html$")
+WANT = re.compile(r"^EH-(GEN 2\.1|ENR 1\.\d+|ENR 2\.[12]|ENR 5\.[1-6]|ENR 6\.\d+|AD 2 EH[A-Z]{2} \d+)-en-GB\.html$")  # heel NL (26 nov): alle AD 2-velden, ENR 1.x en ENR 6
 def get(u):
     with urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=90) as r: return r.read()
 root = get(ROOT).decode('utf-8', 'replace')

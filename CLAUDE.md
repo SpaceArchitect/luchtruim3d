@@ -203,7 +203,7 @@ Regel: `- <datum> SP: <model> · schatting X · werkelijk Y · <plan/les>`.
 - In een CTR is klaring nodig; uitluisteren is niet genoeg. VFR-transponder 7000 tenzij ATC anders zegt. **Wél frequency monitoring codes (FMC)**
   (ENR 1.2, AIRAC 11-2026): TMZ Schiphol Area (onder Schiphol TMA 1, 500–1500 ft AMSL) verplicht 124.300 uitluisteren + 7020
   (zweef/hang/para/paramotor/model vrijgesteld); in Rotterdam TMA 1+2 bij alleen uitluisteren op 122.990 → 7010; onder Rotterdam TMA 1+2
-  sterk aanbevolen 124.300 + 7020. Bij tweeweg-contact geen FMC maar 7000. Valt nu buiten de regio; nodig bij heel NL. **Squawk alleen tonen bij een TMZ** (7000, of 7020 in de TMZ Schiphol Area) (Christian: anders lijkt het alsof je erin mag).
+  sterk aanbevolen 124.300 + 7020; daar bij tweeweg-contact geen FMC maar 7000. In de TMZ Schiphol Area blijft de code ook bij tweeweg-contact met Amsterdam FIC 7020 (ENR 1.2, gecontroleerd 26 nov). Valt nu buiten de regio; nodig bij heel NL. **Squawk alleen tonen bij een TMZ** (7000, of 7020 in de TMZ Schiphol Area) (Christian: anders lijkt het alsof je erin mag).
 - Feestdagen: AIP GEN 2.1 §6 (11 dagen; Pasen en Pinksteren berekend). AIP SUP 03/2022 (Lelystad TMA 3–5, Nieuw Milligen TMA
   B/C2/E) inbouwen zodra de regio die TMA's bevat.
 - **Nog te verifiëren:** status/klasse van een CTR buiten de openingstijden (nu afgeleid: niet actief, RMZ wel); Niederrhein TMZ

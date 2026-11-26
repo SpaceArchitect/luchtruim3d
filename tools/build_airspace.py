@@ -72,6 +72,9 @@ def main():
             lines.append('|'.join(map(str, [LAYER[m.group(1)], ident, P['Name'] or P['Designator'], P.get('Type') or '', P.get('Class') or '',
                          P['LowerLimit'], P['LowerLimitUnit'], P['LowerLimitReference'], P['UpperLimit'], P['UpperLimitUnit'],
                          P['UpperLimitReference'], ';'.join(enc(r) for r in rings)])))
+    # LVNL gebruikt soms één ident voor CTR én TMA (EHLE1, EHLE2, EHGG, EHBK2): AIPINFO is per ident → TMA krijgt suffix 'T' (26 nov)
+    ctr_ids = {l.split('|')[1] for l in lines if l.startswith('CTR|')}
+    lines = [('TMA|' + l.split('|')[1] + 'T|' + l.split('|', 2)[2]) if l.startswith('TMA|') and l.split('|')[1] in ctr_ids else l for l in lines]
     html = open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
     m = re.search(r'(<script id="airspace" type="text/plain">)(.*?)(</script>)', html, re.S)
     cur = m.group(2).strip().split('\n')
