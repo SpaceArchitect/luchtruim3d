@@ -1,0 +1,56 @@
+name: data-osm-nl
+# Heel NL (reset-push, Christian 25 nov): OSM (ODbL) per tegel ophalen via Overpass, in de Action omzetten naar het compacte
+# app-formaat (tools/build_landscape.py) en alleen dat bewaren op branch data/osm-nl. Ruwe data gaat niet in git (te groot). Raakt main/live niet.
+on:
+  push:
+    branches: ['wip/**']
+    paths: ['.github/workflows/data-osm-nl.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  tiles:
+    runs-on: ubuntu-latest
+    outputs: {list: '${{ steps.l.outputs.list }}'}
+    steps:
+      - uses: actions/checkout@v4
+      - id: l
+        run: echo "list=$(python3 tools/fetch_osm.py --list)" >> "$GITHUB_OUTPUT"
+  tile:
+    needs: tiles
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 2   # Overpass: niet meer dan 2 tegelijk
+      matrix: {tile: '${{ fromJson(needs.tiles.outputs.list) }}'}
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -q shapely
+      - run: python3 tools/fetch_osm.py ${{ matrix.tile }}
+      - name: Compact maken
+        run: |
+          BB=$(python3 -c "import json;m=json.load(open('osm/${{ matrix.tile }}/meta.json'));s,w,n,e=m['bbox'];print(f'{w},{s},{e},{n}')")
+          mkdir -p out
+          python3 tools/build_landscape.py --region ${{ matrix.tile }} --src osm/${{ matrix.tile }} --clip $BB --out out/${{ matrix.tile }}.json
+          python3 -c "import json;m=json.load(open('osm/${{ matrix.tile }}/meta.json'));json.dump(m,open('out/${{ matrix.tile }}.meta.json','w'))"
+          ls -la out osm/${{ matrix.tile }}
+      - uses: actions/upload-artifact@v4
+        with: {name: '${{ matrix.tile }}', path: out/}
+  push:
+    needs: tile
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {path: art}
+      - name: Naar branch data/osm-nl
+        run: |
+          mkdir -p osm-nl && find art -name '*.json' -exec cp {} osm-nl/ \;
+          ls -la osm-nl
+          git config user.name "luchtruim3d-bot"; git config user.email "bot@luchtruim3d.nl"
+          git checkout --orphan data/osm-nl
+          git rm -rq --cached . ; git add -f osm-nl
+          git commit -qm "OSM heel NL compact $(date -u +%F)"
+          git push -f origin HEAD:refs/heads/data/osm-nl
