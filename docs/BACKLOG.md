@@ -11,7 +11,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 
 ## P1 — nu
 *26 nov gefixt (zie LOG): Start = volgende missie, ballon/rivierdoel, alles aanklikbaar, zwevende ringen, vario, labels over het toestel, camera liggend.*
-1. [S] Kantelen kalibreert opnieuw na een melding in een bocht — **fix staat op `wip/tilt-26nov`** (ijken alleen bij start en na draaien; test d_tilt_notice_bend). Wacht op test Christian op zijn telefoon, dan live — Christian 25 nov
+1. [S] Kantelen kalibreert opnieuw na een melding in een bocht — **fix staat op `wip/tilt-26nov`** (ijken alleen bij start en na draaien; test d_tilt_notice_bend). Christian testte 26 nov: akkoord, live na de volledige suite (ook klim/daling gedekt) — Christian 25 nov
 2. [M] Militaire gebieden (TRA/TSA/EHR): spike 26 nov klaar (LOG). Geen open primaire bron voor live status; NM B2B (EAUP/EUUP, AIXM) vraagt een certificaat + overeenkomst → **beslissing Christian: aanvragen of niet?** Tot dan: uitleg volgens ENR 5.2 en "of het nu actief is weet deze app niet" (`wip/spike-mil-26nov`, mee met de volgende live-gang); nooit "inactief" — Christian 25 nov
 
 ## P2 — daarna
