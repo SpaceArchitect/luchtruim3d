@@ -396,7 +396,7 @@ async def d_balloon_past(a):
 
 async def d_clearance_success(a):
     await a.hit('#modal [data-ac=motor]')
-    ctr = await a.ev('()=>{const v=window.__vfr;const f=v.LAYERS.find(g=>g.layer==="CTR"&&g.lo===0&&v.AIPINFO[g.ident]);return f&&[f.ident,f.lp]}')
+    ctr = await a.ev('()=>{const v=window.__vfr;const f=v.LAYERS.find(g=>g.ident==="EHEH"&&g.layer==="CTR")||v.LAYERS.find(g=>g.layer==="CTR"&&g.lo===0&&v.AIPINFO[g.ident]);return f&&[f.ident,f.lp]}')  # 27 nov (heel NL): Eindhoven, want de eerste CTR (Beek) ligt naast RMZ Maastricht en die naderingsmelding gaat terecht voor
     await a.place(ctr[1][0], ctr[1][1], 800, 0, paused=False)
     await a.ev('(id)=>{const v=window.__vfr;v.CLR.add(id);v.GOAL={x:v.PLANE.x,n:v.PLANE.n,name:"Test"};v.hudTick()}', ctr[0])
     n = await a.v('v.NOTICE') or ''
@@ -1345,7 +1345,9 @@ async def d_enr55_sites(a):  # 21 nov: alle ENR 5.5-terreinen (lier, lierstart z
     await a.hit('#modal [data-ac=motor]'); await a.frames(2)
     hg = await a.v('v.HG'); typs = {h['typ'] for h in hg}
     ok(typs == {'hg', 'gld', 'uas', 'ulm'}, f'niet alle soorten terreinen: {typs}')
-    ok(await a.v('v.hgCyl.children.filter(c=>c.userData.hg).length') == len(hg), 'niet elk terrein heeft een cilinder')
+    noname = [h['ident'] for h in hg if not h['nm']]
+    ok(not noname, f'terrein zonder naam (accent in de AIP-naam, bv. WÂNSWERT?): {noname}')  # 27 nov: naam-regex kende alleen A–Z
+    ok(await a.v('v.hgCyl.children.filter(c=>c.userData.h).length') == len(hg), 'niet elk terrein heeft een cilinder')
     for nm, typ, word, lim in (('Boxtel', 'uas', 'Modelvliegterrein Boxtel', '1020 ft AMSL'), ('Malden', 'gld', 'Zweefvliegveld Malden', '2300 ft AGL')):
         h = next(x for x in hg if x['nm'] == nm and x['typ'] == typ)
         await a.place(h['x'] - h['r'] - 0.9, h['n'], 800, 90, paused=True)
@@ -1395,7 +1397,11 @@ async def d_para_text(a):  # AIP ENR 5.5: elke paradropzone zijn eigen bovengren
     ok(r, 'geen paradropzones in de regio')
     for ident, hi, t in r:
         ok(hi in t or hi.replace('FL0', 'FL') in t, f'{ident}: waarschuwing noemt de bovengrens {hi} niet: {t[:120]}')
-        ok('ENPC' not in t, f'{ident}: verkeerde operator: {t[:120]}')
+        # 27 nov (heel NL): ENPC is wél de operator van cluster Noord-Brabant (ENR 5.5, AIRAC 12-2026); elders nooit
+        ENPC = {'EHAAPJA013', 'EHAAPJA014', 'EHAAPJA010', 'EHSEPJA001', 'EHAAPJA003'}
+        ok(('ENPC' in t) == (ident in ENPC), f'{ident}: verkeerde operator: {t[:160]}')
+    ops = {t.split('Operator:')[-1].split(',')[0].strip() for _, _, t in r if 'Operator:' in t}
+    ok(len(r) < 2 or len(ops) > 1 or all(i in ENPC for i, _, _ in r), f'alle paradropzones dezelfde operator: {ops}')
 
 async def d_landmarks(a):  # voorstel herkenningspunten 21 nov, akkoord Christian 22 nov: Eindhoven-centrum 7 → 2, Sluis Heumen weg
     await a.hit('#modal [data-ac=map]'); await a.frames(2)

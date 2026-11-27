@@ -36,7 +36,7 @@ def parse(t):
         toks = t[max(0, m.start() - 80):m.start()].split()
         name = []
         for tok in reversed(toks):
-            if tok in STOP or not re.fullmatch(r"[A-Z0-9'\-/().]+", tok) or re.fullmatch(r'[\d.:]+', tok) or tok.endswith('.') and tok != 'ST.':
+            if tok in STOP or not re.fullmatch(r"[A-ZÀ-ÖØ-Þ0-9'\-/().]+", tok) or re.fullmatch(r'[\d.:]+', tok) or tok.endswith('.') and tok != 'ST.':
                 break
             name.insert(0, tok)
         rest = c.group(7)
