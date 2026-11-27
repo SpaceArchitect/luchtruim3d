@@ -15,7 +15,7 @@
 - **`wip/dagelijks`** (gepusht, nog niet getest): dagelijkse uitdaging + test d_daily, zweefkist-klimlimiet (+1000 ft).
 
 ## Eerstvolgende sessie (vr 27 nov 22:47) — AIRAC → bugs → rest
-1. **Live:** volledige suite op `wip/opnieuw` (bevat wip/tilt-26nov) (bevat de 7 bugfixes + kantelfix, akkoord Christian 26 nov) + `wip/spike-mil-26nov` erbij mergen → groen → `release/<datum>` → `main`.
+1. **Eerst:** regressie 2834 ms bij ▶ op wip/opnieuw (A55) bisecten (LOG 26 nov 22:49); tot dan alleen `wip/tilt-26nov` live (278/278 + p7l 71/71, akkoord Christian). **Daarna live:** volledige suite op `wip/opnieuw` (bevat wip/tilt-26nov) (bevat de 7 bugfixes + kantelfix, akkoord Christian 26 nov) + `wip/spike-mil-26nov` erbij mergen → groen → `release/<datum>` → `main`.
 2. Heel NL verder: 5 regio-gebonden tests op `wip/heelnl` (LOG 26 nov) eerst; dan wip/opnieuw erin mergen; data/osm-nl samenvoegen (plaatsen, wegen, rivieren landelijk); eAIP-ophaal verbreden (AD 2 alle velden: torenfrequenties Schiphol/Rotterdam/Eelde/Beek/De Kooy ontbreken nog); `mission_report --fly` na de zweefkist-klimlimiet.
 3. Stotter ½ s na missiestart (A55, Christian 26 nov): Christian meet met `?fps=1` (wip/opnieuw); daarna oorzaak gericht fixen.
 4. NOTAM/AUP: **weekend 28–29 nov samen met Christian** uitwerken (spike in LOG 26 nov; opties NM B2B, EAD, FAA alleen ter vergelijking).
@@ -24,7 +24,7 @@
 - Eén volledige reset van de weeklimiet, geldig t/m 10 dec. 27 nov–4 dec "heel NL" voorbereiden; vr 4–zo 6 dec sessies; ma 7 dec reset; 7–10 dec heel NL bouwen. Christian test 11–14 dec, vóór Mexico (15 dec).
 
 ## Budget
-- 1 SP = 1% weeklimiet; kalibratie 25 nov: 1% ≈ 7,3 M tokens (ccusage). 26 nov: weeklimiet 91% (Christian), laatste dag vóór de reset → doorwerken tot op.
+- 1 SP = 1% weeklimiet; herijking 26 nov: **1% ≈ 5,5 M tokens** (ccusage; 25 nov was 7,3 M). Sessie 26 nov: 102,9 M tokens ≈ 19 SP. 26 nov: weeklimiet 91% (Christian), laatste dag vóór de reset → doorwerken tot op.
 
 ## Werkwijze-notities
 - Volledige suite in twee helften parallel (`--forms desk,p7` en `--forms p7l,se`, eigen `E2E_PORT`).
