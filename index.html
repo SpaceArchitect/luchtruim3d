@@ -2624,8 +2624,11 @@ let last=performance.now(),acc=0;
 {const T=THREE,b=new T.Box3();scene.updateMatrixWorld(true);scene.traverse(o=>{if(!(o.isLine||o.isLineSegments)||!o.material)return;b.setFromObject(o);if(!b.isEmpty()&&b.max.y<.05&&b.max.y-b.min.y<.002)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.depthWrite=false);});}
 /* Christian 26 nov: 'kleine stotter ½ s na de start' (A55), headless niet te zien → meetlat op de telefoon zelf: ?fps=1 toont frametijden; na ▶ het traagste frame + wanneer (ms na ▶) en wat er toen gebeurde */
 const FPS=/[?&]fps=1/.test(location.search)?(()=>{const d=document.createElement('div');d.style.cssText='position:fixed;left:4px;bottom:4px;z-index:99;background:#000c;color:#0f0;font:11px monospace;padding:3px 5px;border-radius:4px;pointer-events:none;white-space:pre';document.body.appendChild(d);return {d,t0:0,max:[0,0],ev:''};})():null;
-function fpsTick(now,raw){if(!FPS)return;if(FPS.wasP&&!PAUSED){FPS.t0=now;FPS.max=[0,0];FPS.ev='';}FPS.wasP=PAUSED;const since=now-FPS.t0;if(FPS.t0&&since<3000&&raw>FPS.max[0]){FPS.max=[Math.round(raw),Math.round(since)];FPS.ev=(NOTICE?'melding ':'')+(TILT&&TILT.pend?'ijken ':'')+(GEN_RUN.size?'generator ':'');}
-  FPS.n=(FPS.n||0)+1;if(FPS.n%10===0)FPS.d.textContent=`frame ${Math.round(raw)} ms\nna ▶ max ${FPS.max[0]} ms @ ${FPS.max[1]} ms ${FPS.ev}`;}
+function fpsTick(now,raw){if(!FPS)return;if(document.hidden||FPS.hid){FPS.hid=document.hidden;return;}/* achtergrond (tab weg, melding) telt niet: dan tekent de browser niets */
+  if(FPS.wasP&&!PAUSED){FPS.t0=now;FPS.top=[];}FPS.wasP=PAUSED;const since=now-FPS.t0;
+  if(FPS.t0&&since<3000){FPS.top.push([Math.round(raw),Math.round(since),(NOTICE?'melding ':'')+(TILT&&TILT.pend?'ijken ':'')+(GEN_RUN.size?'generator':'')]);FPS.top.sort((a,b)=>b[0]-a[0]);FPS.top.length=Math.min(2,FPS.top.length);}
+  FPS.n=(FPS.n||0)+1;if(FPS.n%10===0)FPS.d.textContent=`frame ${Math.round(raw)} ms`+(FPS.top||[]).map((t,i)=>`\nna ▶ #${i+1}: ${t[0]} ms @ ${t[1]} ms ${t[2]}`).join('');}
+document.addEventListener('visibilitychange',()=>{if(FPS)FPS.hid=true;});
 /* 26 nov (stotter A55, 112 ms bij ▶): shaders van alles wat later pas in beeld komt (doel, schaduw, verre volumes) bij het laden al compileren, ook wat nu verborgen is; anders compileert de GPU midden in de vlucht */
 try{const hid=[];scene.traverse(o=>{if(!o.visible){hid.push(o);o.visible=true;}});renderer.compile(scene,camera);for(const o of hid)o.visible=false;}catch(_){}
 (function loop(){requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(.1,(now-last)/1000);fpsTick(now,now-last);last=now;
