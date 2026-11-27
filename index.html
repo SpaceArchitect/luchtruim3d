@@ -1439,11 +1439,10 @@ function placeLabels(){lmMinSize();
     return true;});
   for(const L of list){const p=L.pos3();L.d=p.distanceTo(cam);v.copy(p).project(camera);L.sx=(v.x+1)/2*W;L.sy=(1-v.y)/2*H;L.ok=v.z<1&&L.sx>-50&&L.sx<W+50&&L.sy>-20&&L.sy<H+20;}
   list.sort((a,b)=>(a.prio-(a.prev?0.5:0))-(b.prio-(b.prev?0.5:0))||a.idx-b.idx);
-  measureLabels(list);
   const AR=typeof MODE!=='undefined'&&MODE==='fly'?acRect():null;
   /* Christian 26 nov: niet te druk. Budget: luchtruim, doel en sonde altijd; de rest (wegen, water, plaatsen, herkenningspunten, terreinen) samen ≤ 15% van het scherm in de kaart, ≤ 10% in vliegmodus. Al getoond = 10% marge (geen knipperen). */
   const FLY=typeof MODE!=='undefined'&&MODE==='fly',BUD=W*H*(FLY?.10:.15);let usedA=0;// Christian 25 nov: labels bedekten het eigen toestel → vrije zone; hysterese (al getoond = kleinere marge) tegen knipperen
-  for(const L of list){if(!L.ok)continue;if(!L.w){L.w=L.el.offsetWidth||80;L.h=L.el.offsetHeight||16;}/* gemeten in measureLabels (batch) */
+  for(const L of list){if(!L.ok)continue;if(!L.w){const e=L.el,hid=e.style.display!=='block';if(hid){e.style.visibility='hidden';e.style.display='block';}L.w=e.offsetWidth||80;L.h=e.offsetHeight||16;if(hid){e.style.display='none';e.style.visibility='';}}/* stotter-a: per label meten (zoals vóór 26 nov 20:58) */
     const isTick=L.tickFt!==undefined;const x0=isTick?L.sx:L.sx-L.w/2,y0=L.sy-L.h/2;const r=[x0-2,y0-2,x0+L.w+2,y0+L.h+2];
     if(placed.some(q=>r[0]<q[2]&&r[2]>q[0]&&r[1]<q[3]&&r[3]>q[1]))continue;
     if(AR){const m=L.prev?2:14;if(r[0]<AR[2]+m&&r[2]>AR[0]-m&&r[1]<AR[3]+m&&r[3]>AR[1]-m)continue;}
@@ -2629,10 +2628,10 @@ function fpsTick(now,raw){if(!FPS)return;if(document.hidden||FPS.hid){FPS.hid=do
   if(FPS.t0&&since<3000){FPS.top.push([Math.round(raw),Math.round(since),(NOTICE?'melding ':'')+(TILT&&TILT.pend?'ijken ':'')+(GEN_RUN.size?'generator':''),(FPS.seg||[]).join('/'),Math.round(FPS.hnd||0)]);FPS.hnd=0;FPS.top.sort((a,b)=>b[0]-a[0]);FPS.top.length=Math.min(2,FPS.top.length);}
   FPS.n=(FPS.n||0)+1;if(FPS.n%10===0)FPS.d.textContent=`frame ${Math.round(raw)} ms`+(FPS.top||[]).map((t,i)=>`\nna ▶ #${i+1}: ${t[0]} ms @ ${t[1]} ms ${t[2]}\n   js ${t[3]} (sim/render/labels/hud) · knop ${t[4]}`).join('')+`\nversie ${FPS_VER}`;}
 /* 28 nov: JS-tijd per frame (sim/render/labels/hud, van het vorige frame) en de duur van de ▶-handler naast de frame-gap: grote gap + kleine JS = GPU/pipeline-stall; grote render-JS = shader-link; grote knop = synchrone missieberekening */
-const FPS_VER='opnieuw';
+const FPS_VER='stotter-c';
 document.addEventListener('visibilitychange',()=>{if(FPS)FPS.hid=true;});
 /* 26 nov (stotter A55, 112 ms bij ▶): shaders van alles wat later pas in beeld komt (doel, schaduw, verre volumes) bij het laden al compileren, ook wat nu verborgen is; anders compileert de GPU midden in de vlucht */
-try{const hid=[];scene.traverse(o=>{if(!o.visible){hid.push(o);o.visible=true;}});renderer.compile(scene,camera);for(const o of hid)o.visible=false;}catch(_){}
+/* stotter: geen renderer.compile-opwarmen */
 (function loop(){requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(.1,(now-last)/1000);fpsTick(now,now-last);last=now;
   if(camTween){const k=Math.min(1,(now-camTween.st)/camTween.ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;camera.position.lerpVectors(camTween.p0,camTween.p1,e);controls.target.lerpVectors(camTween.t0,camTween.t1,e);if(k>=1)camTween=null;}
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
