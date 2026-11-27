@@ -6,6 +6,8 @@ on:
     branches: ['wip/**']
     paths: ['.github/workflows/data-osm-nl.yml']
   workflow_dispatch:
+    inputs:
+      tiles: {description: 'tegels (bv. nl-02 nl-12), leeg = alle', required: false, default: ''}
 permissions:
   contents: write
 jobs:
@@ -15,14 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: l
-        run: echo "list=$(python3 tools/fetch_osm.py --list)" >> "$GITHUB_OUTPUT"
+        run: |
+          T="${{ github.event.inputs.tiles }}"
+          if [ -n "$T" ]; then echo "list=$(python3 -c "import json,sys;print(json.dumps(sys.argv[1:]))" $T)" >> "$GITHUB_OUTPUT"
+          else echo "list=$(python3 tools/fetch_osm.py --list)" >> "$GITHUB_OUTPUT"; fi
   tile:
     needs: tiles
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 240
     strategy:
       fail-fast: false
-      max-parallel: 2   # Overpass: niet meer dan 2 tegelijk
+      max-parallel: 1   # Overpass: één tegelijk (27 nov: met 2 tegelijk 7–21 keer 502 per tegel)
       matrix: {tile: '${{ fromJson(needs.tiles.outputs.list) }}'}
     steps:
       - uses: actions/checkout@v4
@@ -45,9 +50,25 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with: {path: art}
-      - name: Naar branch data/osm-nl
+      - name: Naar branch data/osm-nl (samenvoegen; een tegel met meer ontbrekende lagen vervangt nooit een betere)
         run: |
-          mkdir -p osm-nl && find art -name '*.json' -exec cp {} osm-nl/ \;
+          mkdir -p osm-nl new && find art -name '*.json' -exec cp {} new/ \;
+          if git fetch -q origin data/osm-nl; then git archive FETCH_HEAD osm-nl | tar -x; fi
+          python3 - <<'PY'
+          import glob, json, os, shutil
+          for m in sorted(glob.glob('new/*.meta.json')):
+              t = os.path.basename(m)[:-10]; nm = json.load(open(m)); old = f'osm-nl/{t}.meta.json'
+              om = json.load(open(old)) if os.path.exists(old) else None
+              nmiss = len(nm.get('missing', [])); omiss = len(om['missing']) if om and 'missing' in om else 99  # oude tegels zonder 'missing' = onbekend
+              keep = nmiss > omiss
+              print(t, 'nieuw ontbreekt', nm.get('missing', []), '| oud', om.get('missing', '?') if om else '-', '→', 'oud blijft' if keep else 'nieuw')
+              if not keep:
+                  shutil.copy(m, old); shutil.copy(f'new/{t}.json', f'osm-nl/{t}.json')
+          bad = {os.path.basename(m)[:-10]: json.load(open(m)).get('missing', '?') for m in glob.glob('osm-nl/*.meta.json')}
+          bad = {k: v for k, v in bad.items() if v}
+          print('ontbrekend na samenvoegen:', bad or 'niets')
+          open('osm-nl/MISSING.json', 'w').write(json.dumps(bad, indent=1, sort_keys=True))
+          PY
           ls -la osm-nl
           git config user.name "luchtruim3d-bot"; git config user.email "bot@luchtruim3d.nl"
           git checkout --orphan data/osm-nl

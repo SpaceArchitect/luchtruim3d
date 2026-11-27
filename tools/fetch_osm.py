@@ -41,15 +41,24 @@ Q = {
 }
 ERR = []
 UA = {'User-Agent': 'luchtruim3d-data (github.com/SpaceArchitect/luchtruim3d)', 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json,*/*'}
+# 27 nov: data/osm-nl had per tegel 7–21 mislukte verzoeken (502 'server at capacity') en stille gaten (nl-02 zonder snelwegen,
+# nl-12 zonder hoogspanning). Nu: 7 pogingen met exponentiële backoff, afwisselend over Overpass-mirrors (zelfde OSM-data, ODbL),
+# en per tegel vastleggen welke lagen ontbreken ('missing'), zodat de push een betere tegel nooit door een slechtere vervangt.
+ENDPOINTS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.kumi.systems/api/interpreter']
+MISSING = []
 def overpass(q):
     body = urllib.parse.urlencode({'data': q}).encode()
-    for k in range(4):
+    for k in range(7):
+        url = ENDPOINTS[k % len(ENDPOINTS)]
         try:
-            with urllib.request.urlopen(urllib.request.Request('https://overpass-api.de/api/interpreter', data=body, headers=UA), timeout=300) as r:
-                return json.load(r)
+            with urllib.request.urlopen(urllib.request.Request(url, data=body, headers=UA), timeout=300) as r:
+                d = json.load(r)
+            if 'remark' in d and 'runtime error' in str(d.get('remark', '')): raise RuntimeError(d['remark'][:200])  # time-out binnen Overpass = onvolledig
+            return d
         except Exception as e:
-            msg = getattr(e, 'read', lambda: b'')()[:300]
-            print('  retry', k, e, msg); ERR.append(f'{e} {msg!r}'); time.sleep(20 * (k + 1))
+            msg = getattr(e, 'read', lambda: b'')()[:120]
+            wait = min(600, 30 * 2 ** k)
+            print('  retry', k, url.split('/')[2], e, msg, f'wacht {wait}s'); ERR.append(f'{url.split("/")[2]} {e}'[:160]); time.sleep(wait)
     return None
 for reg, (s, w, n, e) in REGIONS.items():
     if len(sys.argv) > 1 and reg not in sys.argv[1:]: continue
@@ -57,8 +66,9 @@ for reg, (s, w, n, e) in REGIONS.items():
     for name, sel in (QH if reg == 'herkenning' else Q).items():
         parts = ''.join(f'{p.strip()}({s},{w},{n},{e});' for p in sel.split(';') if p.strip())
         d = overpass(f'[out:json][timeout:240];({parts});out geom;')
-        if d is None: print(reg, name, 'MISLUKT'); continue
+        if d is None: print(reg, name, 'MISLUKT'); MISSING.append(name); continue
         json.dump(d, open(os.path.join(out, name + '.json'), 'w'))
         print(reg, name, len(d.get('elements', [])))
         time.sleep(5)
-    json.dump({'bbox': [s, w, n, e], 'license': 'ODbL, © OpenStreetMap-bijdragers', 'fetched': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'errors': ERR}, open(os.path.join(out, 'meta.json'), 'w'))
+    json.dump({'bbox': [s, w, n, e], 'license': 'ODbL, © OpenStreetMap-bijdragers', 'fetched': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'errors': ERR, 'missing': MISSING}, open(os.path.join(out, 'meta.json'), 'w'))
+    ERR, MISSING = [], []  # per regio apart
