@@ -20,7 +20,10 @@
    - **Daarna (de oorspronkelijke 112 ms):** Chrome Android (ANGLE/Vulkan) maakt GPU-pipelines pas bij de eerste échte draw; `renderer.compile()` helpt daar niet.
    - **Aanpak:** (1) `?fps=1` uitbreiden: JS-tijd per frame (sim/render/labels) naast de frame-gap → GPU-stall of JS? (2) opwarmen tijdens de startmelding: één frame álles (ook verborgen: doel, schaduw, verre volumes) echt naar het canvas tekenen met scissor 1×1 px vanuit de vliegcamera; (3) synchrone missieberekeningen (`misStart`/`misVerify`/`nextMission` in de meldingstekst) in plakjes of vooraf; (4) niet aantoonbaar opgelost → klein laadscherm 'Luchtruim laden…' (akkoord Christian 26+27 nov).
    - Bug-les (CLAUDE.md): waarom glipte dit door? Headless meet geen GPU-pipelines → vastleggen wat de suite wél kan bewaken (JS-tijd per frame, synchrone berekeningen > 50 ms).
-   - Telefoongedrag is headless niet te bewijzen: **niet live**, previewlink naar Christian om met `?fps=1` te meten (zeg: mobiel).
+   - Telefoongedrag is headless niet te bewijzen: **niet live**. **Christian test za 28 nov 's ochtends (mobiel, A55)** — niet op hem wachten:
+     zet vanavond kant-en-klare previewbranches klaar, elk met `?fps=1` (incl. JS-tijd per frame), en zet de links + wat hij per link doet in STATUS en het eindbericht:
+     `wip/stotter-a` = wip/opnieuw zónder labels-in-batch · `wip/stotter-b` = zónder compile-opwarmen · `wip/stotter-c` = zonder beide (+ evt. `-d` met 1×1-scissor-opwarmen).
+     Daarna **verder met ander werk** (punt 2 heel NL en de rest van BACKLOG); niets op `wip/opnieuw` live.
 1. **Live (pas na de stotter — `wip/opnieuw` niet live met de regressie erin):** volledige suite op `wip/opnieuw` (bevat wip/tilt-26nov: 7 bugfixes + kantelfix, akkoord Christian 26 nov) + `wip/spike-mil-26nov` mergen → groen → `release/<datum>` → `main`. Stotterfix pas mee als Christian op de A55 akkoord geeft.
 2. Heel NL verder: 5 regio-gebonden tests op `wip/heelnl` (LOG 26 nov) eerst; dan wip/opnieuw erin mergen; data/osm-nl samenvoegen; eAIP-ophaal verbreden (AD 2-torens); `mission_report --fly` na de zweefkist-klimlimiet.
 3. NOTAM/AUP: **weekend 28–29 nov samen met Christian** uitwerken (spike in LOG 26 nov).
