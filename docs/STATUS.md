@@ -1,6 +1,6 @@
 # Status — lees dit eerst
 
-*Bijgewerkt: 26 nov 2026, ±17:00 (sessie AIRAC + bugs + heel NL). Backlog: **`docs/BACKLOG.md`** (enige lijst). Volgorde: **AIRAC → bugs → rest** (Christian 25 nov).*
+*Bijgewerkt: 27 nov 2026, 19:00 (stotter naar prio 1, Christian). Docs van wip/sessie-26nov staan nu ook op main. Backlog: **`docs/BACKLOG.md`** (enige lijst). Volgorde: **AIRAC → bugs → rest** (Christian 25 nov).*
 
 ## Live
 - https://luchtruim3d.nl = `main` (25 nov). AIRAC 12-2026 (26 nov) gecontroleerd: **geen wijziging in de regio** (LOG). Terugdraaien: `release/2026-11-25-3`, `-25-2`, `-25`, `-22`, `-21`, `-15`.
@@ -14,11 +14,16 @@
 - **`wip/opnieuw`** (gepusht, op basis van wip/tilt-26nov; akkoord Christian 26 nov): fout in missie → meteen stoppen met reden, ↻ Opnieuw of toch door. Bevat ook (26 nov avond, na tests van Christian): bruggen/herkenningspunten niet te groot, spoor knippert niet (z-fighting), labelbudget + meetbug labels. Mee live morgen na de volledige suite (dan deze branch i.p.v. wip/tilt-26nov).
 - **`wip/dagelijks`** (gepusht, nog niet getest): dagelijkse uitdaging + test d_daily, zweefkist-klimlimiet (+1000 ft).
 
-## Eerstvolgende sessie (vr 27 nov 22:47) — AIRAC → bugs → rest
-1. **Eerst:** regressie 2834 ms bij ▶ op wip/opnieuw (A55) bisecten (LOG 26 nov 22:49); tot dan alleen `wip/tilt-26nov` live (278/278 + p7l 71/71, akkoord Christian). **Daarna live:** volledige suite op `wip/opnieuw` (bevat wip/tilt-26nov) (bevat de 7 bugfixes + kantelfix, akkoord Christian 26 nov) + `wip/spike-mil-26nov` erbij mergen → groen → `release/<datum>` → `main`.
-2. Heel NL verder: 5 regio-gebonden tests op `wip/heelnl` (LOG 26 nov) eerst; dan wip/opnieuw erin mergen; data/osm-nl samenvoegen (plaatsen, wegen, rivieren landelijk); eAIP-ophaal verbreden (AD 2 alle velden: torenfrequenties Schiphol/Rotterdam/Eelde/Beek/De Kooy ontbreken nog); `mission_report --fly` na de zweefkist-klimlimiet.
-3. Stotter ½ s na missiestart (A55, Christian 26 nov): Christian meet met `?fps=1` (wip/opnieuw); daarna oorzaak gericht fixen.
-4. NOTAM/AUP: **weekend 28–29 nov samen met Christian** uitwerken (spike in LOG 26 nov; opties NM B2B, EAD, FAA alleen ter vergelijking).
+## Eerstvolgende sessie (vr 27 nov 22:47) — EERST DE STOTTER (Christian 27 nov)
+0. **Stotter bij ▶ = prioriteit 1.** Meting Christian 27 nov (Galaxy A55, raw.githack `wip/opnieuw`, `?fps=1`, glider-missie 'Vlieg naar Meteren (1/3)', ×5): **na ▶ max 2834 ms @ 0 ms, tijdens ijken**; beeld staat ~3 s stil, sinds 26 nov (eerst 112 ms). **Regressie** door de twee maatregelen van 26 nov zelf (labels in batch meten, `renderer.compile` met alle verborgen objecten zichtbaar) — LOG 26 nov 22:49. **Eerste stap: bisecten** (commit vóór 'Stotter bij ▶' = 112 ms): previewlinks per stap, één maatregel per meting.
+   - Vooronderzoek 27 nov (headless, swiftshader, 4× CPU-rem): **niet te reproduceren**. Geen nieuwe shaderprogramma's, texture-uploads of zware JS na ▶ (ook gen-glider-3 met 2 keerpunten). `misVerify` per vaste missie < 0,5 s; uitschieter `misStart` ballon `bmaas` 2,3 s (synchroon).
+   - **Daarna (de oorspronkelijke 112 ms):** Chrome Android (ANGLE/Vulkan) maakt GPU-pipelines pas bij de eerste échte draw; `renderer.compile()` helpt daar niet.
+   - **Aanpak:** (1) `?fps=1` uitbreiden: JS-tijd per frame (sim/render/labels) naast de frame-gap → GPU-stall of JS? (2) opwarmen tijdens de startmelding: één frame álles (ook verborgen: doel, schaduw, verre volumes) echt naar het canvas tekenen met scissor 1×1 px vanuit de vliegcamera; (3) synchrone missieberekeningen (`misStart`/`misVerify`/`nextMission` in de meldingstekst) in plakjes of vooraf; (4) niet aantoonbaar opgelost → klein laadscherm 'Luchtruim laden…' (akkoord Christian 26+27 nov).
+   - Bug-les (CLAUDE.md): waarom glipte dit door? Headless meet geen GPU-pipelines → vastleggen wat de suite wél kan bewaken (JS-tijd per frame, synchrone berekeningen > 50 ms).
+   - Telefoongedrag is headless niet te bewijzen: **niet live**, previewlink naar Christian om met `?fps=1` te meten (zeg: mobiel).
+1. **Live (pas na de stotter — `wip/opnieuw` niet live met de regressie erin):** volledige suite op `wip/opnieuw` (bevat wip/tilt-26nov: 7 bugfixes + kantelfix, akkoord Christian 26 nov) + `wip/spike-mil-26nov` mergen → groen → `release/<datum>` → `main`. Stotterfix pas mee als Christian op de A55 akkoord geeft.
+2. Heel NL verder: 5 regio-gebonden tests op `wip/heelnl` (LOG 26 nov) eerst; dan wip/opnieuw erin mergen; data/osm-nl samenvoegen; eAIP-ophaal verbreden (AD 2-torens); `mission_report --fly` na de zweefkist-klimlimiet.
+3. NOTAM/AUP: **weekend 28–29 nov samen met Christian** uitwerken (spike in LOG 26 nov).
 
 ## Reset-push (Christian 25 nov)
 - Eén volledige reset van de weeklimiet, geldig t/m 10 dec. 27 nov–4 dec "heel NL" voorbereiden; vr 4–zo 6 dec sessies; ma 7 dec reset; 7–10 dec heel NL bouwen. Christian test 11–14 dec, vóór Mexico (15 dec).
