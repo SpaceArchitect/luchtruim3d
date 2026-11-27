@@ -260,7 +260,7 @@ async def d_banner_rmz(a):
         if await a.visible('#timePop'): await a.hit('#timeBtn')
     else:
         await a.ev('()=>{}')  # tijdknop verborgen op smalle schermen: dan geldt "nu"
-    rmz = await a.ev('()=>{const v=window.__vfr;return v.LAYERS.filter(f=>f.layer==="RMZ"&&v.AIPINFO[f.ident]&&/MIL Info/.test(v.AIPINFO[f.ident].unit)).map(f=>[f.ident,f.lp,f.lo])}')
+    rmz = await a.ev('()=>{const v=window.__vfr;return v.LAYERS.filter(f=>f.layer==="RMZ"&&v.AIPINFO[f.ident]&&/MIL Info/.test(v.AIPINFO[f.ident].unit)&&!v.featsAt(f.lp[0],f.lp[1]).some(g=>g.layer==="CTR")).map(f=>[f.ident,f.lp,f.lo])}')  # 27 nov (heel NL): RMZ Niederrhein (EHAARMZ2) ligt onder CTR Niederrhein → die gaat voor in de banner; test een RMZ zonder CTR erboven
     ok(rmz, 'geen RMZ met MIL Info in data')
     hit = None
     for ident, lp, lo in rmz:
@@ -712,7 +712,7 @@ async def d_tilt_fallback(a):  # geen sensor (desktop-browser op touchscherm, ou
 async def d_tilt_loop_balloon(a):  # Christian: looping door te kantelen; ballon zelfde logica
     if not a.touch: return
     await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
-    st = await a.ev('()=>{const v=window.__vfr;for(let k=0;k<3000;k++){const x=v.PLANE.x+(Math.random()-.5)*60,n=v.PLANE.n+(Math.random()-.5)*60;if(v.inNL(x,n)&&!v.featsAt(x,n).some(f=>f.lo<4000)&&!v.featsAt(x+Math.sin(0)*6,n+6).some(f=>f.lo<4000))return {x,n}}return null}')
+    st = await a.ev('()=>{const v=window.__vfr;for(let k=0;k<20000;k++){const r=k<3000?60:300,x=v.PLANE.x+(Math.random()-.5)*r,n=v.PLANE.n+(Math.random()-.5)*r;if(v.inNL(x,n)&&!v.featsAt(x,n).some(f=>f.lo<4000)&&!v.featsAt(x+Math.sin(0)*6,n+6).some(f=>f.lo<4000))return {x,n}}return null}')
     ok(st, 'geen vrije plek gevonden')
     await a.place(st['x'], st['n'], 2000, 0, paused=True)  # eerst alle meldingen 'gezien', dan pas vliegen (race)
     await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.NOTICE="";v.PAUSED=false;v.resetTilt()}')
@@ -729,7 +729,7 @@ async def d_tilt_loop_balloon(a):  # Christian: looping door te kantelen; ballon
     ok(not await a.v('!!v.LOOP'), 'tweede looping zonder eerst terug naar neutraal')
     # ballon: naar je toe = stijgen, naar voren = dalen, nooit een looping
     await a.fly('balloon')
-    st = await a.ev('()=>{const v=window.__vfr;for(let k=0;k<3000;k++){const x=v.PLANE.x+(Math.random()-.5)*60,n=v.PLANE.n+(Math.random()-.5)*60;if(v.inNL(x,n)&&!v.featsAt(x,n).some(f=>f.lo<4000))return {x,n}}return null}')
+    st = await a.ev('()=>{const v=window.__vfr;for(let k=0;k<20000;k++){const r=k<3000?60:300,x=v.PLANE.x+(Math.random()-.5)*r,n=v.PLANE.n+(Math.random()-.5)*r;if(v.inNL(x,n)&&!v.featsAt(x,n).some(f=>f.lo<4000))return {x,n}}return null}')
     ok(st, 'geen vrije plek voor de ballon gevonden')
     await a.place(st['x'], st['n'], 1000, 0, paused=False)
     await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);v.resetTilt()}')
@@ -812,12 +812,12 @@ async def d_start_next(a):  # Christian 25 nov: ▶ Start na geslaagd/mislukt = 
     for fail in (False, True):
         await a.ev('()=>{const v=window.__vfr;localStorage.setItem("l3d_missies",JSON.stringify(v.MISSIONS.filter(x=>x.ac==="glider"&&x.id!=="torens").map(x=>x.id)));v.newTask()}'); await a.frames(2)
         ok((await a.v('v.MISSION||{}')).get('id') == 'torens', 'missie torens niet gekozen')
-        for i in range(3):  # alle keerpunten
+        for i in range(5):  # alle keerpunten (+ de directe foutmelding bij 'mislukt', 26 nov)
             if not await a.v('v.GOAL'): break
             await a.ev(reach.replace('v.FAILS.clear();', 'v.FAILS.clear();v.FAILS.set("X","verboden gebied X");') if fail else reach); await a.frames(2)
-            if await a.v('v.GOAL') and 'Keerpunt' in await a.v('v.NOTICE'): await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.PAUSED=false}')
+            if await a.v('v.GOAL') and ('Keerpunt' in await a.v('v.NOTICE') or '↻ Opnieuw' in await a.v('v.NOTICE')): await a.ev('()=>{const v=window.__vfr;v.NOTICE="";v.PAUSED=false}')
         n = await a.v('v.NOTICE'); ok(('mislukt' if fail else 'geslaagd') in n, f'geen einde-melding: {n[:80]}')
-        ok('volgende opdracht' in n, f'einde-melding zegt niet wat ▶ doet: {n[:120]}')
+        ok('volgende opdracht' in n or '▶ = opnieuw' in n, f'einde-melding zegt niet wat ▶ doet: {n[:120]}')
         await a.ev('()=>localStorage.setItem("l3d_missies",JSON.stringify(window.__vfr.MISSIONS.filter(x=>x.ac==="glider"&&x.id!=="vught").map(x=>x.id)))')
         await a.hit('#btnPause'); await a.frames(2)
         m = (await a.v('v.MISSION||{}')).get('id')
@@ -942,6 +942,81 @@ async def d_unique_idents(a):  # 26 nov: LVNL gebruikt één ident voor CTR én 
     ok(not r, f'ident hoort bij meerdere soorten luchtruim (AIPINFO raakt de verkeerde): {r[:5]}')
     u = await a.ev("()=>{const v=window.__vfr;return v.LAYERS.filter(f=>f.layer==='CTR'&&v.AIPINFO[f.ident]&&/Arrival|Approach|Radar/.test(v.AIPINFO[f.ident].unit)).map(f=>f.ident)}")
     ok(not u, f'CTR met een naderings-eenheid als radio (hoort Tower/Info): {u[:5]}')
+
+async def d_fail_restart(a):  # Christian 26 nov: fout vóór keerpunt 1 (verboden gebied, geen klaring) → meteen stoppen met de reden, ↻ opnieuw of toch door
+    await a.hit('#modal [data-ac=glider]'); await a.frames(2)
+    start = '()=>{const v=window.__vfr;localStorage.setItem("l3d_missies",JSON.stringify(v.MISSIONS.filter(x=>x.ac==="glider"&&x.id!=="vught").map(x=>x.id)));v.newTask();v.PAUSED=false;v.NOTICE="";v.hudTick()}'
+    bad = '()=>{const v=window.__vfr,f=v.LAYERS.find(g=>g.layer==="P"),[x,n]=f.lp;Object.assign(v.PLANE,{x,n,alt:Math.min(1000,f.hi-200)});for(const g of v.LAYERS)v.WARNED.add(g.ident);v.NOTICE="";v.PAUSED=false;v.hudTick()}'
+    await a.ev(start); await a.frames(2)
+    m0 = (await a.v('v.MISSION||{}')).get('id'); st0 = await a.v('[v.PLANE.x,v.PLANE.n]')
+    await a.ev(bad); await a.frames(3)
+    n = await a.v('v.NOTICE'); ok(await a.v('v.PAUSED') and 'mislukt' in n and 'verboden' in n, f'geen directe melding met reden na verboden gebied: {n[:120]}')
+    ok('Opnieuw' in n, f'melding mist ↻ Opnieuw: {n[:200]}')
+    await a.hit('#btnPause'); await a.frames(2)
+    m1 = (await a.v('v.MISSION||{}')).get('id'); p1 = await a.v('[v.PLANE.x,v.PLANE.n]')
+    ok(m1 == m0 and abs(p1[0] - st0[0]) < .5 and abs(p1[1] - st0[1]) < .5, f'▶ herstart de missie niet vanaf de start: {m0}→{m1}, {st0}→{p1}')
+    ok(not await a.v('v.FAILS.size'), 'na opnieuw staan de fouten er nog')
+    # Christian 26 nov: geen 'Toch doorvliegen'; tik op de melding = ook opnieuw
+    await a.ev(start); await a.frames(2); await a.ev(bad); await a.frames(3)
+    n = await a.v('v.NOTICE'); ok('Toch doorvliegen' not in n, 'knop "Toch doorvliegen" staat er weer')
+    b = await a.pg.locator('#banner .notice').first.bounding_box()
+    if a.touch: await a.pg.touchscreen.tap(b['x'] + 12, b['y'] + 10)
+    else: await a.pg.mouse.click(b['x'] + 12, b['y'] + 10, delay=90)
+    await a.wait(300); await a.frames(2)
+    p2 = await a.v('[v.PLANE.x,v.PLANE.n]'); ok(abs(p2[0] - st0[0]) < .5 and abs(p2[1] - st0[1]) < .5 and not await a.v('v.FAILS.size'), f'tik op de foutmelding herstart niet: {p2}')
+
+async def d_bridge_size(a):  # Christian 26 nov (screenshot Pixel liggend): bruggen veel te groot. Oorzaak: lmMinSize schaalde onbegrensd met de afstand (×30 op 80 km)
+    await a.hit('#modal [data-ac=glider]'); await a.frames(2); bad = []
+    for lo, la, h in ((5.43, 51.89, 124), (5.86, 51.84, 270), (5.2, 51.75, 45)):
+        await a.ev('([lo,la,h])=>{const v=window.__vfr,[x,n]=v.proj(lo,la);Object.assign(v.PLANE,{x,n,alt:1500,hdg:h});for(const f of v.LAYERS)v.WARNED.add(f.ident);v.NOTICE="";v.PAUSED=true;v.chase(0,true);v.hudTick()}', [lo, la, h])
+        await a.frames(4)
+        r = await a.ev('()=>{const v=window.__vfr,T=v.THREE;return v.lmGroup.children.filter(g=>g.userData.bridge&&g.visible).map(g=>{const b=new T.Box3().setFromObject(g),s=b.getSize(new T.Vector3());return [g.userData.bridge,+Math.max(s.x,s.z).toFixed(1)]}).filter(([n,L])=>L>2.5)}')
+        bad += [f'{n} {L} km' for n, L in r]
+    ok(not bad, f'brugmodel langer dan 2,5 km in beeld (moet ±0,7–2 km zijn): {bad[:5]}')
+
+async def d_no_zfight(a):  # Christian 26 nov: treinspoor knippert (z-fighting). Klasse: twee lijnen/vlakken op ≈ dezelfde hoogte die allebei diepte schrijven
+    await a.hit('#modal [data-ac=map]'); await a.frames(2)
+    r = await a.ev("""()=>{const v=window.__vfr,T=v.THREE,out=[],items=[];v.scene.traverse(o=>{if(!(o.isLine||o.isMesh)||!o.visible||!o.material||o.material.depthWrite===false||o.material.depthTest===false)return;
+      o.updateMatrixWorld();const b=new T.Box3().setFromObject(o);if(b.isEmpty()||b.max.y-b.min.y>.002||b.max.y>.05)return;items.push([o,b]);});
+      for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){const [p,a]=items[i],[q,c]=items[j];if(Math.abs(a.min.y-c.min.y)<.0025&&Math.abs(a.min.y-c.min.y)>0&&a.min.x<=c.max.x&&a.max.x>=c.min.x&&a.min.z<=c.max.z&&a.max.z>=c.min.z/* alleen grondvlak: platte kaders op verschillende hoogte snijden nooit */&&p.isLine&&q.isLine)out.push((p.userData.nm||p.type)+'/'+(q.userData.nm||q.type)+' y='+a.min.y.toFixed(4)+'/'+c.min.y.toFixed(4));}
+      return [items.length,out.slice(0,5)];}""")
+    ok(not r[1], f'lijnen op bijna dezelfde hoogte die allebei diepte schrijven (knipperen op telefoons): {r[1]}')
+
+async def d_lm_size(a):  # Christian 26 nov: niet alleen bruggen; geen enkel 3D-herkenningspunt mag ineens het halve beeld vullen (overdreven schaal mag)
+    big = []
+    js = '''()=>{const v=window.__vfr,T=v.THREE,W=innerWidth,H=innerHeight,out=[],b=new T.Box3(),p=new T.Vector3();
+      for(const G of [v.lmGroup,...v.extraGroups()])for(const g of G.children){if(!g.visible||!G.visible)continue;let m=false;g.traverse(o=>{if(o.isMesh)m=true});if(!m)continue;b.setFromObject(g);if(b.isEmpty())continue;
+        let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,beh=false;for(let i=0;i<8;i++){p.set(i&1?b.max.x:b.min.x,i&2?b.max.y:b.min.y,i&4?b.max.z:b.min.z).project(v.camera);if(p.z>1){beh=true;break;}const sx=(p.x+1)/2*W,sy=(1-p.y)/2*H;x0=Math.min(x0,sx);x1=Math.max(x1,sx);y0=Math.min(y0,sy);y1=Math.max(y1,sy);}
+        if(beh||x1<0||x0>W||y1<0||y0>H)continue;const cw=Math.min(x1,W)-Math.max(x0,0),ch=Math.min(y1,H)-Math.max(y0,0);
+        if(cw*ch>.04*W*H||cw>.35*W||ch>.35*H)out.push((g.userData.bridge||g.userData.nm||g.type)+' '+Math.round(cw)+'x'+Math.round(ch));}return out.slice(0,4);}'''
+    await a.hit('#modal [data-ac=glider]'); await a.frames(2)
+    for lo, la, h, alt in ((5.43, 51.89, 124, 1500), (5.47, 51.44, 0, 1000), (5.86, 51.84, 270, 2500), (5.2, 51.65, 90, 800)):
+        await a.ev('([lo,la,h,alt])=>{const v=window.__vfr,[x,n]=v.proj(lo,la);Object.assign(v.PLANE,{x,n,alt,hdg:h});for(const f of v.LAYERS)v.WARNED.add(f.ident);v.NOTICE="";v.PAUSED=true;v.chase(0,true);v.hudTick()}', [lo, la, h, alt]); await a.frames(5)
+        big += [f'vlieg {lo},{la}: {x}' for x in await a.ev(js)]
+    await a.ev('()=>window.__vfr.setMode("map")'); await a.frames(3)
+    for c in ([0, 40, 30], [0, 12, 10], [5, 4, 6], [-20, 3, 4]):
+        await a.ev('(c)=>{const v=window.__vfr;v.controls.target.set(0,0,-30);v.camera.position.set(c[0],c[1],-30+c[2]);v.controls.update()}', c); await a.frames(5)
+        big += [f'kaart {c}: {x}' for x in await a.ev(js)]
+    ok(not big, f'3D-object te groot op het scherm (> 4% vlak of > 35% breed/hoog): {big[:5]}')
+
+async def d_label_budget(a):  # Christian 26 nov: niet te druk. (1) overige labels ≤ 15% (kaart) / 10% (vlieg) van het scherm; (2) nooit twee labels over elkaar (labels werden verborgen gemeten → 80×16)
+    js = '''(fly)=>{const v=window.__vfr,W=innerWidth,H=innerHeight,R=[];let ne=0;for(const L of v.labels){if(L.el.style.display!=='block')continue;const r=L.el.getBoundingClientRect();if(r.right<0||r.left>W||r.bottom<0||r.top>H)continue;R.push([r,L.el.textContent.slice(0,16)]);if(!(L.isAir||L.isGoal||L.isPin))ne+=r.width*r.height;}
+      const ov=[];for(let i=0;i<R.length;i++)for(let j=i+1;j<R.length;j++){const [a,x]=R[i],[b,y]=R[j],w=Math.min(a.right,b.right)-Math.max(a.left,b.left),h=Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top);if(w>4&&h>4)ov.push(x+' / '+y);}
+      return {ne:ne/W/H,ov:ov.slice(0,3)};}'''
+    bad = []
+    await a.hit('#modal [data-ac=map]'); await a.frames(2); await a.wait(1500)
+    for c in ([0, 40, 30], [0, 12, 10], [5, 4, 6]):
+        await a.ev('(c)=>{const v=window.__vfr;v.controls.target.set(0,0,-30);v.camera.position.set(c[0],c[1],-30+c[2]);v.controls.update()}', c); await a.frames(6)
+        r = await a.ev(js, False)
+        if r['ne'] > .165: bad.append(f'kaart {c}: overige labels {r["ne"]:.0%} van het scherm')
+        bad += [f'kaart {c}: overlap {o}' for o in r['ov']]
+    await a.ev('()=>window.__vfr.setMode("fly","glider")'); await a.frames(3)
+    for lo, la, h in ((5.43, 51.89, 124), (5.47, 51.44, 0), (5.2, 51.65, 90)):
+        await a.ev('([lo,la,h])=>{const v=window.__vfr,[x,n]=v.proj(lo,la);Object.assign(v.PLANE,{x,n,alt:1500,hdg:h});for(const f of v.LAYERS)v.WARNED.add(f.ident);v.NOTICE="";v.PAUSED=true;v.chase(0,true);v.hudTick()}', [lo, la, h]); await a.frames(6)
+        r = await a.ev(js, True)
+        if r['ne'] > .11: bad.append(f'vlieg {lo},{la}: overige labels {r["ne"]:.0%}')
+        bad += [f'vlieg {lo},{la}: overlap {o}' for o in r['ov']]
+    ok(not bad, f'te druk of labels over elkaar: {bad[:5]}')
 
 async def d_tap_notice(a):  # Fleur 14 nov: tik op een melding = verder (nu "lege melding onderin")
     await a.hit('#modal [data-ac=glider]'); await a.frames(3)
@@ -1257,6 +1332,18 @@ async def d_no_freeze(a):  # 25 nov: generator/vlucht-check blokkeerden de pagin
     ok(r['id'] == 'gen-glider-1', f'uitdaging start niet vanzelf: {r}')
     ok(r['gap'] < 700, f'pagina zat {r["gap"]:.0f} ms vast tijdens het maken van een uitdaging (max 700)')
 
+async def d_start_smooth(a):  # 27 nov: stotter bij ▶ (A55: 2834 ms stil). Headless ziet geen GPU-pipelines, wél de klasse 'main thread seconden vast na ▶' (synchrone missieberekening, layout-storm)
+    await a.ev("()=>{window.__LT=[];new PerformanceObserver(l=>{for(const e of l.getEntries())window.__LT.push(Math.round(e.duration))}).observe({type:'longtask'})}")
+    for ac in ('glider', 'motor', 'balloon'):
+        await a.fly(ac); await a.wait(1200)
+        ok(await a.v('v.PAUSED'), f'{ac}: geen startmelding')
+        ok('▶ = start' in (await a.v('v.NOTICE') or ''), f'{ac}: startmelding zonder ▶ = start')
+        await a.ev('()=>{window.__LT.length=0}'); await a.hit('#btnPause'); await a.wait(3000)
+        mx = await a.ev('()=>Math.max(0,...window.__LT)')
+        n = await a.v('v.NOTICE') or ''
+        ok('▶ = start' not in n, f'{ac}: ▶ startte de vlucht niet: {n[:90]}')  # daarna mag een naderingsmelding (motor bij Volkel) weer pauzeren
+        ok(mx < 500, f'{ac}: na ▶ zat de pagina {mx} ms vast (max 500)')
+
 async def d_menu_on_top(a):  # 25 nov: missiemelding lag óver het tijdmenu (weekend niet aan te tikken). Klasse: open menu = bovenop, overal
     await a.hit('#modal [data-ac=glider]'); await a.frames(2)
     for btn, pop in (('#timeBtn', '#timePop'), ('#btnPanel', '#panel')):
@@ -1283,6 +1370,47 @@ async def d_ctr_covers_rmz(a):  # Christian 21 nov: "missie mislukt, RMZ Deelen 
     f = await a.ev('()=>[...window.__vfr.FAILS.keys()]')
     ok('EHDLRMZ' in f, f'zonder klaring of oproep hoort RMZ Deelen een fout te zijn: {f}')
 
+async def d_tilt_notice_bend(a):  # Christian 25 nov: melding midden in een bocht → ▶ → kantelen opnieuw geijkt, bocht niet voort te zetten.
+    # Regel (Christian): ijken alleen bij de start en na draaien staand↔liggend; nooit door een melding, resize of pauze. Realistische ruis ±5°.
+    if not a.touch: return
+    await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
+    st = await a.v('v.PLANE'); await a.place(st['x'], st['n'], 2500, 0, paused=True)
+    await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident)}')
+    rng = random.Random(2511); ang0 = await a.v('v.tiltAng()')
+    import time as _t
+    async def hold(turn, back, ms, jit=5):
+        t0 = _t.time()
+        while _t.time() - t0 < ms / 1000:
+            await a.ev(SEND, orient(turn + rng.uniform(-jit, jit), back + rng.uniform(-jit, jit), ang0, 60)); await a.wait(35)
+    await a.ev('()=>window.__vfr.resetTilt()'); await hold(0, 0, 500); await a.hit('#btnPause'); await hold(0, 0, 1500, jit=2)
+    ok(not await a.v('v.PAUSED'), 'start: ▶ hervat niet')
+    for cause in ('melding', 'resize', 'pauze'):
+        await hold(25, 0, 900); ok(await a.v('v.TAX.r') > .2, f'{cause}: bocht naar rechts komt niet op gang')
+        if cause == 'melding':
+            await a.ev('()=>{const v=window.__vfr;v.NOTICE="🔶 Over 1,0 km: <b>CTR X</b> · klaring nodig<br><small>▶ = verder</small>";v.PAUSED=true;v.hudTick()}')
+            await hold(25, 0, 500); await a.hit('#btnPause')
+        elif cause == 'resize':
+            vw = a.pg.viewport_size; await a.pg.set_viewport_size({'width': vw['width'], 'height': vw['height'] - 56}); await hold(25, 0, 400)
+            await a.pg.set_viewport_size(vw)
+        else:
+            await a.hit('#btnPause'); await hold(25, 0, 500); await a.hit('#btnPause')
+        ok(not await a.v('v.PAUSED'), f'{cause}: ▶ hervat niet')
+        h0 = await a.v('v.PLANE.hdg'); await hold(25, 0, 1500)
+        dh = (((await a.v('v.PLANE.hdg')) - h0 + 540) % 360 - 180)
+        ok(dh > 8 and await a.v('v.TAX.r') > .2, f'{cause}: na ▶ midden in de bocht gaat de bocht niet verder (Δkoers {dh:.0f}°, TAX.r {await a.v("v.TAX.r")})')
+        await hold(0, 0, 900); ok(abs(await a.v('v.TAX.r')) < .01, f'{cause}: rechtop houden = niet meer rechtuit (nulstand verschoven)')
+    # Christian 26 nov: hetzelfde voor stijgen en dalen (telefoon naar je toe/van je af) midden in een klim of daling
+    for back, what in ((22, 'klim'), (-22, 'daling')):
+        for cause in ('melding', 'pauze'):
+            await hold(0, back, 900); p0 = await a.v('v.TAX.p'); ok(abs(p0) > .2, f'{what}/{cause}: {what} komt niet op gang (TAX.p {p0})')
+            if cause == 'melding':
+                await a.ev('()=>{const v=window.__vfr;v.NOTICE="🔶 Over 1,0 km: <b>CTR X</b> · klaring nodig<br><small>▶ = verder</small>";v.PAUSED=true;v.hudTick()}')
+            else: await a.hit('#btnPause')
+            await hold(0, back, 500); await a.hit('#btnPause'); await hold(0, back, 1200)
+            p1 = await a.v('v.TAX.p'); ok(abs(p1) > .2 and (p1 > 0) == (p0 > 0), f'{what}/{cause}: na ▶ midden in de {what} gaat die niet door (TAX.p {p0} → {p1})')
+            await hold(0, 0, 900); ok(abs(await a.v('v.TAX.p')) < .01, f'{what}/{cause}: telefoon terug in de starthouding = niet meer horizontaal (nulstand verschoven)')
+    await a.sane()
+
 async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren/onpauzeren gaat het kantelen nu en dan de mist in"
     if not a.touch: return
     await a.hit('#modal [data-ac=glider]'); await tilt_on(a)
@@ -1298,9 +1426,14 @@ async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren
     async def jolt(turn, back, ang=None, p0=60):  # de tik op ▶ schudt de telefoon
         for _ in range(4):
             await a.ev(SEND, orient(turn + rng.uniform(-14, 14), back + rng.uniform(-14, 14), ang0 if ang is None else ang, p0)); await a.wait(20)
-    async def resume_check(label, turn, back, ang=None, p0=60):
-        # pauze, telefoon anders vasthouden (lezen), ▶ met schok, dan rustig in de nieuwe houding
-        await a.hit('#btnPause'); ok(await a.v('v.PAUSED'), f'{label}: pauze gaat niet aan')
+    async def resume_check(label, turn, back, ang=None, p0=60, start=True):
+        # start=True: nieuwe opdracht → ▶ ijkt op de houding van nu. start=False (Christian 25 nov): pauze midden in de vlucht
+        # ijkt níet opnieuw; de oude nulstand (turn, back) blijft gelden, ook als je tijdens de pauze anders vasthoudt
+        if start:
+            await a.ev('()=>{const v=window.__vfr;v.newTask();for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.PLANE.alt=Math.max(v.PLANE.alt,2500)}')
+            ok(await a.v('v.PAUSED') and '▶ = start' in await a.v('v.NOTICE'), f'{label}: nieuwe opdracht start niet in pauze')
+        else:
+            await a.hit('#btnPause'); ok(await a.v('v.PAUSED'), f'{label}: pauze gaat niet aan')
         await hold(rng.uniform(-30, 30), -35, 600, ang, jit=8, p0=p0)
         await hold(turn, back, 400, ang, p0=p0)
         await a.hit('#btnPause'); await jolt(turn, back, ang, p0)
@@ -1316,13 +1449,12 @@ async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren
     await resume_check('scheef (20°) vastgehouden', 20, 10)
     await resume_check('erg scheef (32°)', -32, -5)
     await resume_check('rechtop', 0, 0)
-    # na een nieuwe opdracht (missie klaar) idem
-    await a.ev('()=>{const v=window.__vfr;v.newTask();for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const g of v.HG)v.WARNED.add("HG"+g.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.PLANE.alt=Math.max(v.PLANE.alt,2500)}')
-    ok(await a.v('v.PAUSED'), 'nieuwe opdracht start niet in pauze')
-    await a.hit('#btnPause')  # was pauze → eerst nog even pauzeren zodat resume_check het patroon volgt
+    await resume_check('pauze midden in de vlucht', 0, 0, start=False)  # nulstand blijft (0,0)
     await resume_check('na nieuwe opdracht', 12, 5)
-    # hele onrustige hand (±15°): melding "houd even stil", geen bocht; stil houden → melding weg en bestuurbaar
-    await a.hit('#btnPause'); await hold(0, 0, 400); await a.hit('#btnPause')
+    await resume_check('pauze na scheef ijken', 12, 5, start=False)
+    # hele onrustige hand (±15°) bij de start: melding "houd even stil", geen bocht; stil houden → melding weg en bestuurbaar
+    await a.ev('()=>{const v=window.__vfr;v.newTask();for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident);v.PLANE.alt=Math.max(v.PLANE.alt,2500)}')
+    await hold(0, 0, 400); await a.hit('#btnPause')
     h0 = await a.v('v.PLANE.hdg'); await hold(0, 0, 1700, jit=15)
     ok(await a.visible('#stillHint'), 'onrustige hand: geen melding "houd de telefoon even stil"')
     await a.shot('still_hint')
@@ -1339,6 +1471,7 @@ async def d_tilt_pause_edges(a):  # Christian 21 nov: "na een missie of pauzeren
         await hold(0, 0, 3200, ang=90)
         ok(await a.v('v.TAX.r') == 0, 'vergrendeld: stuurt na ijken')
         await resume_check('vergrendeld liggend', 8, 5, ang=90)
+        await resume_check('vergrendeld liggend, pauze', 8, 5, ang=90, start=False)
     await a.sane()
 
 async def d_enr55_sites(a):  # 21 nov: alle ENR 5.5-terreinen (lier, lierstart zweefvliegen, modelvliegen, ULV) als cilinder met AIP-bovengrens
@@ -1535,7 +1668,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('toetsen zoals MSFS', d_msfs_keys), ('sneltoetskaart', d_keycard), ('spatie bij keerpunten', d_space_waypoints), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('idents uniek per luchtruimsoort', d_unique_idents), ('Start na missie = volgende', d_start_next), ('grondring op de grond', d_hg_ring_ground), ('vario = echte stijgsnelheid', d_vario_real), ('rivier-/wegdoel = hele rivier', d_line_goal_whole), ('alles aanklikbaar (ook ENR 5.5)', d_click_all), ('camera liggend dichtbij', d_chase_landscape), ('labels niet over het toestel', d_labels_off_aircraft), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('open menu ligt bovenop', d_menu_on_top), ('niet haperen bij missies', d_no_freeze), ('missiegenerator', d_generator), ('gedeelde ENR 5.5-terreinen (Malden)', d_shared_sites), ('geen voorbeeldcircuit', d_no_circuit), ('P-gebieden H24 zichtbaar', d_h24_always), ('labels knipperen niet', d_labels_steady), ('missies echt uitvliegen', d_missions_flown), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('bruggen Maas/Waal', d_bridges), ('doorsnede', d_cross_section), ('rondleiding', d_tour), ('herkenningspunten', d_landmarks)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('toetsen zoals MSFS', d_msfs_keys), ('sneltoetskaart', d_keycard), ('spatie bij keerpunten', d_space_waypoints), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('geen z-fighting grondlijnen', d_no_zfight), ('bruggen niet te groot', d_bridge_size), ('3D-herkenningspunten niet te groot', d_lm_size), ('labels: budget en geen overlap', d_label_budget), ('fout in missie: opnieuw of door', d_fail_restart), ('Start na missie = volgende', d_start_next), ('grondring op de grond', d_hg_ring_ground), ('vario = echte stijgsnelheid', d_vario_real), ('rivier-/wegdoel = hele rivier', d_line_goal_whole), ('alles aanklikbaar (ook ENR 5.5)', d_click_all), ('camera liggend dichtbij', d_chase_landscape), ('labels niet over het toestel', d_labels_off_aircraft), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('open menu ligt bovenop', d_menu_on_top), ('niet haperen bij missies', d_no_freeze), ('▶ start zonder vastlopen', d_start_smooth), ('missiegenerator', d_generator), ('gedeelde ENR 5.5-terreinen (Malden)', d_shared_sites), ('geen voorbeeldcircuit', d_no_circuit), ('P-gebieden H24 zichtbaar', d_h24_always), ('labels knipperen niet', d_labels_steady), ('missies echt uitvliegen', d_missions_flown), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('kantelen: melding in de bocht', d_tilt_notice_bend), ('bruggen Maas/Waal', d_bridges), ('doorsnede', d_cross_section), ('rondleiding', d_tour), ('herkenningspunten', d_landmarks), ('idents uniek per luchtruimsoort', d_unique_idents)]
     async with async_playwright() as p:
         try:
             b = await p.chromium.launch(args=ARGS)
