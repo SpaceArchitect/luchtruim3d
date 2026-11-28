@@ -77,6 +77,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - Highscorelijst met bijnaam (alleen na akkoord Christian + privacycheck) → D
 - Anonieme terugkeer-gebeurtenissen (pas na juridische check) → F
 - IGC-import als lokale tool voor alleen Christian (niet op de site) → E
+- Gebruikerstest met zweefvliegers van Christians club (middag tijdens het winteronderhoud), pas als de site 'af' is: scenario's papieren kaart vs. app — Christian 28 nov
 
 ## Nog te verifiëren (AIP) — zie CLAUDE.md "Vastgelegde kennis"
 - TRA/TSA-activering: planner en missies rekenen ze als altijd actief; echte status via Eurocontrol AUP/UUP (zie NOTAM-punt P3)
@@ -94,5 +95,6 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - Na de vaste missies: oneindige generator (staat sinds 25 nov; docs/MISSIES.md).
 
 ## Niet doen (besluit Christian)
+- 'Les van de week' uit de AIP voor Christian — Christian 28 nov: flutidee.
 - Betaalde device-testdienst (BrowserStack e.d.) — Christian 28 nov: geen abonnement; liever schone code. Vervanging: structurele klasse-tests (d_smooth_flight, bugregister) + meetlat ?fps=1 bij twijfel.
 - Voorbeeldcircuit en circuits per zweefveld · thermiek/zweven · MSFS-export · accounts met inloggen · cookiemelding · "spel"/"game" in metadata · IGC op de openbare site · AR-bril (apart project)
