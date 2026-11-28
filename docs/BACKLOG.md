@@ -50,7 +50,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 ## Nog te verifiëren (AIP) — zie CLAUDE.md "Vastgelegde kennis"
 - TRA/TSA-activering: planner en missies rekenen ze als altijd actief; echte status via Eurocontrol AUP/UUP (zie NOTAM-punt P3)
 - Malden: model- en zweefvliegen nooit tegelijk (Christian, lokale afspraak; ENR 5.5 zegt niets) · Nistelrode: zweef + lier op één terrein, gelijktijdigheid onbekend
-- Status/klasse van een CTR buiten de openingstijden · Niederrhein TMZ squawk/frequentie (DFS-AIP) · eerste oproep Arrival of Tower
+- Niederrhein TMZ squawk/frequentie (DFS-AIP). *(CTR buiten openingstijden en eerste oproep Tower: geverifieerd 28 nov, zie CLAUDE.md)*
 
 ## Open vragen aan Christian
 - Vught 's avonds onzichtbaar: niet te reproduceren (EHP29 is H24 en in de app altijd actief). Zie je het nog, stuur dan een screenshot met tijd en modus.

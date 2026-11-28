@@ -207,8 +207,11 @@ Regel: `- <datum> SP: <model> · schatting X · werkelijk Y · <plan/les>`.
   sterk aanbevolen 124.300 + 7020. Bij tweeweg-contact geen FMC maar 7000. Valt nu buiten de regio; nodig bij heel NL. **Squawk alleen tonen bij een TMZ** (7000, of 7020 in de TMZ Schiphol Area) (Christian: anders lijkt het alsof je erin mag).
 - Feestdagen: AIP GEN 2.1 §6 (11 dagen; Pasen en Pinksteren berekend). AIP SUP 03/2022 (Lelystad TMA 3–5, Nieuw Milligen TMA
   B/C2/E) inbouwen zodra de regio die TMA's bevat.
-- **Nog te verifiëren:** status/klasse van een CTR buiten de openingstijden (nu afgeleid: niet actief, RMZ wel); Niederrhein TMZ
-  (squawk 6101 + Langen Radar 119.110? bron was een AI-overzicht → DFS-AIP); eerste oproep Arrival of Tower.
+- **Geverifieerd 28 nov (eAIP AIRAC 12-2026):** EHEH AD 2.17/2.18: CTR Eindhoven (D, GND–3000 ft AMSL) 0600–2300 UTC (zomer 0500–2200) = 07–24 lokaal;
+  ATS-eenheid = Eindhoven Tower 131.005 → **de CTR in = eerst Tower**; Eindhoven Arrival 132.530 alleen voor 'VFR traffic crossing Eindhoven TMA';
+  Tower: 'Outside OPR HR contact Dutch MIL Info 132.350'. ENR 2.2: RMZ Eindhoven en RMZ De Peel GND–3000 ft AMSL, 2300–0600 UTC (zomer 2200–0500),
+  Dutch MIL Info 132.350 → buiten de openingstijden is de CTR niet actief en geldt de RMZ.
+- **Nog te verifiëren:** Niederrhein TMZ (squawk 6101 + Langen Radar 119.110? bron was een AI-overzicht → DFS-AIP, niet in de LVNL-spiegel).
 
 **Licenties:** LVNL Geoportaal CC BY 4.0 · OSM ODbL ("© OpenStreetMap-bijdragers") · three.js MIT · Natural Earth publiek domein.
 
