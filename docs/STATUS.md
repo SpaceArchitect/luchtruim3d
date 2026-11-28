@@ -22,7 +22,7 @@
   - CTR/RMZ-openingstijden uit de AIP-tekst;
   - **landdoel** (missie 'lely': landen op Lelystad);
   - tests: d_tiles, d_tiles_probe_cold, d_ctr_hours, d_land_goal.
-  - Volledige suite liep 28 nov 10:04 (uitslag in LOG).
+  - Volledige suite: 28 nov gestopt voor de stotter → opnieuw draaien.
 - **`wip/vindbaar-28nov`**: metadata zonder spel/game, JSON-LD, over.html, robots, sitemap. **Christian: privacytekst over.html goedkeuren** ('verwerkingsverantwoordelijke: Christian Niemeijer').
 
 ## Eerstvolgende stappen
