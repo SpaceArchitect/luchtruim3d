@@ -1422,6 +1422,8 @@ async def d_smooth_flight(a):  # 28 nov (Christian: 'na het laadscherm nimmer ha
     for ac in ('glider', 'motor', 'balloon'):
         await a.fly(ac)
         await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident)}')  # meldingen pauzeren: hier gaat het om haperen tijdens het vliegen
+        un = await a.v('v.labels.filter(L=>L.el&&!L.w).length')  # 28 nov: labels voor het eerst meten tijdens het vliegen = geforceerde layout = hapering
+        if un > 3: bad.append(f'{ac}: {un} labels nog niet gemeten na het laadscherm')
         await a.ev('()=>{const T=window.__TW;T.F=[];T.tm=0;T.tw="";T.on=true}')
         await a.hit('#btnPause'); await a.wait(10000)
         r = await a.ev('()=>{const T=window.__TW;T.on=false;const F=T.F.slice().sort((x,y)=>x-y);return {med:F[F.length>>1]||0,max:F[F.length-1]||0,n:F.length,tm:T.tm,tw:T.tw}}')
