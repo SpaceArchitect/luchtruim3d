@@ -1427,6 +1427,11 @@ async def d_loading(a):  # 28 nov (Christian): laadscherm bij openen, vliegen en
     # pauze midden in de vlucht en weer verder: geen laadscherm (alleen bij een nieuwe start)
     await a.hit('#btnPause'); await a.frames(2); await a.hit('#btnPause'); await a.frames(1)
     ok(not await a.ev(on), 'laadscherm bij gewone pauze → verder (hoort alleen bij start)')
+    # klasse: telefoon die tussen 16 en 33 ms wisselt (30–60 fps) is vloeiend → scherm moet dicht; een hapering van 2,9 s houdt het open (bug 28 nov: drempel 1,6× snelste frame hield het 8 s vast)
+    r = await a.ev("""()=>{const v=window.__vfr,G=v.GATE;const best=G.best;v.gateShow('test',0);G.best=16;const seq=[];for(let k=0;k<12&&G.on;k++){v.gateTick(k%2?33:16);seq.push(k)}const jit=!G.on;
+      v.gateShow('test',0);G.best=16;v.gateTick(16);v.gateTick(2900);const stall=G.on;for(let k=0;k<4;k++)v.gateTick(17);const after=!G.on;G.best=best;return {jit,stall,after,n:seq.length}}""")
+    ok(r['jit'], f'laadscherm blijft hangen bij wisselend 16/33 ms (30–60 fps): {r}')
+    ok(r['stall'] and r['after'], f'hapering van 2,9 s niet achter het laadscherm, of daarna niet dicht: {r}')
 
 async def d_menu_on_top(a):  # 25 nov: missiemelding lag óver het tijdmenu (weekend niet aan te tikken). Klasse: open menu = bovenop, overal
     await a.hit('#modal [data-ac=glider]'); await a.frames(2)
