@@ -1368,7 +1368,8 @@ async def d_start_smooth(a):  # 27 nov: stotter bij ▶ (A55: 2834 ms stil). Hea
 
 async def d_loading(a):  # 28 nov (Christian): laadscherm bij openen, vliegen en ▶ start. Moet komen, weer weggaan (≤ 8,5 s), en nooit klikken blokkeren
     on = "()=>{const L=document.getElementById('loadScr');return !!L&&!L.classList.contains('off')}"
-    ok(not await a.ev(on), 'laadscherm hangt na het openen')
+    t0 = await a.ev("""async()=>{const t=performance.now(),L=document.getElementById('loadScr');while(!L.classList.contains('off')&&performance.now()-t<8500)await new Promise(r=>setTimeout(r,50));return performance.now()-t}""")
+    ok(t0 < 8500, f'laadscherm hangt na het openen ({t0:.0f} ms extra)')  # suite 28 nov: direct na het laden kijken was te vroeg (scherm gaat 0,2–0,4 s na de module weg)
     ok(await a.ev("()=>getComputedStyle(document.getElementById('loadScr')).pointerEvents") == 'none', 'laadscherm blokkeert klikken')
     await a.fly('glider'); await a.wait(1500)
     ok(not await a.ev(on), 'laadscherm hangt na kiezen van een toestel')
