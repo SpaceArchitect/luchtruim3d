@@ -57,6 +57,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - [M] **Vaste missies heel NL** (Christian 28 nov: nu vooral Zuid-Nederland): per regio missies met één leerdoel; generator werkt op wip/tiles al landelijk.
 
 ## P3 — koers (top 5, even zwaar) en groter werk
+- [M] **Transition level op basis van het actuele weer** (idee Christian 28 nov). AIP ENR 1.7 (AIRAC 12-2026): transition altitude **3000 ft IFR / 3500 ft VFR** in de hele Amsterdam FIR; transition level op of boven 4000 ft AMSL, elk uur vastgesteld. Nog te verifiëren: de regel/tabel QNH → TL (ENR 1.7) en een primaire, loginvrije bron voor QNH (METAR via een Action). In de app: boven TA hoogte als FL tonen, uitleg 'boven 3500 ft: standaard 1013 hPa', TL in de HUD; bij twijfel 'vereenvoudigd'.
 - **Story — generator v2** (Christian 22–25 nov; v1 staat, zie docs/MISSIES.md; opgesplitst door Claude 28 nov). Elke stap: generator blijft alleen missies leveren die de vlucht-check haalt, nooit generatorwerk tijdens het vliegen (d_gen_bg_idle, d_smooth_flight).
   - G1. [S] Leerdoel uit de werkelijk geraakte gebieden (sonde langs de geplande route) i.p.v. het doelgebied + plafond aan de moeilijkheid (max. aantal conflicten per niveau). Eerst, want G2–G5 leunen erop.
   - G2. [M] Smalle gangen: keerpunt of route door een gang < 3 km tussen twee gebieden (bv. tussen CTR en TMA-trap). Vangnet: elke gang-missie heeft een route met ≥ 300 m marge.
