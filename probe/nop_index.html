@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!-- The line above switches the browser into standard mode, see also
+http://en.wikipedia.org/wiki/Internet_Explorer_box_model_bug
+http://en.wikipedia.org/wiki/Document_type_declaration
+
+This line must be the first in the data stream that is sent to the browser. Add
+onload="alert('mode: ' + document.compatMode);"
+to the body tag to see which mode the browser has chosen. If the output is "BackCompat" then
+some other part of the server system might have added code in front of this file rendering
+the DOCTYPE setting useless. Check with "View page source" or such in the browser.
+-->
+<html>
+  <head>
+    <meta Http-Equiv="X-UA-Compatible" Content="IE=Edge">
+    <title>NOP Network Operations Portal</title>
+    <meta Http-Equiv="Cache-Control" Content="no-cache">
+    <meta Http-Equiv="Pragma" Content="no-cache">
+    <meta Http-Equiv="Expires" Content="0">
+  </head>
+  <!-- 964px is the width of the header image,
+         margin: 0 auto; centers on Firefox,
+         text-align: center; centers on IEx7 -->
+  <body id="main" style="margin: 0 auto; width: 964px; background: #C5CDD7; text-align: center;">
+    <script language='javascript' src='/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/MainPages.nocache.js'></script>
+    <iframe src="javascript:''" id="__gwt_historyFrame" style="position:absolute;width:0;height:0;border:0"></iframe>
+  </body>
+</html>

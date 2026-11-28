@@ -1,0 +1,135 @@
+[
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/index.html",
+  "status": 200,
+  "type": "document",
+  "method": "GET",
+  "body": "<!DOCTYPE html>\n<!-- The line above switches the browser into standard mode, see also\nhttp://en.wikipedia.org/wiki/Internet_Explorer_box_model_bug\nhttp://en.wikipedia.org/wiki/Document_type_declaration\n\nThis line must be the first in the data stream that is sent to the browser. Add\nonload=\"alert('mode: ' + document.compatMode);\"\nto the body tag to see which mode the browser has chosen. If the outp"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/mainpages",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[2,1,[\"eurocontrol.cfmu.cua.portal.common.main.PortalSessionStatus/2052556584\"],0,7]"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/mainpages",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[-385,258,1,238,0,237,3,0,0,0,830,65,0,0,626,491,0,0,492,491,0,59,0,-425,0,829,-385,352,351,350,349,348,347,346,345,344,343,342,341,340,339,338,337,336,335,334,333,332,331,330,329,328,327,326,325,324,323,322,321,320,319,318,317,316,315,314,313,312,311,310,309,308,307,306,305,304,303,302,301,300,299,298,297,296,295,294,293,292,291,290,289,288,287,286,285,284,283,282,281,280,279,278,277,276,275,"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/wind",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,7,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,1,5,4,\"aIfc5wA\",0,3,\"A\",\"aIjNHSl\",0,0,2,0,0,0,0,1,[\"eurocontrol.cfmu.cua.portal.common.main.MainViewConfig/954261731\",\"eurocontrol.cfmu.cua.portal.common.main.ClientPortalContext/3867874825\",\"/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121\",\"/gateway/spec/PORTAL.29.0.0.1.121\",\"eurocontrol.cfmu.cua.portal.common.main.viewmanager.ViewScope/2010989164\",\"\",\"e"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/eaup",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,1,0,\"aIbltcA\",0,1,0,\"aIgvTMA\",4,15,0,1,0,\"aIYdNaA\",2,0,1,0,\"aIbltcA\",0,1,0,\"aIgvTMA\",4,14,0,2,0,\"aIY2nYg\",2,0,1,0,\"aIbzcWA\",0,1,0,\"aIgvTMA\",4,13,0,3,0,\"aIbzq_g\",2,0,1,0,\"aIcBLQA\",0,1,0,\"aIgvTMA\",4,12,0,4,0,\"aIcBLQA\",2,0,1,0,\"aIcICtA\",0,1,0,\"aIgvTMA\",4,11,0,5,0,\"aIcIRWg\",2,0,1,0,\"aIcO6KA\",0,1,0,\"aIgvTMA\",4,10,0,6,0,\"aIcPIzg\",2,0,1,0,\"aIcVxnA\",0,1,0,\"aIgvTMA\",4,9,0,7,0,\"aIcVxnA\",2,0,1,0,\"aIdF"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/daily_plan",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[1,1,[\"java.lang.Boolean/476441737\"],0,7]"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/anm",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[\"aIjGlzg\",2,\"aIjMUBA\",2,2,1,[\"[Ljava.util.Date;/3768760277\",\"java.util.Date/3385151746\"],0,7]"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/wind",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,7,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,1,5,4,\"aIfc5wA\",0,3,\"A\",\"aIjNHTI\",0,0,2,0,0,0,0,1,[\"eurocontrol.cfmu.cua.portal.common.main.MainViewConfig/954261731\",\"eurocontrol.cfmu.cua.portal.common.main.ClientPortalContext/3867874825\",\"/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121\",\"/gateway/spec/PORTAL.29.0.0.1.121\",\"eurocontrol.cfmu.cua.portal.common.main.viewmanager.ViewScope/2010989164\",\"\",\"e"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/daily_plan",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,0,0,0,0,9,855638015,3,8,-8421505,3,7,-8421505,3,6,838926335,3,5,838861055,3,4,838926080,3,6,2,\"aIi5fLo\",0,1,[\"eurocontrol.cfmu.cua.portal.common.main.map.MapData/221721788\",\"java.util.ArrayList/4159755760\",\"eurocontrol.cfmu.cua.portal.common.main.map.MapLegendEntry/1650305233\",\"Headline News\",\"Events\",\"ACCs\",\"NAT\",\"Weather\",\"Hotspot\"],0,7]"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/eaup",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[1,2,0,0,0,0,1,[\"eurocontrol.cfmu.common.iem.RetrieveResult/1278097372\",\"eurocontrol.cfmu.common.iem.RetrieveStatus/3173674294\"],0,7]"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/headline_news",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,0,45,0,44,33,0,1,0,1,0,0,43,1,\"A\",0,\"YAUmM0E\",0,\"YcakiyA\",42,0,\"YcajH9S\",12,41,1,\"A\",-8,9,0,0,0,0,40,39,6,5,0,0,4,21,0,1,0,0,0,0,38,1,\"A\",0,\"ZyzNWkj\",0,\"ZymsdwA\",37,0,\"ZyzNWkj\",12,36,1,\"A\",-8,9,0,0,0,0,35,34,6,5,0,0,4,33,0,1,0,1,0,0,32,1,\"A\",0,\"aDnJZOA\",0,\"aHBMuLg\",31,0,\"aHBMdD$\",12,30,1,\"A\",-8,9,0,0,0,0,29,28,6,5,0,0,4,27,0,1,0,0,0,0,26,1,\"A\",0,\"aIccUHw\",0,\"aGKGzAA\",25,0,\"aIccUHw\",12,24,1,"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/networkevent",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,0,599,0,598,-25,0,0,0,-42,1,12,29,-77,0,-19,-20,0,-19,467,0,283,280,0,12,282,0,1,281,21,1,12,280,19,1,12,466,465,463,464,463,462,13,1,12,7,0,\"aHn0n35\",6,7,0,\"aHn0n35\",6,0,597,0,0,0,0,0,\"aIu5rAA\",0,0,1,\"aKgMa2g\",10,-8,8,0,0,7,0,\"aHn0n34\",6,0,-5,4,-670,0,-669,1,12,0,0,29,-634,0,-76,-20,0,-76,596,0,188,187,0,12,186,0,1,185,21,1,12,184,19,1,12,389,0,388,0,388,288,0,188,187,0,12,186,0,1,185,21,1"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/networkevent",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,0,416,0,415,-834,0,-833,1,12,0,0,29,-618,0,-76,-20,0,-76,414,0,76,73,0,12,75,0,1,74,21,1,12,73,19,1,12,377,0,376,0,376,324,1,12,322,0,\"aIYdcLO\",6,322,0,\"aIYddB0\",6,0,413,0,0,0,0,0,\"aIkmfgA\",0,0,1,\"aI$WNmg\",10,-8,8,0,0,322,0,\"aIYcoak\",6,0,0,0,\"aIkmfgA\",0,0,1,\"aI$WNmg\",10,-8,8,-5,4,-81,0,67,1,12,0,0,0,29,-618,0,-76,-20,0,-76,412,0,403,400,0,12,402,0,1,401,21,1,12,400,19,1,12,411,0,410,0,410,3"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/asd",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,\"aIjMxUA\",23,0,0,0,0,0,\"aIfc5wA\",0,\"aIjMiqg\",22,0,1,0,\"aIjMiqg\",0,22781,0,14594,0,4236,0,21,400,0,3951,0,\"BL5Gfg\",0,2.625359872E9,20,0,\"2THOg\",6,19,0,\"A\",6,18,0,\"G3dA\",6,17,0,\"Mmzvg\",6,16,0,\"A\",6,15,0,\"GLvJg\",6,14,0,\"FCRA\",6,13,0,\"A\",6,12,0,\"A\",6,11,0,\"HaeNg\",6,10,0,\"J$lJA\",6,9,0,\"A\",6,8,0,\"BB0V2A\",6,7,0,\"A\",6,14,5,0,4,115243.0,0,\"BQl2ig\",3,0,0,\"dTA\",0,1,0,2,0,0,\"aIjMxWI\",1,[\"eurocontrol.cf"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/e_helpdesk",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,37,0,36,0,35,31,34,31,33,31,32,31,0,30,1,0,29,0,0,28,23,0,0,2,27,0,26,1,25,24,\"aIfc5wA\",0,23,\"A\",\"aIjNHVx\",0,0,22,21,20,0,19,0,0,0,18,0,0,0,0,0,0,17,9,0,0,1,12,0,16,9,0,15,7,0,14,0,0,0,0,5,13,0,0,0,12,0,11,9,10,9,0,8,7,0,6,0,0,0,0,5,4,3,2,1,[\"eurocontrol.cfmu.cua.portal.e_helpdesk.main.EHelpdeskMainViewConfig/1894565002\",\"\",\"eurocontrol.cfmu.cua.config.runtime.e_helpdesk.MAIN/1816249445\",\"e"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/evita",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,16,12,11,-5,0,1,15,8,7,0,\"aHty362\",6,1,\"A\",0,\"Z38aizN\",14,13,0,\"Z38afOW\",3,12,11,2,10,0,1,9,8,7,0,\"Z38bgT9\",6,1,\"A\",0,\"Z26MW3o\",5,4,0,\"Z26MTLW\",3,2,2,0,0,0,1,[\"eurocontrol.cfmu.common.iem.QueryResult/3355019857\",\"java.util.ArrayList/4159755760\",\"eurocontrol.cfmu.evita.iem.Crisis/1964525640\",\"This is a simulated crisis for training purposes\",\"921\",\"eurocontrol.cfmu.common.iem.LastUpdate/2780"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/status_map",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,0,0,0,0,7,855572480,3,6,855611648,3,5,855624704,3,4,845396223,3,4,2,\"aIjMyxw\",0,1,[\"eurocontrol.cfmu.cua.portal.common.main.map.MapData/221721788\",\"java.util.ArrayList/4159755760\",\"eurocontrol.cfmu.cua.portal.common.main.map.MapLegendEntry/1650305233\",\"\\u003C 15 MIN\",\"\\u003C 30 MIN\",\"\\u003C 45 MIN\",\"\\u003E\\u003D 45 MIN\"],0,7]"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/networkevent",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,0,416,0,415,-834,0,-833,1,12,0,0,29,-618,0,-76,-20,0,-76,414,0,76,73,0,12,75,0,1,74,21,1,12,73,19,1,12,377,0,376,0,376,324,1,12,322,0,\"aIYdcLO\",6,322,0,\"aIYddB0\",6,0,413,0,0,0,0,0,\"aIkmfgA\",0,0,1,\"aI$WNmg\",10,-8,8,0,0,322,0,\"aIYcoak\",6,0,0,0,\"aIkmfgA\",0,0,1,\"aI$WNmg\",10,-8,8,-5,4,-81,0,67,1,12,0,0,0,29,-618,0,-76,-20,0,-76,412,0,403,400,0,12,402,0,1,401,21,1,12,400,19,1,12,411,0,410,0,410,3"
+ },
+ {
+  "url": "https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/PORTAL.29.0.0.1.121/gwt/MainPages/pri",
+  "status": 200,
+  "type": "xhr",
+  "method": "POST",
+  "body": "//OK[0,0,55,0,54,14,0,0,0,0,53,1,\"A\",0,\"ZJWoU8v\",1,\"A\",34,0,\"ZJWoU8v\",11,52,1,\"A\",9,0,0,51,50,6,5,0,0,4,49,0,0,0,0,48,1,\"A\",0,\"ZJ7uXDf\",1,\"A\",34,0,\"ZJ7uXDf\",11,47,1,\"A\",9,0,0,46,45,6,5,0,0,4,14,0,0,0,0,44,1,\"A\",0,\"ZNiuNOl\",1,\"A\",34,0,\"ZNiuNOl\",11,43,1,\"A\",9,0,0,42,41,6,5,0,0,4,40,0,0,0,0,39,1,\"A\",0,\"ZSZAzi8\",1,\"A\",34,0,\"ZSZAzi8\",11,38,1,\"A\",9,0,0,37,36,6,5,0,0,4,14,0,0,0,0,35,1,\"A\",0,\"ZU3Yxie\",1,\""
+ }
+]

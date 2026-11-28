@@ -1,0 +1,1532 @@
+	
+
+
+						HELP
+	
+28/11/2026
+	
+
+
+17:29
+	
+33
+	
+UTC
+	
+TARGET DATE: 28/11/2026
+
+
+	
+	
+SET
+
+
+D (Tactical)
+	
+	
+SEARCH
+
+	
+
+
+ 
+	
+Resources & Services
+	
+Post-Operations
+	
+Tactical
+	
+PreTactical
+	
+Strategic
+	
+ 
+
+
+Initial Network Plan
+	
+	
+
+
+Network Plan
+
+
+
+
+	
+Headline News
+
+
+	
+Events
+
+
+	
+ACCs
+
+
+	
+NAT
+
+
+	
+Weather
+
+
+	
+Hotspot
+
+
+	
+Network Static Map
+
+
+ATFCM Measures (Scenarios)
+	
+	
+
+
+	
+
+Scenarios aim at the optimisation of capacity across the European Network of ACCs. NM Strategic Operational Planning works actively to minimise the number of ATFM regulations, consistent with the protection of ATC sectors. Find the scenario request form here
+
+
+
+Scenario List
+
+
+Network Axis Management
+	
+	
+
+
+Involvement of ACCs in the axes processes
+
+
+
+Read the NM Axes Meetings Terms of Reference.
+
+
+Axis Weekly Management
+	
+	
+
+
+
+The Axis interactive dashboard provides daily axis traffic statistics.
+
+FATHOM has other flight metric, sector configuration and punctuality views.
+
+Request access to FATHOM on the below link.
+Axis interactive dashboard
+Mention you are an FMP in the additional information box and you will also be granted access to the Axis interactive dashboard.
+
+
+
+
+Contingency
+	
+	
+
+
+The status of the Network Manager operations is NORMAL.
+
+
+
+
+ATFCM Procedural Contingency Plan Summer 2026 - Edition 1.0
+
+
+Valid 29/03/2026
+
+
+ATFCM Procedural Contingency Plan Winter 2026-2027- Edition 1.0
+
+
+Valid 25/10/2026
+
+
+These documents address the contingency procedure to be carried out in the event of a long term failure of Network Operations systems.
+
+The following document is for use in the event of a CCAMS contingency:
+CCAMS Contingency Plan 2.8- valid from 09/12/2024
+
+
+ANM
+	
+	
+
+
+Valid On	
+28/11/2026
+
+Last Released	
+28/11/2026 17:01
+
+
+AIM
+	
+	
+
+
+Description	Released on
+
+WAVE 2.6 RELEASE MIGRATION 01 DEC UPDATE
+	
+26/11/2026 12:28
+
+
+XCD NON-AVAILABILITY OF EDDK FCM NO
+	
+27/11/2026 22:42
+
+
+FLIGHT PLAN MAINTENANCE SYSTEM AT LECM
+	
+27/11/2026 08:44
+
+
+XCD CANCELLED FOR EDDK
+	
+27/11/2026 23:44
+
+
+more
+
+
+European AUP/UUP
+	
+	
+
+
+
+
+EUUP	
+28/11/2026 08:00
+	29/11/2026 06:00
+EUUP	
+28/11/2026 06:00
+	29/11/2026 06:00
+EAUP	
+28/11/2026 06:00
+	29/11/2026 06:00
+EUUP	
+27/11/2026 13:30
+	28/11/2026 06:00
+EUUP	
+27/11/2026 13:00
+	28/11/2026 06:00
+EUUP	
+27/11/2026 09:30
+	28/11/2026 06:00
+EUUP	
+27/11/2026 09:00
+	28/11/2026 06:00
+EUUP	
+27/11/2026 08:30
+	28/11/2026 06:00
+EUUP	
+27/11/2026 08:00
+	28/11/2026 06:00
+EUUP	
+27/11/2026 07:00
+	28/11/2026 06:00
+EUUP	
+27/11/2026 06:00
+	28/11/2026 06:00
+EAUP	
+27/11/2026 06:00
+	28/11/2026 06:00
+
+
+
+more
+
+
+RAD
+	
+	
+
+
+The RAD is designed as a part of the Network Manager (NM) ATFCM operation. The objective of the RAD is to facilitate flight planning, in order to improve ATFCM, while allowing aircraft operators flight planning flexibility.
+
+
+
+
+RAD Homepage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+Network Headline News
+	
+	
+
+
+ 
+	
+Latest News
+	
+Ongoing News
+	
+ 
+
+
+28 NOV 2026 16:24
+	
+	
+Tactical Update
+	
+
+
+28 NOV 2026 16:05
+	
+	
+INP (Initial Network Plan)
+	
+
+
+
+
+more
+
+
+Network Events
+	
+	
+
+
+Saturday, 28 November 2026
+	
+	
+	
+	
+	
+
+
+ 
+	
+Month
+	
+Day
+	
+ 
+
+
+Show only starting events
+
+Select Types
+
+
+
+
+ 	
+BIRDCTA, ENORFIR, BGGLFIR, ENOBFIR
+
+
+	
+Isar Spectrum Launch - ANDOYA Spaceport
+
+ 	
+26/11/2026 00:00 - 17/02/2027 23:59
+
+
+ 	
+LFBB
+
+
+	
+Training for new ATM system step 4
+
+ 	
+21/09/2026 00:00 - 31/12/2026 23:59
+
+
+ 	
+EYVLFIR
+
+
+	
+Freedom Shield 2026-II (FRSH26-II)
+
+ 	
+15/11/2026 00:00 - 01/12/2026 23:59
+
+
+ 	
+EYVLFIR
+
+
+	
+Military exercise and Meteorological Ballon Flights (MIL_EX)
+
+ 	
+16/11/2026 00:00 - 17/12/2026 23:59
+
+
+ 	
+LBSRFIR, LTAAFIR, LTFM, LTFJ, LTBA, LTBBFIR
+
+
+	
+Missile firing over Black Sea
+
+ 	
+25/11/2026 06:30 - 28/11/2026 07:45
+
+
+ 	
+LECMFIR, LECBFIR
+
+
+	
+TLP 04-26
+
+ 	
+23/11/2026 00:00 - 04/12/2026 23:59
+
+
+ 	
+LGAV
+
+
+	
+03L/21R closure
+
+ 	
+05/11/2026 00:00 - 18/12/2026 23:59
+
+
+ 	
+LPPT
+
+
+	
+ATC Clearance via DCL
+
+ 	
+25/02/2021 00:00 - TBD
+
+
+ 	
+LIRN
+
+
+	
+Aerodrome closure
+
+ 	
+01/11/2026 00:00 - 30/11/2026 18:00
+
+
+ 	
+LFPG
+
+
+	
+Closure of Southern Tower
+
+ 	
+09/12/2025 00:00 - 01/04/2027 23:59
+
+
+ 	
+LCLK
+
+
+	
+Closure of Stands 16,17,21,22 & 22A
+
+ 	
+12/05/2026 00:00 - TBD
+
+
+ 	
+LIMC
+
+
+	
+D-DCL Data-Link implementation
+
+ 	
+19/12/2024 01:00 - TBD
+
+
+ 	
+LPPT
+
+
+	
+Data link clearance
+
+ 	
+31/07/2025 11:07 - TBD
+
+
+ 	
+LMML
+
+
+	
+Diversion parking
+
+ 	
+28/02/2026 00:00 - TBD
+
+
+ 	
+EKCH
+
+
+	
+EKCH snow
+
+ 	
+05/02/2026 15:00 - TBD
+
+
+ 	
+LICC
+
+
+	
+ETNA VOLCANIC ACTIVITY _ IROPS EVENT
+
+ 	
+29/10/2026 07:45 - TBD
+
+
+ 	
+LEAL
+
+
+	
+Handling company Groundforce on strike
+
+ 	
+15/05/2026 00:00 - TBD
+
+
+ 	
+LEAL
+
+
+	
+Handling company Groundforce on strike
+
+ 	
+29/04/2026 03:00 - TBD
+
+
+ 	
+LPPT
+
+
+	
+High solar activity.
+
+ 	
+12/11/2025 17:30 - TBD
+
+
+ 	
+LTFM
+
+
+	
+LOCAL A-CDM OPERATION HAS BEEN LAUNCHED AT ISTANBUL AIRPORT
+
+ 	
+21/11/2023 07:00 - TBD
+
+
+ 	
+LSGG
+
+
+	
+LSGG - new AODB & new A-CDM as of MAY 6th 2025
+
+ 	
+06/05/2025 00:00 - TBD
+
+
+ 	
+LPPT
+
+
+	
+MAJOR WORKS - EXTENSION OF APRON 10 AND NEW APRON 23
+
+ 	
+01/02/2025 00:00 - 31/08/2027 23:59
+
+
+ 	
+LMML
+
+
+	
+Main Terminal (East) Expansion
+
+ 	
+01/11/2025 00:00 - TBD
+
+
+ 	
+LPPT
+
+
+	
+NEW TEMPORARY STANDS 001, 002, 003 AND 004 IN USE. TWY A1 CENTRE LINE DEVIATED
+
+ 	
+17/07/2025 06:00 - TBD
+
+
+ 	
+LIMC
+
+
+	
+New Apron frequency - Start Up procedure
+
+ 	
+23/09/2024 07:30 - TBD
+
+
+ 	
+LEBB
+
+
+	
+New aircraft stand configurantion
+
+ 	
+27/01/2025 00:00 - TBD
+
+
+ 	
+LTFM
+
+
+	
+Official Opening of Runway 09
+
+ 	
+18/09/2026 05:00 - TBD
+
+
+ 	
+LATI
+
+
+	
+Parking stands
+
+ 	
+31/05/2024 00:00 - TBD
+
+
+ 	
+EVRA
+
+
+	
+Passenger Terminal Expansion
+
+ 	
+01/11/2026 00:00 - 31/03/2030 23:59
+
+
+ 	
+LICC
+
+
+	
+Potential Delays Due to ANSP Data Network Disruption
+
+ 	
+16/10/2026 04:00 - TBD
+
+
+ 	
+LTBA
+
+
+	
+Procedures for DCL (Digital ATC Clearance)
+
+ 	
+02/10/2025 00:00 - TBD
+
+
+ 	
+LTBA
+
+
+	
+RNAV SID and STAR s Change
+
+ 	
+17/04/2025 00:00 - TBD
+
+
+ 	
+LGSK
+
+
+	
+RWY 01/19 CLOSED DUE TO WIP
+
+ 	
+18/11/2026 00:00 - 30/11/2026 23:59
+
+
+ 	
+LCLK
+
+
+	
+RWY 04/22 CLOSED
+
+ 	
+15/11/2026 21:50 - 06/12/2026 03:25
+
+
+ 	
+LTFJ
+
+
+	
+RWY 06L/24R WINTER SEASON CLOSURE
+
+ 	
+25/10/2026 23:00 - 27/03/2027 02:00
+
+
+ 	
+LGTS
+
+
+	
+RWY 10/28 CLOSED DUE TO WIP
+
+ 	
+23/11/2026 06:00 - 07/12/2026 15:00
+
+
+ 	
+LYBE
+
+
+	
+RWY 12L-30R RET
+
+ 	
+29/05/2025 02:30 - TBD
+
+
+ 	
+LMML
+
+
+	
+RWY 13 Approach Lighting Upgrade
+
+ 	
+19/11/2026 00:00 - 26/01/2027 23:59
+
+
+ 	
+LGMT
+
+
+	
+RWY 14/32 CLOSED DUE TO WIP
+
+ 	
+16/11/2026 22:00 - 29/12/2026 22:00
+
+
+ 	
+LGKF
+
+
+	
+RWY 14/32 CLSD DUE TO WIP
+
+ 	
+04/11/2026 10:30 - 30/11/2026 11:30
+
+
+ 	
+LGMK
+
+
+	
+RWY 16/34 CLOSED DUE TO WIP
+
+ 	
+25/11/2026 22:00 - 17/12/2026 22:00
+
+
+ 	
+EDDK
+
+
+	
+Reconstruction TWY B segmented Part 1 until 5
+
+ 	
+02/11/2021 00:00 - 31/12/2026 23:59
+
+
+ 	
+EVRA
+
+
+	
+Reconstruction of Apron 4
+
+ 	
+01/06/2024 00:00 - 31/12/2027 23:59
+
+
+ 	
+EDDK
+
+
+	
+Reconstruction of TWY C between THR 31L and TWY A
+
+ 	
+01/01/2026 00:00 - 31/03/2027 23:59
+
+
+ 	
+LQSA
+
+
+	
+Reparation of Rwy and apron taxiway surface
+
+ 	
+29/05/2026 00:00 - TBD
+
+
+ 	
+LFMN
+
+
+	
+Runway 04L/22R Closure
+
+ 	
+26/10/2026 07:00 - 18/12/2026 16:00
+
+
+ 	
+LIMC
+
+
+	
+Runway Holding Position Stop Bars Illuminated H24
+
+ 	
+02/11/2026 00:00 - 24/12/2026 23:00
+
+
+ 	
+EVRA
+
+
+	
+Runway Night-Time Scheduled Maintenance Closures
+
+ 	
+28/10/2026 00:00 - 24/03/2027 23:59
+
+
+ 	
+LEAL
+
+
+	
+Split of inner taxiway on apron in front of Terminal building
+
+ 	
+25/02/2026 00:00 - 25/12/2026 23:59
+
+
+ 	
+EGCC
+
+
+	
+TAXIWAY DELTA CLOSURE
+
+ 	
+20/02/2026 00:00 - TBD
+
+
+ 	
+LTFJ
+
+
+	
+TWY A1 CLOSURE
+
+ 	
+28/10/2026 15:50 - 25/01/2027 16:00
+
+
+ 	
+LATI
+
+
+	
+TWY C closure
+
+ 	
+31/03/2026 00:00 - 30/12/2026 23:59
+
+
+ 	
+LPPT
+
+
+	
+TWY M1 RENAMED R1 AND TWY M2 RENAMED R2 AND R3.
+
+ 	
+15/07/2025 05:00 - TBD
+
+
+ 	
+LTFJ
+
+
+	
+TWY R2 CLOSURE
+
+ 	
+28/10/2026 15:52 - 25/01/2027 16:00
+
+
+ 	
+LPPT
+
+
+	
+TWYS R1, R2 and T1 Closed. TWY Y centreline deviated.
+
+ 	
+02/09/2026 04:00 - TBD
+
+
+ 	
+LCLK
+
+
+	
+Taxilane LC Reduce from Code E to Code C due to Apron Expansion
+
+ 	
+12/05/2026 00:00 - TBD
+
+
+ 	
+EGCC
+
+
+	
+Taxiway Delta (D7-D8) Pavement Reconstruction
+
+ 	
+23/11/2026 08:00 - 28/05/2027 17:00
+
+
+ 	
+EGCC
+
+
+	
+Taxiway Delta Closure
+
+ 	
+20/08/2026 00:00 - TBD
+
+
+ 	
+EGCC
+
+
+	
+Taxiway Delta Diversion
+
+ 	
+01/09/2026 00:00 - TBD
+
+
+ 	
+LEPA
+
+
+	
+Terminal Area/building refurbishment
+
+ 	
+03/11/2022 00:00 - 31/03/2027 23:59
+
+
+ 	
+LMML
+
+
+	
+Turnpad 05 - TWY L Fillet Upgrade
+
+ 	
+23/11/2026 00:00 - 31/01/2027 23:59
+
+
+ 	
+LTBA
+
+
+	
+VFR flight permission
+
+ 	
+17/04/2025 00:00 - TBD
+
+
+ 	
+EDDM
+
+
+	
+Weather / Fog
+
+ 	
+21/01/2025 09:50 - TBD
+
+
+Search
+	
+List
+
+
+Network Weather Information
+	
+	
+
+
+Assessment of available meteorological information with potential impact oncapacity or network operations provided by the NMOC Weather Specialists.
+
+
+Daily Update (click here)
+
+
+
+
+
+Convective forecasts related to "Capacity and Weather-based operations".
+
+
+Interactive display of the Cross Border Convection Forecast polygons provided by the EUMETNET partners: Weather App
+
+CWBO Post Operational Report:CWBO interactive dashboard
+
+
+
+
+Tele/WebEx conferences
+	
+	
+
+
+
+NM may invite Customers via AIM or Headline News to join a specific Operations Briefing targeted towards adhoc situations as they occur.
+
+The Briefings connect operational stakeholders via conference as part of a strengthened coordination process to jointly achieved better operations.
+
+The conferences may be in the form of a web conference via WebEx or a teleconference via InterCall.
+
+* For the teleconference dial +32 2891 0103. The required PIN and/or additional details will be published via AIM and/or Headline News.
+
+
+
+
+Safety Claims
+	
+	
+
+
+NM Incident eTOKAI Log in
+
+	
+For post-event occurrences users can raise claims with the NM Incident team.
+eTOKAI is recognized as an easy-to-use online tool already utilized by many Air Navigation Service Providers (ANSPs) and Aircraft Operators (AO) and CFSP for occurrence investigation, supporting safety management systems and partner collaboration.
+
+Users who wish to report post-event operational problems via eTOKAI can request access via the "contact us" page.
+
+Select Post-event incident investigations from the dropdown menu.
+In Your question, insert: eTOKAI access request.
+
+To request access, please follow the process published on Post Event Operational Problem Reporting
+
+eTOKAI LOG IN
+More info on eTOKAI
+
+
+Contacts
+	
+	
+
+
+
+Depending on the nature of your enquiry you can get direct contact with NMOC or make a search to send a message to NM on different topics.
+
+
+
+
+Network Operations & NM Contacts
+
+
+
+
+Portal Assistance
+	
+	
+
+
+If you have an urgent Operational request in relation to a flight, please follow the procedure in place to reach the Network Manager Operations Center NMOC.
+
+If you experience login or other technical urgent problems please contact our Technical helpdesk (CSO).
+
+To provide non-urgent feedback on your user experience or any question in relation to the NOP Portal please send an email to NOP Portal Support.
+
+To understand a little more how the NOP works, you can access Video Tutorials via NM Flight Management Zone.
+
+
+	
+Current Network Situation
+	
+	
+
+
+Last update: 28/11/2026 17:28
+
+
+	
+< 15 MIN
+
+
+	
+< 30 MIN
+
+
+	
+< 45 MIN
+
+
+	
+>= 45 MIN
+
+
+	
+Static Map
+
+
+ATFCM Situation Data
+	
+	
+
+
+Last update
+	
+28/11/2026 17:27
+
+
+Flights
+
+
+Total
+	
+22,781
+
+
+Landed
+	
+14,594 (64%)
+
+
+Airborne
+	
+3,951 (17%)
+
+
+Expected
+	
+4,236 (19%)
+
+
+Delays (in minutes)
+
+
+Cumulated
+	
+43,756.0
+
+
+Average/Flight
+	
+1.9
+
+
+En-route
+	
+21,221 (48%)
+
+
+Airport
+	
+22,535 (52%)
+
+
+>= 30 min
+	
+400
+
+
+Delay Causes
+
+
+Reason
+	
+Delay
+	
+Delay (%)
+
+
+ATC Capacity	18404	42%
+Weather	15183	35%
+ATC Staffing	3525	8%
+Aerodrome Capacity	2790	6%
+ATC Ind Action	2073	5%
+Special Event	1729	4%
+ATC Equipment	30	0%
+Others	22	0%
+Accident / Incident	0	0%
+Aerodrome Services	0	0%
+Airspace Management	0	0%
+Ind Action non-ATC	0	0%
+ATC Routeings	0	0%
+Environmental Issues	0	0%
+
+
+
+
+
+
+more
+
+
+E-Helpdesk
+	
+	
+
+
+To request access to the E-Helpdesk please fill in the NM information request form.
+
+
+Flights
+	
+	
+
+
+Access to Flights is restricted to NOP (Protected) Portal Users.
+For more information on this function consult the online help through the ? button on the right of the title.
+To read the instructions for subscription please visit the NM Operational services and products page of our website.
+
+
+
+
+Flight Planning
+	
+	
+
+
+The Network Manager Flight Planning area provides a flight plan validation service as well as a flight plan management and route finding service for secure access users.
+
+Access our video tutorials in the NM Flight Management Zone
+
+Flight Plan Validation can also be performed on Next AIRAC data (normally available 14 days before the AIRAC switch) via the NEXT AIRAC link, or on adhoc AIRAC data (only during pre-validation exercises) via the ADHOC AIRAC link.
+
+Flight Planning Tools:
+
+
+
+	
+Free Text Editor
+
+
+Structured Editor
+
+
+Contacts and Support
+
+
+NM Flight Planning Documentation
+
+
+Flight Plan Guide
+
+
+NM Release Information
+	
+	
+
+
+ 
+	
+Latest News
+	
+OnGoing News
+	
+ 
+
+
+20 APR 2026 05:18
+	
+	
+EUROCONTROL iNM Wave 2.3 Release Notes Edition 3
+	
+
+
+25 MAR 2026 06:26
+	
+	
+EUROCONTROL iNM Wave 2.3 Release Notes Edition 2
+	
+
+
+12 DEC 2025 13:53
+	
+	
+EUROCONTROL iNM Wave 2.2 Release Notes Edition 1
+	
+
+
+04 NOV 2025 06:26
+	
+	
+EUROCONTROL iNM Wave 2.1 Release Notes Edition 2
+	
+
+
+12 SEP 2025 11:58
+	
+	
+EUROCONTROL iNM Wave 2.1 Release Notes Edition 1
+	
+
+
+24 FEB 2025 09:56
+	
+	
+EUROCONTROL iNM Wave 1.1 Release Notes Edition 2.0
+	
+
+
+24 JAN 2025 15:51
+	
+	
+EUROCONTROL iNM Wave 1.1 Release Notes Edition 1.0
+	
+
+
+25 NOV 2024 09:48
+	
+	
+EUROCONTROL iNM Wave-1 Release Notes Edition 1.0
+	
+
+
+11 OCT 2024 13:16
+	
+	
+EUROCONTROL iNM Wave-O Release Notes Edition 3.0
+	
+
+
+04 OCT 2024 08:24
+	
+	
+EUROCONTROL iNM Wave-O Release Notes Edition 2
+	
+
+
+
+
+more
+
+
+EVITA
+	
+	
+
+
+For more information on the European Crisis Visualisation Interactive Tool for ATFCM (EVITA), please consult the EVITA web page.
+
+
+
+
+Measures
+	
+	
+
+
+Access to Measures is restricted to NOP (Protected) Portal Users.
+For more information on this function consult the online help through the ? button on the right of the title.
+To read the instructions for subscription please visit the NM Operational services and products page of our website.
+
+
+
+
+Traffic Counts
+	
+	
+
+
+Access to Traffic Counts is restricted to NOP (Protected) Portal Users.
+For more information on this function consult the online help through the ? button on the right of the title.
+To read the instructions for subscription please visit the NM Operational services and products page of our website.
+
+
+
+
+Airspace Data
+	
+	
+
+
+Access to Airspace Data is restricted to NOP (Protected) Portal Users.
+For more information on this function consult the online help through the ? button on the right of the title.
+To read the instructions for subscription please visit the NM Operational services and products page of our website.
+
+
+
+
+Network Operations HANDBOOK
+	
+	
+
+
+Network Operations Procedure Updates
+
+
+
+
+ATFCM Users Manual - Edition Wave 2.6 Date 01/12/2026
+
+
+
+
+ATFCM Users Manual - Edition Wave 2.3 Date 22/04/2026
+
+
+
+
+ATFCM Operations Manual - Edition Wave 2.6 Date 01/12/2026
+
+
+
+
+ATFCM Operations Manual - Edition Wave 2.3 Date 22/04/2026
+
+
+
+
+IFPS Users Manual - Edition Wave 2.6 Date 02/12/2026
+
+
+
+
+IFPS Users Manual - Edition Wave 2.3 Date 22/04/2026
+
+
+
+
+
+
+Provision of CACD Data - Edition 14.0 Date 01/04/2026
+
+
+
+
+Access guide for iNM Digital Products - iNM Log in User Guide 1.0
+
+
+
+
+Flexible Use of Airspace AMC/CADF Operations Manual - Edition 21.0 Date 10/11/2025
+
+
+
+
+Flexible Use of Airspace AMC/CADF Operations Manual - Edition 22.0 Date 01/12/2026
+
+
+
+
+CCAMS Users Manual - Edition 2.5 Date 01/12/2020
+
+
+
+
+CCAMS User Manual - Edition 2.6 Date 01/12/2026
+
+
+
+
+NM Operational Problem Reporting - Edition: 20.0 Date 01/12/20225
+
+
+
+
+
+
+Other operational documentation & CACD forms
+
+
+
+
+ 
+
+
+© 2021 The European Organisation for the Safety of Air Navigation (EUROCONTROL)
+All rights reserved	nop.office@eurocontrol.int	
+Legal Notice & Disclaimer
