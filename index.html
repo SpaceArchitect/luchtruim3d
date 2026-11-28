@@ -1459,7 +1459,7 @@ function placeLabels(){lmMinSize();
     if(AR){const m=L.prev?2:14;if(r[0]<AR[2]+m&&r[2]>AR[0]-m&&r[1]<AR[3]+m&&r[3]>AR[1]-m)continue;}
     if(L.prio>=9&&L.d>140)continue;
     {const ess=L.isAir||L.isGoal||L.isPin,la=L.w*L.h;if(!ess&&usedA+la>BUD*(L.prev?1.1:1))continue;usedA+=la;}
-    placed.push(r);L.show=true;L.el.style.transform=`translate(${Math.round(x0)}px,${Math.round(y0)}px)`;}
+    placed.push(r);L.show=true;{const tf=`translate(${Math.round(x0)}px,${Math.round(y0)}px)`;if(L.tf!==tf){L.tf=tf;L.el.style.transform=tf;}}/* 28 nov: alleen bij verandering (minder stijlwerk) */}
   for(const L of labels){const disp=L.show?'block':'none';if(L.el.style.display!==disp)L.el.style.display=disp;}
 }
 
