@@ -1446,7 +1446,8 @@ async def d_refuse_turn(a):  # Christian 28 nov (×10, motor, De Peel): klaring 
             await a.frames(1)
             r = await a.ev("()=>{const v=window.__vfr;return {p:v.PAUSED,n:v.NOTICE||'',open:!!document.querySelector('#banner [data-rt=\"open:EHDP\"]'),in:v.INSIDE.some(f=>f.ident==='EHDP')}}")
             if r['in']: got = 'al in de CTR vóór de waarschuwing'; break
-            if r['p'] and r['open']: break
+            if r['p'] and r['open'] and 'CTR' in r['n']: break
+            if r['p']: await a.ev("()=>{const v=window.__vfr;v.NOTICE='';v.PAUSED=false}")  # andere melding (bv. militair gebied): de gebruiker drukt ▶
         if got: bad.append(f'×{[1,2,5,10][tempo_i]}: {got}'); continue
         # klaring vragen → geweigerd (alleen knoppen)
         clicked = False
@@ -1454,7 +1455,9 @@ async def d_refuse_turn(a):  # Christian 28 nov (×10, motor, De Peel): klaring 
             clicked = await a.ev("()=>{const v=window.__vfr,e=document.querySelector('#banner [data-rt=\"open:EHDP\"]');if(!e)return false;v.RTOUT.set('EHDP',{t:performance.now(),o:'traffic'});e.click();return true}")
             if clicked: break
             await a.frames(1)
-        if not clicked: bad.append(f'×{[1,2,5,10][tempo_i]}: klaringsknop verdween'); continue
+        if not clicked:
+            dbg = await a.ev("()=>{const v=window.__vfr;return [v.PAUSED,(v.NOTICE||'').replace(/<[^>]+>/g,'').slice(0,90),[...document.querySelectorAll('#banner [data-rt]')].map(e=>e.dataset.rt).join(','),v.INSIDE.map(f=>f.ident).join(',')]}")
+            bad.append(f'×{[1,2,5,10][tempo_i]}: klaringsknop verdween {dbg}'); continue
         for _ in range(4):
             ks = await a.ev('()=>[...document.querySelectorAll("#banner [data-rt^=pick],#banner [data-rt^=rb]")].map(e=>e.dataset.rt)')
             if not ks: break
@@ -1466,6 +1469,7 @@ async def d_refuse_turn(a):  # Christian 28 nov (×10, motor, De Peel): klaring 
         d0 = await a.ev("()=>{const v=window.__vfr;return v.AHEAD&&v.AHEAD.d}")
         await a.ev("()=>{const e=document.querySelector('#banner [data-rt=\"close\"]');if(e)e.click()}")
         await a.ev("()=>{const v=window.__vfr;v.NOTICE='';v.PAUSED=false}")
+        await a.wait(2000)  # reactietijd: melding gesloten, dan pas sturen (Christian: 'onvoldoende tijd om om te draaien')
         # gebruiker keert om: stuurknop vasthouden (vol) of kantelen (half)
         await a.ev("(fr)=>{const v=window.__vfr;if(fr>=1)v.keys['arrowright']=true;else{v.keys['tr']=true;v.TAX.r=fr}}", frac)
         h0 = await a.v('v.PLANE.hdg'); inside = False
