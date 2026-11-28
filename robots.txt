@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://luchtruim3d.nl/sitemap.xml
