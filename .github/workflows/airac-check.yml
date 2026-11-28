@@ -1,0 +1,64 @@
+name: airac-check
+# AIRAC-vangnet (BACKLOG P2, Christian 25 nov). Na elke ophaalactie van data/eaip of data/lvnl, en elke donderdag:
+# 1) luchtruim in de app vs. LVNL Geoportaal (build_airspace --check: nieuw/verdwenen/gewijzigd per volume),
+# 2) frequenties/eenheden vs. eAIP (aip_check), 3) elke vaste missie echt uitvliegen + generator (e2e).
+# Bij een afwijking: een issue met label 'airac' en de uitvoer, zodat de volgende sessie het als P0 oppakt. Raakt main/live niet.
+on:
+  workflow_run:
+    workflows: ['data-eaip', 'data-lvnl']
+    types: [completed]
+  schedule:
+    - cron: '17 8 * * 4'   # donderdag (AIRAC-dag), na de ophaalacties
+  workflow_dispatch:
+  push:
+    branches: ['wip/**']
+    paths: ['.github/workflows/airac-check.yml', 'tools/build_airspace.py', 'tools/aip_check.py']
+permissions:
+  contents: read
+  issues: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      BBOX: '4.75,51.2,6.15,52.15'   # regio van de live-app; bij heel NL verbreden
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ github.event_name == 'push' && github.ref || 'main' }}", fetch-depth: 1}
+      - name: Data ophalen
+        run: git fetch -q --depth 1 origin data/lvnl:refs/remotes/origin/data/lvnl data/eaip:refs/remotes/origin/data/eaip
+      - name: Luchtruim vs. Geoportaal
+        id: lvnl
+        continue-on-error: true
+        run: python3 tools/build_airspace.py --bbox "$BBOX" --check 2>&1 | tee lvnl.txt; exit ${PIPESTATUS[0]}
+      - name: Frequenties vs. eAIP
+        id: aip
+        continue-on-error: true
+        run: python3 tools/aip_check.py 2>&1 | tee aip.txt; exit ${PIPESTATUS[0]}
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - name: Testomgeving
+        run: python3 tools/setup.py && python3 -m playwright install --with-deps chromium
+      - name: Missies uitvliegen + generator
+        id: fly
+        continue-on-error: true
+        run: |
+          python3 tools/e2e.py --only det --forms desk -k "missies echt uitvliegen" 2>&1 | tee fly.txt; a=${PIPESTATUS[0]}
+          python3 tools/e2e.py --only det --forms desk -k "missiegenerator" 2>&1 | tee -a fly.txt; b=${PIPESTATUS[0]}
+          grep -q "✗" fly.txt && exit 1; exit $((a|b))
+      - name: Issue bij afwijking
+        if: steps.lvnl.outcome == 'failure' || steps.aip.outcome == 'failure' || steps.fly.outcome == 'failure'
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          {
+            echo "Automatische AIRAC-controle ($(date -u +%F), run ${{ github.run_id }}) vond afwijkingen. Volgende sessie: P0 (CLAUDE.md, AIRAC-wissel)."
+            echo; echo "**Luchtruim vs. LVNL Geoportaal:** ${{ steps.lvnl.outcome }}"; echo '```'; tail -40 lvnl.txt; echo '```'
+            echo "**Frequenties vs. eAIP:** ${{ steps.aip.outcome }}"; echo '```'; grep -v '^OK' aip.txt | tail -30; echo '```'
+            echo "**Missies uitvliegen + generator:** ${{ steps.fly.outcome }}"; echo '```'; grep -E "✗|== " fly.txt | tail -20; echo '```'
+            echo; echo "Bron is leidend: LVNL eAIP / Geoportaal. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          } > body.md
+          gh label create airac --color D93F0B --description 'AIRAC-vangnet' 2>/dev/null || true
+          if [ "${{ github.event_name }}" = "push" ]; then echo "(push-test: geen issue)"; cat body.md; exit 1; fi
+          open=$(gh issue list --label airac --state open --json number -q '.[0].number')
+          if [ -n "$open" ]; then gh issue comment "$open" --body-file body.md; else gh issue create --title "AIRAC-controle: afwijking $(date -u +%F)" --label airac --body-file body.md; fi
+          exit 1
