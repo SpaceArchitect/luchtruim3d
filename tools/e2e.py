@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 """Regressiesuite Luchtruim in 3D (02-instructies D0).
 
 Gebruik:  python3 tools/e2e.py [--seed N] [--forms desk,p7,p7l,se] [--only smoke|det|fuzz]
@@ -1853,10 +1854,14 @@ async def fuzz(a, seed, steps):
         except Fail as e:
             raise Fail(f'seed {seed} stap {i} na [{" | ".join(log[-4:])}]: {e}')
 
+# Christian 28 nov: tijdgevoelige tests (sensor-terugval, frametijden) los draaien, de rest parallel op alle cores (tools/suite.py)
+TIMING = re.compile(r'kantel|30 fps|laadscherm|vloeiend|vastlopen|haperen|knipper|schokken|generator niet', re.I)
+
 async def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--seed', type=int, default=None); ap.add_argument('--forms', default='desk,p7,p7l,se')
     ap.add_argument('--only', default=''); ap.add_argument('--steps', type=int, default=40)
     ap.add_argument('-k', default='', help='alleen tests waarvan de naam deze tekst bevat')
+    ap.add_argument('--timing', choices=['all', 'skip', 'only'], default='all', help='tijdgevoelige tests (kantelen, fps, laadscherm): skip = overslaan (parallel draaien), only = alleen deze (los draaien)')
     ap.add_argument('--quick', action='store_true', help='smoke op desk+p7 (snelle check per commit)')
     o = ap.parse_args()
     if o.quick: o.only, o.forms = 'smoke', 'desk,p7'
@@ -1878,6 +1883,7 @@ async def main():
                 if o.only and o.only != layer: continue
                 for name, fn in tests:
                     if o.k and o.k.lower() not in name.lower() and o.k not in fn.__name__: continue
+                    if o.timing != 'all' and (TIMING.search(name) is not None) != (o.timing == 'only'): continue
                     if fn in LOGIC_ONLY and form != 'desk' and 'desk' in forms: continue  # pure logica (missies uitvliegen): één schermvorm is genoeg
                     a = await new_app(p, b, form, url); await run(layer, name, form, fn, a); await a.ctx.close()
             if (not o.only or o.only == 'fuzz') and not o.k:
