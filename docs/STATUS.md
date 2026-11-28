@@ -28,7 +28,7 @@
 ## Eerstvolgende stappen
 1. Rode tests van de wip/tiles-suite oplossen → heel NL klaar voor Christians test (11–14 dec): eerst previewlink (raw.githack wip/tiles) + fps-meting op de A55.
 2. BACKLOG 'Heel NL missies': De Kooy (langere aanloop), Teuge (doel buiten PJA); PJA's zijn in de app altijd verboden (vereenvoudigd) → velden met een PJA (Eelde) vallen af als landdoel.
-3. NOTAM/AUP: weekend 28–29 nov met Christian (spike LOG 26 nov).
+3. NOTAM: route "Inloggen met EasyVFR" gekozen (BACKLOG P3, N1–N4). Wacht op EasyVFR (call 1–4 dec) en LVNL GIS; AUP wacht op NOP Office. Christian bevestigt de twee CLAUDE.md-punten (BACKLOG, open vragen).
 
 ## Reset-push (Christian 25 nov)
 - Reset geldig t/m 10 dec. 27 nov–4 dec heel NL voorbereiden; 7–10 dec bouwen; Christian test 11–14 dec, vóór Mexico (15 dec).
@@ -41,4 +41,4 @@
 - Worktrees: `THREE_DIR=<repo>/.devenv/node_modules/three`. Merge-conflicten index.html/e2e.py: `python tools/merge_resolve.py <label> index.html tools/e2e.py`.
 - OSM heel NL verversen: Action **data-osm-pbf** (workflow_dispatch op main, 23 min). Niet meer de Overpass-route (data-osm-nl, uren).
 - Een push die `tools/fetch_osm.py` wijzigt op een wip-branch start óók `data-osm` (wist data/osm): annuleren als dat niet de bedoeling is.
-- NOTAM: geen NOTAMs in de app tot er een geverifieerde primaire bron is.
+- NOTAM: nog geen NOTAMs in de app; eerst N1 (CORS/app) en Christians akkoord op de CLAUDE.md-punten. Homebriefing-data nooit gebruiken (voorwaarden).
