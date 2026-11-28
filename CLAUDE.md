@@ -138,6 +138,7 @@ meldt, volgt de verhouding tokens ↔ % (zie LOG); daarmee stuur je zelf op ±25
 **Story points (Christian 25 nov):** 1 SP = 1% van de weeklimiet. Begin elke sessie met een
 schatting in `docs/LOG.md` (features + tests, met model); Christian meldt achteraf het werkelijke %.
 Doel: structureel ±25 SP per sessie. Te vroeg klaar? Pak het volgende punt uit de top 5.
+**Niet stoppen onder het doel (Christian 28 nov):** een sessie eindigt pas rond ±25 SP, niet als het eerste lijstje af is. Wacht je op een lange testrun, doe dan parallel ander backlogwerk.
 Regel: `- <datum> SP: <model> · schatting X · werkelijk Y · <plan/les>`.
 
 ## 🤖 Zelfstandig werken (afspraak 22 nov)
