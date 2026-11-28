@@ -1459,7 +1459,7 @@ function placeLabels(){lmMinSize();
     if(AR){const m=L.prev?2:14;if(r[0]<AR[2]+m&&r[2]>AR[0]-m&&r[1]<AR[3]+m&&r[3]>AR[1]-m)continue;}
     if(L.prio>=9&&L.d>140)continue;
     {const ess=L.isAir||L.isGoal||L.isPin,la=L.w*L.h;if(!ess&&usedA+la>BUD*(L.prev?1.1:1))continue;usedA+=la;}
-    placed.push(r);L.show=true;L.el.style.transform=`translate(${Math.round(x0)}px,${Math.round(y0)}px)`;}
+    placed.push(r);L.show=true;{const tf=`translate(${Math.round(x0)}px,${Math.round(y0)}px)`;if(L.tf!==tf){L.tf=tf;L.el.style.transform=tf;}}/* 28 nov: alleen bij verandering (minder stijlwerk) */}
   for(const L of labels){const disp=L.show?'block':'none';if(L.el.style.display!==disp)L.el.style.display=disp;}
 }
 
@@ -1835,7 +1835,7 @@ function warnText(f){const i=AIPINFO[f.ident]||{};
   return `⚠ Vlak voor je: <b>${f.name}</b> (${f.loTxt}–${f.hiTxt})<br>${what}${link}<br><small>▶ = toch doorvliegen</small>`;}
 function setRelax(on){RELAX=on;airGroup.visible=!on;vrpGroup.visible=!on;sliceGroup.visible=!on;pin.visible=!on;$('banner').style.display=on?'none':'';$('relaxChip').style.display=on?'block':'none';
   const c=$('optRelax');if(c)c.checked=on;if(on){NOTICE='';}hudTick();}
-let BANNER_OPEN=false,TASK='';$('banner').addEventListener('click',e=>{if(e.target.closest('a'))return;const rb=e.target.closest('[data-rt]');if(rb){e.stopPropagation();rtClick(rb.dataset.rt);return;}if(e.target.closest('.nt.day')){e.stopPropagation();startDay();return;}if(e.target.closest('.nt.dshare')){e.stopPropagation();dayShare();return;}if(e.target.closest('.nt')){e.stopPropagation();newTask();return;}
+let BANNER_OPEN=false,TASK='';$('banner').addEventListener('click',e=>{if(e.target.closest('a'))return;const rb=e.target.closest('[data-rt]');if(rb){e.stopPropagation();rtClick(rb.dataset.rt);return;}if(e.target.closest('.nt.day')){e.stopPropagation();gatePrep('Missie klaarzetten…',startDay);return;}if(e.target.closest('.nt.dshare')){e.stopPropagation();dayShare();return;}if(e.target.closest('.nt')){e.stopPropagation();gatePrep('Missie klaarzetten…',newTask);return;}
   // Fleur 14 nov: tik op een melding = ▶ verder (niet bij radiokeuzes: die moeten bewust)
   if(e.target.closest('.notice')&&PAUSED&&MODE==='fly'&&!$('banner').querySelector('[data-rt]')&&!e.target.closest('button,input,select')){e.stopPropagation();playNext();hudTick();}});
 let VZ=0,VFPM=0,VZ_S=0,LOOP=null,DRIFT_HIT=false,WAS_AIR=true,ACTYPE='glider',CHOSEN=false,MODE='map',TI=2,PAUSED=true,AT_EDGE=false,camYaw=0,dragging=false,lastPX=0,FIRST_WARN_DONE=false,NOTICE='';
@@ -1867,7 +1867,7 @@ document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
 function setTempo(i){TI=Math.max(0,Math.min(TEMPOS.length-1,i));$('tempo').value=TI;$('tempoVal').textContent='×'+TEMPO();$('tChip').textContent='×'+TEMPO();}
 /* Op desktop heet ▶ gewoon Spatie; een afgeronde missie toont 'Volgende missie (spatie)' (Christian 21 nov) */
 function kbText(n){if(!document.body.classList.contains('kbd'))return n;
-  if(/<button class="nt">/.test(n))return n.replace(/<button class="nt">🎯 Nieuwe opdracht<\/button>/,`<button class="nt">🎯 ${MODE==='fly'&&nextMission(ACTYPE)?'Volgende missie':'Nieuwe opdracht'} (spatie)</button>`);
+  if(/<button class="nt">/.test(n))return n.replace(/<button class="nt">🎯 Nieuwe opdracht<\/button>/,`<button class="nt">🎯 ${MODE==='fly'&&!RELAX?'Volgende missie':'Nieuwe opdracht'}/* 28 nov: geen nextMission() hier (synchroon zwaar) */ (spatie)</button>`);
   return n.replace(/▶ = (toch )?(verder|start)/g,'Spatie = $1$2');}
 /* Sneltoetskaart vóór de vlucht (Christian 21 nov): alleen op desktop, één keer per bezoek, 'niet meer tonen' wordt onthouden, ? of H = opnieuw */
 function keyCard(){if($('keycard'))return;const b=ACTYPE==='balloon',d=document.createElement('div');d.id='keycard';d.setAttribute('role','dialog');d.setAttribute('aria-label','Sneltoetsen');
@@ -1882,9 +1882,9 @@ addEventListener('pointerdown',e=>{const d=$('keycard');if(!d||e.target.closest(
 function keyCardClose(){const d=$('keycard');if(!d)return;try{if($('kcNo').checked)localStorage.setItem('l3d_keys_seen','1');sessionStorage.setItem('l3d_keys_s','1');}catch(_){}d.remove();}
 function keyCardAuto(){if(!document.body.classList.contains('kbd'))return;try{if(localStorage.getItem('l3d_keys_seen')||sessionStorage.getItem('l3d_keys_s'))return;}catch(_){}keyCard();}
 /* Christian 25 nov: na geslaagd/mislukt is ▶ (knop, tik op de melding, Spatie) = de volgende opdracht, niet doorvliegen zonder opdracht */
-const MIS_OVER=()=>MODE==='fly'&&PAUSED&&/<button class="nt">/.test(NOTICE);function playNext(){const t=performance.now();try{if(MIS_OVER()){newTask();hudTick();return;}togglePause();}finally{if(FPS)FPS.hnd=(FPS.hnd||0)+performance.now()-t;}}
-let START_PEND=false;function togglePause(){if(PAUSED&&!START_PEND&&MODE==='fly'&&(/▶ = start/.test(NOTICE)||!FLOWN)&&typeof gateShow==='function'){/* 28 nov: eerst het laadscherm tekenen, dan pas starten: de stilstand valt erachter */
-    START_PEND=true;const n0=NOTICE;gateShow('Starten…',350);requestAnimationFrame(()=>requestAnimationFrame(()=>{START_PEND=false;if(PAUSED&&MODE==='fly'&&NOTICE===n0)togglePause0();}));return;}/* review 28 nov: niet starten als je intussen de kiezer opende of van modus wisselde */if(START_PEND)return;togglePause0();}
+const MIS_OVER=()=>MODE==='fly'&&PAUSED&&/<button class="nt">/.test(NOTICE);function playNext(){const t=performance.now();try{if(MIS_OVER()){gatePrep('Missie klaarzetten…',()=>{newTask();hudTick();});return;}togglePause();}finally{if(FPS)FPS.hnd=(FPS.hnd||0)+performance.now()-t;}}
+let START_PEND=false;function togglePause(){if(false){/* 28 nov (Christian): geen laadscherm bij ▶; het zware werk gebeurt al onder 'Missie klaarzetten…' *//* 28 nov: eerst het laadscherm tekenen, dan pas starten: de stilstand valt erachter */
+    START_PEND=true;const n0=NOTICE;gateShow('Starten…',1000,true,8);requestAnimationFrame(()=>requestAnimationFrame(()=>{START_PEND=false;if(PAUSED&&MODE==='fly'&&NOTICE===n0)togglePause0();}));return;}/* review 28 nov: niet starten als je intussen de kiezer opende of van modus wisselde */if(START_PEND)return;togglePause0();}
 function togglePause0(){const st=/▶ = start/.test(NOTICE)||!FLOWN;PAUSED=!PAUSED;$('stillHint').hidden=true;if(!PAUSED){NOTICE='';FLOWN=true;if(st)tiltRecal();/* Christian 25 nov: alleen ijken bij de start (eerste vlucht, nieuwe opdracht); nooit door een melding, pauze of resize (bocht was daarna niet voort te zetten). Draaien staand↔liggend ijkt apart. */}}
 let FLOWN=false;
 function tiltRecal(){/* Christian 21 nov: na ▶ of een nieuwe opdracht ging kantelen soms de mist in: er werd geijkt op het eerste sensorsignaal (de tik-schok), scheef vasthouden (>25°) werd een vaste bocht en de vergrendelde liggende houding ging verloren. Nu: besturing even neutraal, ijken zodra de telefoon 0,3 s rustig is (uiterlijk 1,2 s), rol tot 45° telt als rechtuit, fysieke houding blijft. */
@@ -2242,7 +2242,7 @@ function lineAreas(a,b,alt){const d=Math.hypot(b[0]-a[0],b[1]-a[1]),on=new Map()
 function* genSteps(ac,L,seed=0){const key=ac+L+(seed?'d'+seed:'');if(GEN.has(key))return GEN.get(key);const pool=genPool(ac);yield 0;let best=null,spare=null;
   for(let att=0;att<3&&!best&&!spare;att++){const r=rng(L*7919+{glider:11,motor:23,balloon:37}[ac]+att*104729+seed*131);
   const nl=ac==='balloon'?1:L<=2?1:L<=5?2:3,minC=ac==='balloon'?Math.min(1+Math.floor((L-1)/3),2):Math.min(1+Math.floor((L-1)/2),4),wantAlt=L>=3&&L%2===1&&ac!=='balloon',alts=ac==='motor'?[1000,1500,2000,2500]:[1000,1500,2000];
-  for(let tr=0,planned=0;tr<300&&planned<(ac==='balloon'?30:8)&&!best;tr++){if(tr%15===14)yield 0;const alt=alts[Math.floor(r()*alts.length)],legs=[];let p=pool[Math.floor(r()*pool.length)];legs.push(p);
+  for(let tr=0,planned=0;tr<300&&planned<(ac==='balloon'?30:8)&&!best;tr++){if(tr%3===2)yield 0;const alt=alts[Math.floor(r()*alts.length)],legs=[];let p=pool[Math.floor(r()*pool.length)];legs.push(p);
     for(let k=1;k<nl;k++){const c=pool.filter(q=>!legs.includes(q)&&Math.hypot(q.x-p.x,q.n-p.n)>6&&Math.hypot(q.x-p.x,q.n-p.n)<20);if(!c.length)break;p=c[Math.floor(r()*c.length)];legs.push(p);}
     if(legs.length<nl)continue;{const pv=seed?null:GEN.get(ac+(L-1));if(pv&&pv.legs[0]===legs[0].nm)continue;}/* niet twee keer achter elkaar hetzelfde doel */const W0=WIND;const wind=ac==='balloon'&&L>=3?{f0:180+r()*120,f1:240+r()*90,k0:6,k1:24}:null;if(ac==='balloon')WIND=wind;
     const dd=8+r()*(6+Math.min(L,8)),b0=ac==='balloon'?windAt(alt).from-25:r()*360;let sx=null,sn=null;
@@ -2265,9 +2265,12 @@ function* genSteps(ac,L,seed=0){const key=ac+L+(seed?'d'+seed:'');if(GEN.has(key
 function genMission(ac,L){const it=genSteps(ac,L);let r;do{r=it.next();}while(!r.done);return r.value;}// synchroon (tests, rapport)
 // in de app: in plakjes van ±25 ms rekenen, zodat de pagina (knijpen, knoppen, 60 fps) nooit vastzit (25 nov: suite ving haperen)
 const GEN_RUN=new Map(),GEN_WAIT='🛠 Nieuwe uitdaging wordt gemaakt en eerst zelf uitgevlogen…<br><small>Even geduld, hij start vanzelf.</small>';
-function genAsync(ac,L,cb,seed=0){const key=ac+L+(seed?'d'+seed:'');if(GEN.has(key)){if(cb)cb(GEN.get(key));return;}if(GEN_RUN.has(key)){if(cb)GEN_RUN.get(key).push(cb);return;}
-  const cbs=cb?[cb]:[];GEN_RUN.set(key,cbs);const it=genSteps(ac,L,seed);
-  const tick=()=>{const t0=performance.now();let r;do{r=it.next();}while(!r.done&&performance.now()-t0<25);
+/* 28 nov (stotter A55: 1562/978/391 ms 'generator'): het vooraf maken van de volgende uitdaging blokkeerde de telefoon tijdens het vliegen
+   (één stap = 15 routepogingen ≈ 1 s op een A55). Achtergrondwerk (bg) rekent nu alleen als je stilstaat (pauze, melding, kaart); wacht je er zelf op, dan meteen. */
+let GEN_STEPS=0;const genIdle=()=>!(typeof MODE!=='undefined'&&MODE==='fly'&&!PAUSED);
+function genAsync(ac,L,cb,seed=0,bg=false){const key=ac+L+(seed?'d'+seed:'');if(GEN.has(key)){if(cb)cb(GEN.get(key));return;}if(GEN_RUN.has(key)){if(cb){GEN_RUN.get(key).push(cb);GEN_RUN.get(key).fg=true;}return;}
+  const cbs=cb?[cb]:[];cbs.fg=!bg;GEN_RUN.set(key,cbs);const it=genSteps(ac,L,seed);
+  const tick=()=>{if(!cbs.fg&&!genIdle()){setTimeout(tick,400);return;}const t0=performance.now();let r;do{r=it.next();GEN_STEPS++;}while(!r.done&&performance.now()-t0<25&&(cbs.fg||genIdle()));
     if(!r.done){setTimeout(tick,0);return;}GEN_RUN.delete(key);for(const f of cbs)try{f(r.value)}catch(_){}};setTimeout(tick,0);}
 function misLegGoal(m,i){const L=MPT(),p=L[m.legs[i]];return {x:p[0],n:p[1],name:m.legs[i]};}
 function misTask(m,i){const g=misLegGoal(m,i);return (m.ac==='balloon'?'Drijf naar ':'Vlieg naar ')+`<b>${g.name}</b>`+(m.legs.length>1?` (${i+1}/${m.legs.length})`:'');}
@@ -2276,7 +2279,7 @@ function misLesson0(m){const fs=[...new Set([...(m.teach||[m.les]),...[...FAILS.
   return fs.map(f=>`<br>📘 <b>${short(f)}</b> · ${f.loTxt}–${f.hiTxt}: ${({P:'nooit in, op geen enkele hoogte binnen de grenzen',R:'beperkt gebied: alleen als het niet actief is',CTR:'klaring nodig'+(f.cls?' (klasse '+f.cls+')':''),TMA:'klaring nodig'+(f.cls?' (klasse '+f.cls+')':''),RMZ:'eerst oproepen op de radio',PJA:'parachutisten: status opvragen',UAS:'drones: blijf weg als het actief is',TRA:'militair, actief per AUP/UUP of NOTAM; dan verboden zonder toestemming (ENR 5.2)',TSA:'militair, actief per AUP/UUP of NOTAM; dan verboden zonder toestemming (ENR 5.2)'})[f.layer]||'check de AIP'}.`).join('')+(m.tip?`<br>📘 ${m.tip}`:'')+'<br><small>Vereenvoudigd; de AIP is leidend.</small>';}
 function randomStart(ac){FAIL_SHOWN=false;const nm=nextMission(ac);MISSION=null;WIND=null;
   if(nm&&nm.pending){genAsync(nm.ac,nm.L,()=>{if(MODE==='fly'&&ACTYPE===nm.ac&&!MISSION&&NOTICE.includes('wordt gemaakt'))newTask();},nm.seed||0);return {x:PLANE.x,n:PLANE.n,alt:PLANE.alt||1000,hdg:PLANE.hdg,task:null,pending:true};}
-  if(nm){MISSION=nm.m;WIND=nm.m.wind||null;LASTGOAL={...misLegGoal(nm.m,0),mis:nm.m.id,li:0};MREF=misRef(nm.m,nm.st);MDIST=0;MLAST=null;if(!nm.m.day){const d=misDone().filter(i=>i.startsWith('gen-'+ac+'-')).length;setTimeout(()=>genAsync(ac,d+(nm.m.gen?2:1)),2000);}const ser=misSeries(nm.m.ac);return {...nm.st,task:misTask(nm.m,0)+`<br><b>${nm.m.title}</b> · ${nm.m.brief}<br class="mlvl"><small class="mlvl">${nm.m.gen?'uitdaging '+nm.m.genL+' (gegenereerd)':LVL[nm.m.lvl]+' · missie '+(ser.indexOf(nm.m)+1)+'/'+ser.length} · 🎓 ${nm.m.goal}</small>`};}
+  if(nm){MISSION=nm.m;WIND=nm.m.wind||null;LASTGOAL={...misLegGoal(nm.m,0),mis:nm.m.id,li:0};MREF=misRef(nm.m,nm.st);MDIST=0;MLAST=null;if(!nm.m.day){const d=misDone().filter(i=>i.startsWith('gen-'+ac+'-')).length;/* 28 nov (Christian): geen rekenwerk tijdens het vliegen; de volgende uitdaging wordt onder het laadscherm gemaakt */}const ser=misSeries(nm.m.ac);return {...nm.st,task:misTask(nm.m,0)+`<br><b>${nm.m.title}</b> · ${nm.m.brief}<br class="mlvl"><small class="mlvl">${nm.m.gen?'uitdaging '+nm.m.genL+' (gegenereerd)':LVL[nm.m.lvl]+' · missie '+(ser.indexOf(nm.m)+1)+'/'+ser.length} · 🎓 ${nm.m.goal}</small>`};}
   const alt=ac==='balloon'?800:1000;
   for(let k=0;k<400;k++){const x=gx0+8+Math.random()*(gx1-gx0-16),n=gn0+8+Math.random()*(gn1-gn0-16);if(!inNL(x,n))continue;
     const hdg=ac==='balloon'?Math.round((windAt(alt).from+180)%360):Math.round(Math.random()*360);let ok=true;
@@ -2331,7 +2334,7 @@ function setMode(m,ac){
   document.body.classList.toggle('looking',m!=='fly');document.body.classList.toggle('balloon',ACTYPE==='balloon');
   $('btnMode').innerHTML=m==='fly'?'→ Kaart':'→ Vliegen';
   $('tape').classList.toggle('off',m==='fly'?!$('optTape').checked:false);
-  if(m==='fly'&&(prev!=='fly'||ac)){camReset();keyCardAuto();if(typeof gateShow==='function'&&prev!=='fly')gateShow('Vliegen laden…',0);}else if(m!=='fly')keyCardClose();// elke vlucht begint met de camera achter het toestel
+  if(m==='fly'&&(prev!=='fly'||ac)){camReset();keyCardAuto();}else if(m!=='fly')keyCardClose();// elke vlucht begint met de camera achter het toestel
   if(m==='fly'&&prev!=='fly'&&PROBE.user){PLANE.x=PROBE.x;PLANE.n=PROBE.n;if(SLICE>0&&ACTYPE!=='balloon')PLANE.alt=SLICE;PROBE.user=false;WARNED.clear();FAILS.clear();CLR.clear();
     {let t=null,hd=PLANE.hdg;const hs=ACTYPE==='balloon'?[(windAt(Math.max(300,PLANE.alt)).from+180)%360]:[0,45,90,135,180,225,270,315];for(const h of hs){t=pickTask(PLANE.x,PLANE.n,h,ACTYPE);if(t){hd=h;break;}}/* S1b panel (Fatima): ook vanaf de sonde een opdracht */
      TASK=t&&!RELAX?t:'';GOAL=TASK?{...LASTGOAL}:null;PLANE.hdg=hd;if(TASK){PAUSED=true;NOTICE=`🎯 ${t}<br><small>▶ = start</small>`;}}}
@@ -2351,8 +2354,9 @@ $('btnPause').onclick=playNext;
 function openChooser(){oneMenu('modal');$('modal').style.display='flex';}
 document.querySelectorAll('[data-ac]').forEach(b=>b.onclick=()=>{if(b.dataset.ac!=='map')autoTilt();$('modal').style.display='none';document.body.classList.remove('welcome');$('btnMode').style.visibility='visible';$('panel').classList.add('hidden');let a=b.dataset.ac;if(a!=='map'){const want=$('relaxBox').checked;if(want!==RELAX)setTimeout(()=>setRelax(want),0);}
   if(a==='map'){setMode('map');setView('schuin');showProbe();return;}
+  gatePrep('Missie klaarzetten…',()=>{
   let task=null,pend=false;if(a!=='map'&&!PROBE.user){const st=randomStart(a);task=st.task;pend=!!st.pending;GOAL=task&&!$('relaxBox').checked?{...LASTGOAL}:null;FAILS.clear();CLR.clear();Object.assign(PLANE,{x:st.x,n:st.n,alt:st.alt,hdg:st.hdg,bank:0,pitch:0});FIRST_WARN_DONE=false;WARNED.clear();}
-  TASK=task&&!$('relaxBox').checked?task:'';PAUSED=true;NOTICE=pend?GEN_WAIT:(task&&!$('relaxBox').checked?`🎯 ${task}<br>`:'')+'<small>▶ = start</small>'+(MISSION&&!MISSION.day&&!$('relaxBox').checked?' <button class="nt day mini">📅 Vandaag</button>':'');setMode('fly',a);});
+  TASK=task&&!$('relaxBox').checked?task:'';PAUSED=true;NOTICE=pend?GEN_WAIT:(task&&!$('relaxBox').checked?`🎯 ${task}<br>`:'')+'<small>▶ = start</small>'+(MISSION&&!MISSION.day&&!$('relaxBox').checked?' <button class="nt day mini">📅 Vandaag</button>':'');setMode('fly',a);});});
 
 // ---------- sonde ----------
 function probeAt(e){const v=new THREE.Vector2(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(v,camera);
@@ -2439,7 +2443,8 @@ function hudTick(){if(MISSION&&MODE==='fly'){const p=[PLANE.x,PLANE.n];if(MLAST&
   const px=MODE==='fly'?PLANE.x:PROBE.x,pn=MODE==='fly'?PLANE.n:PROBE.n,alt=curAlt();
   COLUMN=featsAt(px,pn);INSIDE=applies(COLUMN,alt).filter(f=>f.layer!=='LFA');
   const h=PLANE.hdg*Math.PI/180;let ahead=null;
-  const NOW=performance.now(),spd=(ACTYPE==='balloon'?windAt(PLANE.alt).kt:AC[ACTYPE].kt)*1.852/3600*TEMPO(),WD=Math.max(0.4,Math.min(20,spd*8));// waarschuwen ~8 s schermtijd vooraf
+  const NOW=performance.now(),spd=(ACTYPE==='balloon'?windAt(PLANE.alt).kt:AC[ACTYPE].kt)*1.852/3600*TEMPO(),TR=AC[ACTYPE].turn?spd/(AC[ACTYPE].turn*Math.PI/180):0,TURN_NEED=spd*6+2.5*TR,WD=Math.max(0.4,Math.min(20,Math.max(spd*8,TURN_NEED)));// waarschuwen ~8 s schermtijd vooraf, en altijd ver genoeg om zelf om te keren
+  /* Christian 28 nov (×10, klaring De Peel geweigerd → kon niet meer omkeren): draaien gaat 25°/s in échte tijd, vooruit vliegen schaalt met het tempo → draaicirkelstraal TR groeit ×tempo. TURN_NEED = 6 s reactie + 2,5 × TR (ook bij geleidelijk kantelen = halve draaisnelheid) */
   if(MODE==='fly')for(let d=.5;d<=Math.max(6,WD+1)&&!ahead;d+=.5){const ax=PLANE.x+Math.sin(h)*d,an=PLANE.n+Math.cos(h)*d;const here=applies(featsAt(ax,an),PLANE.alt);
     const g=governing(here),gNow=governing(INSIDE);
     if(needsClr(g)&&g!==gNow&&(!needsClr(gNow)||((AIPINFO[g.ident]||{}).freq!==(AIPINFO[gNow.ident]||{}).freq)))ahead={f:g,d,clr:true};
@@ -2455,7 +2460,7 @@ function hudTick(){if(MISSION&&MODE==='fly'){const p=[PLANE.x,PLANE.n];if(MLAST&
     if(ahead&&ahead.clr&&!cleared(ahead.f)&&ahead.d<=WD&&!WARNED.has(ahead.f.ident)&&!PAUSED){WARNED.add(ahead.f.ident);FIRST_WARN_DONE=true;PAUSED=true;{const ii=AIPINFO[ahead.f.ident];NOTICE=`🔶 Over ${ahead.d.toFixed(1).replace('.',',')} km: <b>${short(ahead.f)}</b> · klaring nodig${rtLine(ii)}<br><small>▶ = verder</small>${ii&&ii.freq&&!RELAX?rtButton(ahead.f):''}`;}}
     if(ahead&&ahead.call&&ahead.d<=WD&&!WARNED.has(ahead.f.ident)&&!PAUSED&&!RELAX){WARNED.add(ahead.f.ident);PAUSED=true;NOTICE=`📻 Over ${ahead.d.toFixed(1).replace('.',',')} km: <b>${short(ahead.f)}</b> · eerst oproepen${rtLine(AIPINFO[ahead.f.ident])}<br><small>▶ = verder</small>${rtButton(ahead.f)}`;}
     // D2: na een geweigerde klaring opnieuw waarschuwen vlak vóór de grens (anders kwam de eerste melding pas als je er al in zat)
-    if(ahead&&ahead.clr&&REFUSED.has(ahead.f.ident)&&!cleared(ahead.f)&&ahead.d<=Math.max(1,WD/2)&&!REFW.has(ahead.f.ident)&&!PAUSED&&!RELAX){REFW.add(ahead.f.ident);PAUSED=true;NOTICE=`🚫 <b>Geen klaring</b> voor ${short(ahead.f)} · nog ${ahead.d.toFixed(1).replace('.',',')} km<br>Draai weg${ahead.f.lo>0?` of daal onder ${fmtAlt(ahead.f.lo)}`:''}, of cirkel en vraag het straks opnieuw.<br><small>▶ = verder</small>${rtButton(ahead.f)}`;}
+    if(ahead&&ahead.clr&&REFUSED.has(ahead.f.ident)&&!cleared(ahead.f)&&ahead.d<=Math.max(1,TURN_NEED)&&!REFW.has(ahead.f.ident)&&!PAUSED&&!RELAX){REFW.add(ahead.f.ident);PAUSED=true;NOTICE=`🚫 <b>Geen klaring</b> voor ${short(ahead.f)} · nog ${ahead.d.toFixed(1).replace('.',',')} km<br>Draai weg${ahead.f.lo>0?` of daal onder ${fmtAlt(ahead.f.lo)}`:''}, of cirkel en vraag het straks opnieuw.<br><small>▶ = verder</small>${rtButton(ahead.f)}`;}
     if(!PAUSED&&!RELAX&&vis.gld&&PLANE.alt>0){for(const h of hgNear(PLANE.x,PLANE.n,2.2)){if(PLANE.alt>h.top+500||Math.hypot(h.x-PLANE.x,h.n-PLANE.n)>h.r+1.2)continue;if(WARNED.has('HG'+h.ident))continue;WARNED.add('HG'+h.ident);for(const g of h.shared)WARNED.add('HG'+g.ident);PAUSED=true;NOTICE=hgWarn(h);break;}}
     // opdracht: geslaagd of gefaald (Christian 11 nov): fout = verboden gebied, gecontroleerd luchtruim zonder klaring, para- of dronegebied
     if(GOAL&&!RELAX&&PLANE.alt>0){const gg=governing(INSIDE);for(const f of INSIDE){if(rmzLive(f)&&!rmzOk(f,INSIDE))FAILS.set(f.ident,short(f)+' zonder oproep');if(f.layer==='P'||f.layer==='PJA'||f.layer==='UAS')FAILS.set(f.ident,{P:'verboden gebied ',PJA:'paradropzone ',UAS:'dronegebied '}[f.layer]+nm(f).replace(/^(verboden|para|drones?)\s+/i,''));/* niet 'verboden gebied Verboden Vught' (Christian) */}
@@ -2508,7 +2513,10 @@ const unitS=u=>{const m=u.match(/(Tower|Arrival|Approach|Ground|Radio|MIL Info|I
 const TYP={P:'Verboden',R:'Beperkt',D:'Gevaar',TRA:'TRA',TSA:'TSA',PJA:'Para',UAS:'Drones',TMZ:'TMZ',RMZ:'RMZ',ATZ:'ATZ'};
 const short=f=>{let n=nm(f);const t=TYP[f.layer];if(t&&!n.toUpperCase().includes(t.toUpperCase()))n=t+' '+n;if(f.layer==='TRA'||f.layer==='TSA')n+=' (mil.)';return `${n}${f.cls?' ('+f.cls+')':''}`;};
 const dpr=Math.min(devicePixelRatio,2);
-function prep(c){const W=c.clientWidth,H=c.clientHeight;if(c.width!==W*dpr||c.height!==H*dpr){c.width=W*dpr;c.height=H*dpr;}const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);return [g,W,H];}
+/* 28 nov (30 fps): canvasmaten niet elk frame opvragen. placeLabels schrijft eerst stijlen; daarna clientWidth lezen dwong elk frame een volledige layout (honderden labels) */
+const SZ=new WeakMap(),RO=typeof ResizeObserver!=='undefined'?new ResizeObserver(es=>{for(const e of es)SZ.set(e.target,[e.target.clientWidth,e.target.clientHeight]);}):null;
+function csz(c){let v=SZ.get(c);if(!v){v=[c.clientWidth,c.clientHeight];SZ.set(c,v);if(RO)RO.observe(c);}return v;}
+function prep(c){const [W,H]=csz(c);if(c.width!==W*dpr||c.height!==H*dpr){c.width=W*dpr;c.height=H*dpr;}const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);return [g,W,H];}
 function drawCompass(){if(MODE!=='fly'){const d=controls.target.clone().sub(camera.position);const h=Math.atan2(d.x,-d.z);$('northIn').style.transform=`rotate(${-h}rad)`;return;}const [g,W,H]=prep($('compass'));const span=120,px=W/span;
   g.fillStyle='rgba(255,255,255,.95)';g.beginPath();g.roundRect(0,0,W,H,8);g.fill();
   g.strokeStyle='#1c2024';g.fillStyle='#1c2024';g.textAlign='center';g.font='700 13px system-ui';
@@ -2516,7 +2524,7 @@ function drawCompass(){if(MODE!=='fly'){const d=controls.target.clone().sub(came
     const big=dd%10===0;g.beginPath();g.moveTo(x,H-2);g.lineTo(x,H-(big?10:6));g.lineWidth=1;g.stroke();
     if(dd%30===0)g.fillText(dd===0?'N':String(dd/10).padStart(2,'0'),x,16);}
   g.fillStyle='#1c2024';g.beginPath();g.moveTo(W/2-7,H);g.lineTo(W/2+7,H);g.lineWidth=0;g.lineTo(W/2,H-10);g.fill();}
-function drawTape(){if(!$('tape').clientWidth)return;const [g,W,H]=prep($('tape'));const top=CAP,pad=18,y=a=>H-pad-(Math.min(a,top)/top)*(H-2*pad-14);
+function drawTape(){if(!csz($('tape'))[0])return;const [g,W,H]=prep($('tape'));const top=CAP,pad=18,y=a=>H-pad-(Math.min(a,top)/top)*(H-2*pad-14);
   g.fillStyle='rgba(255,255,255,.95)';g.beginPath();g.roundRect(0,0,W,H,10);g.fill();
   g.fillStyle='#1c2024';g.font='700 11.5px system-ui';g.textAlign='center';g.fillText(MODE==='fly'?'Boven en onder je':'Boven de sonde',W/2,14);
   g.font='600 10.5px system-ui';g.textAlign='left';g.fillStyle='#3a3f45';g.strokeStyle='#c1c6cd';
@@ -2535,13 +2543,18 @@ function drawTape(){if(!$('tape').clientWidth)return;const [g,W,H]=prep($('tape'
   if(MODE==='fly'&&ACTYPE==='balloon'){g.fillStyle='#b4410b';g.font='700 10px system-ui';for(let a=1000;a<top;a+=1000){const w=windAt(a),yy=y(a);g.save();g.translate(W-10,yy-7);g.rotate(((w.from+180)%360)*Math.PI/180);g.beginPath();g.moveTo(0,-6);g.lineTo(4,4);g.lineTo(-4,4);g.closePath();g.fill();g.restore();}}
   const ya=y(curAlt());g.strokeStyle='#1c2024';g.lineWidth=3;g.beginPath();g.moveTo(34,ya);g.lineTo(W-2,ya);g.stroke();
   g.fillStyle='#1c2024';g.beginPath();g.moveTo(36,ya);g.lineTo(26,ya-6);g.lineTo(26,ya+6);g.fill();}
-function drawMini(){const c=$('mini');if(!c.clientWidth)return;const [g,W,H]=prep(c);const s=Math.min(W/(gx1-gx0),H/(gn1-gn0));
+let MINI_KEY='',MINI_CV=null;
+function drawMini(){const c=$('mini');if(!csz(c)[0])return;const [g,W,H]=prep(c);const s=Math.min(W/(gx1-gx0),H/(gn1-gn0));
   const X=x=>(x-gx0)*s,Y=n=>H-(n-gn0)*s;
+  /* 28 nov (30 fps): veelhoeken en steden alleen opnieuw tekenen als grootte, zichtbare groepen of 'waar ben ik in' veranderen */
+  const key=W+'x'+H+'|'+GROUPS.map(q=>vis[q.id]?1:0).join('')+'|'+INSIDE.map(f=>f.ident).join(',')+'|'+CITYXY.length+'|'+LAYERS.length;
+  if(key!==MINI_KEY||!MINI_CV){MINI_KEY=key;MINI_CV=MINI_CV||document.createElement('canvas');MINI_CV.width=W*dpr;MINI_CV.height=H*dpr;{const g=MINI_CV.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
   g.fillStyle='rgba(255,255,255,.95)';g.fillRect(0,0,W,H);
   for(const f of LAYERS){if(!vis[f.group.id]||!['CTR','TMA','CTA','P','R','ATZ'].includes(f.layer))continue;const inn=INSIDE.includes(f);
     g.strokeStyle=f.color;g.lineWidth=inn?2:1;g.globalAlpha=f.cls==='E'?.5:.9;
     for(const r of f.rings){g.beginPath();r.forEach(([x,n],i)=>i?g.lineTo(X(x),Y(n)):g.moveTo(X(x),Y(n)));g.closePath();if(inn){g.fillStyle=f.color;g.globalAlpha=.25;g.fill();g.globalAlpha=.9;}g.stroke();}}
-  g.globalAlpha=1;g.fillStyle='#3a3f45';for(const c2 of CITYXY)g.fillRect(X(c2.x)-1.5,Y(c2.n)-1.5,3,3);
+  g.globalAlpha=1;g.fillStyle='#3a3f45';for(const c2 of CITYXY)g.fillRect(X(c2.x)-1.5,Y(c2.n)-1.5,3,3);}}
+  g.setTransform(1,0,0,1,0,0);g.drawImage(MINI_CV,0,0);g.setTransform(dpr,0,0,dpr,0,0);
   const px=MODE==='fly'?PLANE.x:PROBE.x,pn=MODE==='fly'?PLANE.n:PROBE.n;
   g.save();g.translate(X(px),Y(pn));g.fillStyle='#1c2024';if(MODE==='fly'){g.rotate(PLANE.hdg*Math.PI/180);g.beginPath();g.moveTo(0,-8);g.lineTo(6,6);g.lineTo(0,2);g.lineTo(-6,6);g.closePath();g.fill();}else{g.beginPath();g.arc(0,0,4,0,7);g.fill();}g.restore();
   g.strokeStyle='#9aa1a9';g.lineWidth=1;g.strokeRect(.5,.5,W-1,H-1);}
@@ -2663,24 +2676,29 @@ let last=performance.now(),acc=0;
 const FPS=/[?&]fps=1/.test(location.search)?(()=>{const d=document.createElement('div');d.style.cssText='position:fixed;left:4px;bottom:4px;z-index:99;background:#000c;color:#0f0;font:11px monospace;padding:3px 5px;border-radius:4px;pointer-events:none;white-space:pre';document.body.appendChild(d);return {d,t0:0,max:[0,0],ev:''};})():null;
 function fpsTick(now,raw){if(!FPS)return;if(document.hidden||FPS.hid){FPS.hid=document.hidden;return;}/* achtergrond (tab weg, melding) telt niet: dan tekent de browser niets */
   if(FPS.wasP&&!PAUSED){FPS.t0=now;FPS.top=[];}else if(PAUSED&&!FPS.wasP)FPS.hnd=0;FPS.wasP=PAUSED;const since=now-FPS.t0;
-  if(FPS.t0&&since<3000){FPS.top.push([Math.round(raw),Math.round(since),(NOTICE?'melding ':'')+(TILT&&TILT.pend?'ijken ':'')+(GEN_RUN.size?'generator':''),(FPS.seg||[]).join('/'),Math.round(FPS.hnd||0)]);FPS.hnd=0;FPS.top.sort((a,b)=>b[0]-a[0]);FPS.top.length=Math.min(2,FPS.top.length);}
-  FPS.n=(FPS.n||0)+1;if(FPS.n%10===0)FPS.d.textContent=`frame ${Math.round(raw)} ms`+(FPS.top||[]).map((t,i)=>`\nna ▶ #${i+1}: ${t[0]} ms @ ${t[1]} ms ${t[2]}\n   js ${t[3]} (sim/render/labels/hud) · knop ${t[4]}`).join('')+`\nversie ${FPS_VER}`;}
+  if(FPS.t0&&since<10000){FPS.top.push([Math.round(raw),Math.round(since),(NOTICE?'melding ':'')+(TILT&&TILT.pend?'ijken ':'')+(GEN_RUN.size?'generator':''),(FPS.seg||[]).join('/'),Math.round(FPS.hnd||0)]);FPS.hnd=0;FPS.top.sort((a,b)=>b[0]-a[0]);FPS.top.length=Math.min(3,FPS.top.length);}
+  FPS.n=(FPS.n||0)+1;if(FPS.n%10===0)FPS.d.textContent=`frame ${Math.round(raw)} ms`+(FPS.top||[]).map((t,i)=>`\nna ▶ #${i+1}: ${t[0]} ms @ ${t[1]} ms ${t[2]}\n   js ${t[3]} (sim/render/labels/hud) · knop ${t[4]}`).join('')+(GATE&&GATE.offAt&&FPS.t0&&GATE.offAt>FPS.t0?`\nlaadscherm weg @ ${Math.round(GATE.offAt-FPS.t0)} ms na ▶`:'')+`\nversie ${FPS_VER}`;}
 /* 28 nov: JS-tijd per frame (sim/render/labels/hud, van het vorige frame) en de duur van de ▶-handler naast de frame-gap: grote gap + kleine JS = GPU/pipeline-stall; grote render-JS = shader-link; grote knop = synchrone missieberekening */
-const FPS_VER='live-28nov';
+const FPS_VER='vloeiend';
 document.addEventListener('visibilitychange',()=>{if(FPS)FPS.hid=true;});
 /* 26 nov (stotter A55, 112 ms bij ▶): shaders van alles wat later pas in beeld komt (doel, schaduw, verre volumes) bij het laden al compileren, ook wat nu verborgen is; anders compileert de GPU midden in de vlucht */
 try{/* stotter-d: echt tekenen (1×1 px, alles zichtbaar, geen culling) bij het laden, zodat de GPU-pipelines (ANGLE/Vulkan) al bestaan vóór ▶ */const hid=[],cul=[];scene.traverse(o=>{if(!o.visible){hid.push(o);o.visible=true;}if(o.frustumCulled){cul.push(o);o.frustumCulled=false;}});try{renderer.setScissorTest(true);renderer.setScissor(0,0,1,1);renderer.render(scene,camera);}finally{renderer.setScissorTest(false);for(const o of hid)o.visible=false;for(const o of cul)o.frustumCulled=true;}}catch(_){}/* review 28 nov: herstel altijd, ook als render gooit */
 /* Laadscherm-poort: weg na 4 vloeiende frames (≤ max(70 ms, 1,6× het snelste frame), zodat het ook op trage apparaten en headless werkt), minstens GATE.min ms, uiterlijk 8 s. */
 var GATE={on:true,ok:0,t0:performance.now(),min:0,best:1e9};
-function gateShow(txt,min=350,soft=true){if(!GATE)return;const L=document.getElementById('loadScr');GATE.on=true;GATE.ok=0;GATE.t0=performance.now();GATE.min=min;document.getElementById('loadTxt').textContent=txt;L.classList.toggle('soft',soft);L.classList.remove('off');}
+/* 28 nov (Christian): één laadscherm per nieuwe missie; daarna nooit haperen (30 fps = harde eis). Zwaar werk (missie maken, startpunt, eerste vliegbeeld) gebeurt hieronder. */
+/* 28 nov: labels die pas tijdens het vliegen voor het eerst zichtbaar worden, werden dán gemeten (geforceerde layout per label → op een A55 een frame > 33 ms).
+   Onder het laadscherm alles in één keer meten; daarna is er tijdens het vliegen niets meer te meten. */
+function premeasureLabels(){try{const todo=labels.filter(L=>!L.w&&L.el);for(const L of todo)L.ok=true;measureLabels(todo);}catch(_){}}
+function gatePrep(txt,fn){if(!GATE){fn();return;}gateShow(txt,600,false,10);GATE.work=true;requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();premeasureLabels();}finally{GATE.work=false;GATE.ok=0;GATE.t0=performance.now();}}));}
+function gateShow(txt,min=350,soft=true,need=4){if(!GATE)return;const L=document.getElementById('loadScr');GATE.on=true;GATE.ok=0;GATE.need=need;GATE.t0=performance.now();GATE.min=min;document.getElementById('loadTxt').textContent=txt;L.classList.toggle('soft',soft);L.classList.remove('off');}
 function gateTick(raw){if(!GATE)return;if(raw>0)GATE.best=Math.min(GATE.best,Math.max(8,raw));if(!GATE.on)return;GATE.ok=raw<=Math.max(70,GATE.best*1.6+4)?GATE.ok+1:0;/* ≥ 70 ms: een telefoon die tussen 16 en 33 ms wisselt is vloeiend genoeg; alleen echte haperingen houden het scherm vast */const el=performance.now()-GATE.t0;
-  if((GATE.ok>=4&&el>=GATE.min&&!(window.GATE_WAIT&&window.GATE_WAIT()))||el>8000){GATE.on=false;document.getElementById('loadScr').classList.add('off');}}
+  if((GATE.ok>=(GATE.need||4)&&el>=GATE.min&&!GATE.work&&!(typeof GEN_RUN!=='undefined'&&[...GEN_RUN.values()].some(c=>c.fg))&&!(window.GATE_WAIT&&window.GATE_WAIT()))||(el>20000&&!GATE.work)){if(!GATE.pre){GATE.pre=true;premeasureLabels();}GATE.on=false;GATE.offAt=performance.now();document.getElementById('loadScr').classList.add('off');}}
 (function loop(){requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(.1,(now-last)/1000);fpsTick(now,now-last);gateTick(now-last);last=now;
   if(camTween){const k=Math.min(1,(now-camTween.st)/camTween.ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;camera.position.lerpVectors(camTween.p0,camTween.p1,e);controls.target.lerpVectors(camTween.t0,camTween.t1,e);if(k>=1)camTween=null;}
-  if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
+  if(MODE==='fly'){if(!PAUSED&&!(GATE&&GATE.on))sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
   const tA=performance.now();goalVizTick(now);renderer.render(scene,camera);const tB=performance.now();placeLabels();const tC=performance.now();drawCompass();drawTape();drawMini();if(FPS)FPS.seg=[Math.round(tA-now),Math.round(tB-tA),Math.round(tC-tB),Math.round(performance.now()-tC)];})();
-window.__vfr={rtAdvice,placeLabels,extraGroups:()=>[pwGroup,windGroup,vrpGroup,rwGroup].filter(Boolean),scene,get FAIL_SHOWN(){return FAIL_SHOWN},acRect,chase,model:()=>models[ACTYPE],pickHits,ray,goalDist,decode,get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,MPT_EXTRA,genAsync,GEN_RUN,misVerify,MIS_OK,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine,startDay,daySeed,dayLog,dayStreak,dayShareText,get DAY_REQ(){return DAY_REQ},gateShow,gateTick,get GATE(){return GATE}};
+window.__vfr={setTempo,REFUSED,get GEN_STEPS(){return GEN_STEPS},get GEN_RUN(){return GEN_RUN},genAsync,rtAdvice,placeLabels,extraGroups:()=>[pwGroup,windGroup,vrpGroup,rwGroup].filter(Boolean),scene,get FAIL_SHOWN(){return FAIL_SHOWN},acRect,chase,model:()=>models[ACTYPE],pickHits,ray,goalDist,decode,get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,MPT_EXTRA,genAsync,GEN_RUN,misVerify,MIS_OK,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine,startDay,daySeed,dayLog,dayStreak,dayShareText,get DAY_REQ(){return DAY_REQ},gateShow,gateTick,get GATE(){return GATE}};
 
 </script>
 </body>
