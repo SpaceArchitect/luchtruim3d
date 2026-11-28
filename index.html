@@ -1867,7 +1867,8 @@ document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
 function setTempo(i){TI=Math.max(0,Math.min(TEMPOS.length-1,i));$('tempo').value=TI;$('tempoVal').textContent='×'+TEMPO();$('tChip').textContent='×'+TEMPO();}
 /* Op desktop heet ▶ gewoon Spatie; een afgeronde missie toont 'Volgende missie (spatie)' (Christian 21 nov) */
 function kbText(n){if(!document.body.classList.contains('kbd'))return n;
-  if(/<button class="nt">/.test(n))return n.replace(/<button class="nt">🎯 Nieuwe opdracht<\/button>/,`<button class="nt">🎯 ${MODE==='fly'&&!RELAX?'Volgende missie':'Nieuwe opdracht'}/* 28 nov: geen nextMission() hier (synchroon zwaar) */ (spatie)</button>`);
+  /* 28 nov: knoplabel zonder nextMission() (synchroon zwaar); commentaar buiten de tekst houden (stond eerst ín de knop, Christian) */
+  if(/<button class="nt">/.test(n))return n.replace(/<button class="nt">🎯 Nieuwe opdracht<\/button>/,`<button class="nt">🎯 ${MODE==='fly'&&!RELAX?'Volgende missie':'Nieuwe opdracht'} (spatie)</button>`);
   return n.replace(/▶ = (toch )?(verder|start)/g,'Spatie = $1$2');}
 /* Sneltoetskaart vóór de vlucht (Christian 21 nov): alleen op desktop, één keer per bezoek, 'niet meer tonen' wordt onthouden, ? of H = opnieuw */
 function keyCard(){if($('keycard'))return;const b=ACTYPE==='balloon',d=document.createElement('div');d.id='keycard';d.setAttribute('role','dialog');d.setAttribute('aria-label','Sneltoetsen');
