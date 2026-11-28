@@ -1,41 +1,33 @@
 # Status — lees dit eerst
 
-*Bijgewerkt: 28 nov 2026, 00:00 (sessie 27 nov). Backlog: **`docs/BACKLOG.md`** (enige lijst). Volgorde: **AIRAC → bugs → rest** (Christian 25 nov).*
+*Bijgewerkt: 28 nov 2026 (sessie 27–28 nov). Backlog: **`docs/BACKLOG.md`** (enige lijst). Volgorde: **AIRAC → bugs → rest**. **Elke sessie door tot ±25 SP, ook als je op Christian wacht** (CLAUDE.md).*
 
 ## Live
-- https://luchtruim3d.nl = `main` (25 nov). AIRAC 12-2026 gecontroleerd (geen wijziging in de regio). Terugdraaien: `release/2026-11-25-3`, `-25-2`, `-25`, `-22`, `-21`, `-15`.
+- https://luchtruim3d.nl = `main` (25 nov). Terugdraaien: `release/2026-11-25-3`, `-25-2`, `-25`, `-22`, `-21`, `-15`.
+- Live-kandidaat **`wip/live-28nov`** (volledige suite loopt/liep 28 nov): stotter-variant d + **laadscherm** (openen, naar vliegen, ▶ start) + 7 bugfixes 26 nov + kantelfix (Christian akkoord) + opnieuw bij fout + labelbudget + TRA/TSA-uitleg (ENR 5.2) + dagelijkse uitdaging + zweefkist-klimlimiet. Groen → `release/<datum>` → `main`.
 
-## Christian test za 28 nov (Galaxy A55, Chrome): stotter bij ▶
-Per link: pagina openen → Zweefvliegtuig → 'Vlieg naar Meteren (1/3)' → ▶ → 3 s vliegen. Doe dat 3×, en maak een screenshot van het groene kader linksonder (of noteer de regels 'na ▶ #1' en 'js …'). Onderaan staat de versie.
-- **0** `wip/opnieuw` (huidige stand, 2834 ms op 26 nov): https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/opnieuw/index.html?fps=1
-- **a** zónder labels-in-batch: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/stotter-a/index.html?fps=1
-- **b** zónder compile-opwarmen: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/stotter-b/index.html?fps=1
-- **c** zonder beide (= stand 26 nov 17:13, toen 112 ms): https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/stotter-c/index.html?fps=1
-- **d** zonder beide + bij het laden 1×1 px écht tekenen: https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/stotter-d/index.html?fps=1
-- Lezen: `js sim/render/labels/hud` = JS-tijd van dat frame, `knop` = duur van ▶. Grote gap + kleine JS = GPU/pipeline-stall; grote render = shader-link; grote knop = synchrone berekening.
-- Beslisregel daarna: de snelste variant die < 100 ms haalt wordt de basis; is c ≈ 112 ms en d beter → d. Niets haalt < 100 ms → laadscherm (akkoord Christian).
+## Klaar op branches (nog niet live)
+- **`wip/rt-28nov`**: RT per blok ('Wat doe je' per luchtruim: CTR/RMZ/TMZ/TMA/P), test d_rt_advice. Volgende live-gang.
+- **`wip/airac-vangnet`**: Action airac-check + `build_airspace --check` per volume (exit 1). Moet op `main` staan om na data-eaip/data-lvnl te draaien.
+- **`wip/vindbaar-28nov`**: metadata zonder spel/game, JSON-LD, over.html, robots, sitemap. **Christian: privacytekst over.html goedkeuren** ('verwerkingsverantwoordelijke: Christian Niemeijer').
+- **`wip/tiles`** (heel NL, bevat wip/heelnl + live-28nov): landschap per tegel (data/osm-nl in repo, laden ≤ 60 km, bouwen in plakjes van 6 ms), laadscherm wacht op tegels, opdracht vanaf de sonde + generator overal in NL, CTR/RMZ-tijden uit de AIP-tekst, missie 'lely'. Tests d_tiles, d_tiles_probe_cold, d_ctr_hours. Volledige suite nog niet gedraaid.
+- **`wip/osm-nl-26nov`**: data-osm-nl gerepareerd; run 27–28 nov loopt (1 tegel tegelijk; nl-01 liep in de 4-uurs time-out → opnieuw met workflow_dispatch `tiles: nl-01` zodra de workflow op main staat, of tijdelijk op een wip-push).
 
-## Klaar maar nog niet live (branches)
-- **`wip/opnieuw`**: 7 P1-bugfixes 26 nov + kantelfix (Christian akkoord) + opnieuw bij fout + bruggen/spoor/labelbudget + meetlat + d_start_smooth. **Niet live tot de stotter beslist is.** Daarna: regressie eruit (variant uit de test), `wip/spike-mil-26nov` + `wip/dagelijks` erin, volledige suite → `release/<datum>` → `main`.
-- **`wip/dagelijks`**: dagelijkse uitdaging + zweefkist-klimlimiet; 27 nov: uitvliegen/generator/d_daily groen, alle 18 vaste missies gehaald (`mission_report --fly`).
-- **`wip/spike-mil-26nov`**: TRA/TSA-uitleg (ENR 5.2).
-- **`wip/heelnl`** (heel NL, 259 volumes): 27 nov `wip/opnieuw` erin gemerged, 6 regio-gebonden tests opgelost + bug WÂNSWERT (naam met accent viel weg). vóór de laatste 2 testfixes: desk 68/69, p7 66/69; de rode tests daarna los groen (volledige run nog te doen); `d_tilt_pause_edges` 1× van 6 rood alleen op heelnl (tragere frames) → in de gaten houden.
-- **`wip/osm-nl-26nov`**: Action `data-osm-nl` gerepareerd (Overpass-502 gaf gaten). Nieuwe run gestart 27 nov 23:30 (17 tegels, één tegelijk, uren).
-
-## Eerstvolgende sessie (di 1 dec 22:47)
-1. Uitslag stottertest verwerken (zie beslisregel) → live-gang zoals hierboven (volledige suite; kantelfix is al door Christian getest).
-2. `data/osm-nl`: `osm-nl/MISSING.json` lezen; tegels met ontbrekende lagen opnieuw (workflow_dispatch met `tiles`). Daarna landschap heel NL samenvoegen (± 1 MB compact → pagina ±1,5 MB: dan data/*.json-splitsing, BACKLOG).
-3. Heel NL: volledige suite op `wip/heelnl` (alle 4 vormen); `d_tilt_pause_edges` herhalen.
-4. NOTAM/AUP: weekend 28–29 nov samen met Christian (spike LOG 26 nov).
+## Eerstvolgende stappen
+1. Live-gang `wip/live-28nov` (als niet al gedaan) → daarna `wip/rt-28nov` + `wip/airac-vangnet` erin, suite, live.
+2. Heel NL: volledige suite op `wip/tiles` (4 vormen), `uitvliegen` opnieuw (liep 28 nov in een time-out onder belasting), `osm-nl/MISSING.json` lezen en tegels bijwerken in `data/osm-nl/`.
+3. BACKLOG P3 'Heel NL missies': landdoel-missietype (Eelde), langere aanloop (De Kooy), PJA op veld (Teuge).
+4. NOTAM/AUP: weekend 28–29 nov met Christian (spike LOG 26 nov).
 
 ## Reset-push (Christian 25 nov)
-- Eén volledige reset van de weeklimiet, geldig t/m 10 dec. 27 nov–4 dec heel NL voorbereiden; vr 4–zo 6 dec sessies; ma 7 dec reset; 7–10 dec heel NL bouwen. Christian test 11–14 dec, vóór Mexico (15 dec).
+- Reset geldig t/m 10 dec. 27 nov–4 dec heel NL voorbereiden; 7–10 dec bouwen; Christian test 11–14 dec, vóór Mexico (15 dec).
 
 ## Budget
-- 1 SP = 1% weeklimiet; herijking 26 nov: **1% ≈ 5,5 M tokens** (ccusage). Sessie 27 nov: ±17 M tokens ≈ 3 SP (weinig: vooral wachten op tests).
+- 1 SP ≈ 5,5 M tokens (ccusage). Sessie 27–28 nov: zie LOG (SP-regel).
 
 ## Werkwijze
-- Volledige suite in twee helften parallel (`--forms desk,p7` en `--forms p7l,se`, eigen `E2E_PORT`). Andere worktree testen: `THREE_DIR=<repo>/.devenv/node_modules/three`.
-- Overpass/eAIP/Eurocontrol alleen via GitHub Actions. Een push die `tools/fetch_osm.py` wijzigt start óók `data-osm` (wist data/osm): annuleren als dat niet de bedoeling is.
+- Volledige suite in twee helften parallel (`--forms desk,p7` en `--forms p7l,se`, eigen `E2E_PORT`); geen andere tests tegelijk (tijdmetingen worden onbetrouwbaar, uitvliegen haalt de time-out niet).
+- Worktrees: `THREE_DIR=<repo>/.devenv/node_modules/three`. Merge-conflicten index.html/e2e.py (render-regel, `window.__vfr`, det-lijst): `python tools/merge_resolve.py <label> index.html tools/e2e.py`.
+- Een push die `tools/fetch_osm.py` wijzigt start óók `data-osm` (wist data/osm): annuleren als dat niet de bedoeling is.
+- Docs naar `main` pushen werd 28 nov door de auto-mode geweigerd: docs gaan mee met de live-gang.
 - NOTAM: geen NOTAMs in de app tot er een geverifieerde primaire bron is.
-- Eindcontrole elke sessie: BACKLOG, STATUS en LOG nalopen.
