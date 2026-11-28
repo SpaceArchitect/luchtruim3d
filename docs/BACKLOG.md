@@ -37,6 +37,10 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 
 - [M] Ideeën Raquel (via Christian 28 nov): 5 sterren i.p.v. 3 voor een perfecte score; beloning bij het halen van een missie: hoedje (sombrero) op het toestel; hangaar met skins. Voortgang zonder accounts/cookies: localStorage per apparaat (functioneel, zonder ID's: mag volgens de privacyregel); ander apparaat = voortgangscode om over te zetten (kopiëren of QR), geen server nodig.
 
+- [M] **Echte telefoons in de testronde** (Christian 28 nov): cloud-device-dienst (echte Android met GPU) vanuit GitHub Actions. Account = Christian (grens 4); eerst opties en kosten uitzoeken.
+- [M] **Bugregister:** script dat elke bug-regel in LOG koppelt aan een test in de suite. Eerst kantelen en knipperende lijnen (Christian: komen terug).
+- [M] **Vaste missies heel NL** (Christian 28 nov: nu vooral Zuid-Nederland): per regio missies met één leerdoel; generator werkt op wip/tiles al landelijk.
+
 ## P3 — koers (top 5, even zwaar) en groter werk
 - [M] Generator v2: smalle gangen tussen gebieden, wind voor zweef/motor, tijdsgebonden gebieden (CTR open/dicht), RMZ-oproep als opdracht, plafond aan de moeilijkheid; leerdoel uit de werkelijk geraakte gebieden — Christian 22–25 nov (v1 staat, zie docs/MISSIES.md)
 - [L] Live NOTAM/AUP uit een primaire bron. Spike 26 nov: EAD Basic ongeschikt (niet operationeel, login), LVNL NOTAM Portal = aanvragen, NM B2B = certificaat + overeenkomst (beslissing Christian, P1-2). Automatische AIRAC-check: data-acties draaien op do, maar de cron kan overslaan → vangnet-Action die op AIRAC-dag de datum van data/eaip controleert — Christian 22 + 25 nov

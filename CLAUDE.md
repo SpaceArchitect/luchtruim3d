@@ -110,6 +110,14 @@ we zo op: **hoe dichter bij de gebruiker, hoe strenger.**
 | Nieuwe AIRAC (elke 28 dagen, donderdag) | `git fetch origin data/lvnl data/eaip` → `python tools/build_airspace.py --bbox … --check` en `python tools/aip_check.py`, daarna **`python tools/mission_report.py --fly --gen 8`** en `e2e.py -k "uitvliegen|generator"`: elke vaste missie moet nog gehaald worden (de app slaat een onhaalbare missie wel over, maar dan mist er een leerdoel) |
 | Na publicatie, als de pc bereikbaar is | open de live site in Chrome; anders controleer je de Pages-deploy via GitHub |
 
+**Teststrategie (Christian 28 nov, na te veel bugs en terugkerende oude bugs):**
+- **Eén integratiebranch `develop`.** Alles gaat daar meteen in; `main` komt alleen uit `develop`. Feature-branches leven hooguit één sessie (lang levende wip-branches brachten oude bugs terug).
+- **Rood is rood.** Nooit publiceren met een rode test, ook niet 'het is timing'. Repareer test of code en draai de hele suite opnieuw.
+- **Testplan vóór het bouwen:** per story eerst opschrijven welke klassen bugs kunnen ontstaan (hapering, modus-overgang, tempo, schermvorm, mobiel) en welke test die vangt; die test faalt eerst.
+- **Kleine publicaties:** één thema per live-gang, met in LOG wat er veranderd is.
+- **Bugregister:** elke bug in LOG heeft een vaste regressietest in de suite.
+- **Headless ≠ telefoon.** Stotter, knipperen (dieptebuffer), 30 fps en sensoren zie je headless niet: structurele tests (d_smooth_flight, d_no_zfight, d_tilt_*) en zodra mogelijk echte toestellen in de cloud.
+
 Bug gevonden of gemeld? Een fix alleen is niet genoeg (Christian 24 nov). Doe per bug drie dingen:
 1. **Oorzaak:** hoe is de bug ontstaan? Welke aanname, welk gat in het ontwerp of welke wijziging?
 2. **Vangnet:** waarom hebben de tests hem niet gevangen? Schrijf eerst een test die faalt, dan de fix. Zo komt hij
