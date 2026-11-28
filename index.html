@@ -219,6 +219,14 @@
     #info{top:54px!important;bottom:8px!important;right:8px!important;left:auto!important;width:min(290px,33vw)!important;max-height:none!important;padding:8px 10px!important;font-size:12px}
     body:has(#info[style*="block"]) #tape{display:none!important}
     body:has(#info[style*="block"]) #north{right:calc(min(290px,33vw) + 18px)!important}}
+  /* 28 nov (Christian): laadscherm. Stotter van seconden bij openen/▶ (GPU-pipelines, A55) valt achter dit scherm; weg zodra het beeld vloeiend loopt. Blokkeert nooit klikken. */
+  #loadScr{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(214,224,214,.97);pointer-events:none;transition:opacity .25s}
+  #loadScr.soft{background:rgba(214,224,214,.55)}
+  #loadScr.off{opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
+  #loadScr .box{background:var(--panel);border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.15);padding:14px 22px;font-weight:700;font-size:17px;color:var(--ink);text-align:center;min-width:200px}
+  #loadScr .bar{height:4px;border-radius:2px;background:var(--line);margin-top:10px;overflow:hidden}#loadScr .bar i{display:block;height:100%;width:35%;background:var(--accent);border-radius:2px;animation:ldb 1.1s ease-in-out infinite}
+  @keyframes ldb{0%{transform:translateX(-100%)}100%{transform:translateX(290%)}}
+  @media (prefers-reduced-motion: reduce){#loadScr .bar i{animation:none;width:100%;opacity:.5}#loadScr,#loadScr.off{transition:none}}
 </style>
 <script type="text/plain" id="enr55">
 gld|Arnhem/Deelen|EHDLGLD001|5.87194|52.05972|0.25|2300|AGL|Zweefvliegclub Deelen/Rotterdam|123.505
@@ -299,6 +307,7 @@ ulm|Weert/Budel|EHBDULT001|5.60083|51.25444|0.25|500|AMSL||
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body class="welcome">
+<div id="loadScr" role="status" aria-live="polite"><div class="box"><span id="loadTxt">Luchtruim laden…</span><div class="bar"><i></i></div></div></div>
 <div id="app"><div id="labels"></div></div>
 <header>
   <div class="title">Luchtruim in 3D · kaart &amp; vliegen<small>Zuidoost-Nederland · LVNL, CC BY 4.0 (AIRAC 26 nov 2026) · © OpenStreetMap</small></div>
@@ -1863,7 +1872,9 @@ function keyCardClose(){const d=$('keycard');if(!d)return;try{if($('kcNo').check
 function keyCardAuto(){if(!document.body.classList.contains('kbd'))return;try{if(localStorage.getItem('l3d_keys_seen')||sessionStorage.getItem('l3d_keys_s'))return;}catch(_){}keyCard();}
 /* Christian 25 nov: na geslaagd/mislukt is ▶ (knop, tik op de melding, Spatie) = de volgende opdracht, niet doorvliegen zonder opdracht */
 const MIS_OVER=()=>MODE==='fly'&&PAUSED&&/<button class="nt">/.test(NOTICE);function playNext(){const t=performance.now();try{if(MIS_OVER()){newTask();hudTick();return;}togglePause();}finally{if(FPS)FPS.hnd=(FPS.hnd||0)+performance.now()-t;}}
-function togglePause(){const st=/▶ = start/.test(NOTICE)||!FLOWN;PAUSED=!PAUSED;$('stillHint').hidden=true;if(!PAUSED){NOTICE='';FLOWN=true;if(st)tiltRecal();/* Christian 25 nov: alleen ijken bij de start (eerste vlucht, nieuwe opdracht); nooit door een melding, pauze of resize (bocht was daarna niet voort te zetten). Draaien staand↔liggend ijkt apart. */}}
+let START_PEND=false;function togglePause(){if(PAUSED&&!START_PEND&&MODE==='fly'&&(/▶ = start/.test(NOTICE)||!FLOWN)&&typeof gateShow==='function'){/* 28 nov: eerst het laadscherm tekenen, dan pas starten: de stilstand valt erachter */
+    START_PEND=true;gateShow('Starten…',350);requestAnimationFrame(()=>requestAnimationFrame(()=>{START_PEND=false;if(PAUSED)togglePause0();}));return;}if(START_PEND)return;togglePause0();}
+function togglePause0(){const st=/▶ = start/.test(NOTICE)||!FLOWN;PAUSED=!PAUSED;$('stillHint').hidden=true;if(!PAUSED){NOTICE='';FLOWN=true;if(st)tiltRecal();/* Christian 25 nov: alleen ijken bij de start (eerste vlucht, nieuwe opdracht); nooit door een melding, pauze of resize (bocht was daarna niet voort te zetten). Draaien staand↔liggend ijkt apart. */}}
 let FLOWN=false;
 function tiltRecal(){/* Christian 21 nov: na ▶ of een nieuwe opdracht ging kantelen soms de mist in: er werd geijkt op het eerste sensorsignaal (de tik-schok), scheef vasthouden (>25°) werd een vaste bocht en de vergrendelde liggende houding ging verloren. Nu: besturing even neutraal, ijken zodra de telefoon 0,3 s rustig is (uiterlijk 1,2 s), rol tot 45° telt als rechtuit, fysieke houding blijft. */
   if(!$('optTilt').checked||!TILT){TILT=null;return;}const now=performance.now();TILT={recal:true,pend:true,ang:TILT.ang,sAng:TILT.sAng,phys:TILT.phys,start:now,ts:now};keys['tl']=keys['tr']=keys['tu']=keys['td']=false;TAX.r=TAX.p=0;}
@@ -2309,7 +2320,7 @@ function setMode(m,ac){
   document.body.classList.toggle('looking',m!=='fly');document.body.classList.toggle('balloon',ACTYPE==='balloon');
   $('btnMode').innerHTML=m==='fly'?'→ Kaart':'→ Vliegen';
   $('tape').classList.toggle('off',m==='fly'?!$('optTape').checked:false);
-  if(m==='fly'&&(prev!=='fly'||ac)){camReset();keyCardAuto();}else if(m!=='fly')keyCardClose();// elke vlucht begint met de camera achter het toestel
+  if(m==='fly'&&(prev!=='fly'||ac)){camReset();keyCardAuto();if(typeof gateShow==='function'&&prev!=='fly')gateShow('Vliegen laden…',0);}else if(m!=='fly')keyCardClose();// elke vlucht begint met de camera achter het toestel
   if(m==='fly'&&prev!=='fly'&&PROBE.user){PLANE.x=PROBE.x;PLANE.n=PROBE.n;if(SLICE>0&&ACTYPE!=='balloon')PLANE.alt=SLICE;PROBE.user=false;WARNED.clear();FAILS.clear();CLR.clear();
     {let t=null,hd=PLANE.hdg;const hs=ACTYPE==='balloon'?[(windAt(Math.max(300,PLANE.alt)).from+180)%360]:[0,45,90,135,180,225,270,315];for(const h of hs){t=pickTask(PLANE.x,PLANE.n,h,ACTYPE);if(t){hd=h;break;}}/* S1b panel (Fatima): ook vanaf de sonde een opdracht */
      TASK=t&&!RELAX?t:'';GOAL=TASK?{...LASTGOAL}:null;PLANE.hdg=hd;if(TASK){PAUSED=true;NOTICE=`🎯 ${t}<br><small>▶ = start</small>`;}}}
@@ -2648,7 +2659,12 @@ const FPS_VER='live-28nov';
 document.addEventListener('visibilitychange',()=>{if(FPS)FPS.hid=true;});
 /* 26 nov (stotter A55, 112 ms bij ▶): shaders van alles wat later pas in beeld komt (doel, schaduw, verre volumes) bij het laden al compileren, ook wat nu verborgen is; anders compileert de GPU midden in de vlucht */
 try{/* stotter-d: echt tekenen (1×1 px, alles zichtbaar, geen culling) bij het laden, zodat de GPU-pipelines (ANGLE/Vulkan) al bestaan vóór ▶ */const hid=[],cul=[];scene.traverse(o=>{if(!o.visible){hid.push(o);o.visible=true;}if(o.frustumCulled){cul.push(o);o.frustumCulled=false;}});renderer.setScissorTest(true);renderer.setScissor(0,0,1,1);renderer.render(scene,camera);renderer.setScissorTest(false);for(const o of hid)o.visible=false;for(const o of cul)o.frustumCulled=true;}catch(_){renderer.setScissorTest(false);}
-(function loop(){requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(.1,(now-last)/1000);fpsTick(now,now-last);last=now;
+/* Laadscherm-poort: weg na 4 vloeiende frames (≤ 1,6× het snelste frame sinds het openen, zodat het ook op trage apparaten werkt), minstens GATE.min ms, uiterlijk 8 s. */
+var GATE={on:true,ok:0,t0:performance.now(),min:0,best:1e9};
+function gateShow(txt,min=350,soft=true){if(!GATE)return;const L=document.getElementById('loadScr');GATE.on=true;GATE.ok=0;GATE.t0=performance.now();GATE.min=min;document.getElementById('loadTxt').textContent=txt;L.classList.toggle('soft',soft);L.classList.remove('off');}
+function gateTick(raw){if(!GATE)return;if(raw>0)GATE.best=Math.min(GATE.best,Math.max(8,raw));if(!GATE.on)return;GATE.ok=raw<=GATE.best*1.6+4?GATE.ok+1:0;const el=performance.now()-GATE.t0;
+  if((GATE.ok>=4&&el>=GATE.min&&!(window.GATE_WAIT&&window.GATE_WAIT()))||el>8000){GATE.on=false;document.getElementById('loadScr').classList.add('off');}}
+(function loop(){requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(.1,(now-last)/1000);fpsTick(now,now-last);gateTick(now-last);last=now;
   if(camTween){const k=Math.min(1,(now-camTween.st)/camTween.ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;camera.position.lerpVectors(camTween.p0,camTween.p1,e);controls.target.lerpVectors(camTween.t0,camTween.t1,e);if(k>=1)camTween=null;}
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
