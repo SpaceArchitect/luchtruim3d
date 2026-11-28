@@ -12,7 +12,7 @@
   - data-workflows heel NL (data-osm-pbf).
 - Suites: live-28nov 277/278, rt-28nov 281/282; de ene fout telkens test-timing in d_loading, gecorrigeerd en op 4 vormen groen.
 - Terugdraaien: **`release/2026-11-28-2`** (= live 08:46), **`release/2026-11-28`** (= 25 nov), `-25-3` … `-15`.
-- **Christian:** graag op de A55 kijken of de stotter weg is ('Starten…' i.p.v. stilstand) en of RT-uitleg in de sonde helpt.
+- **Stotter nog niet weg** (Christian 28 nov 11u: 3 laadschermen + stotter erna). Preview `wip/stotter2` (1 meting met ?fps=1 → wanneer en waar): https://raw.githack.com/SpaceArchitect/luchtruim3d/wip/stotter2/index.html?fps=1
 
 ## Klaar op branches (nog niet live)
 - **`wip/tiles`** = heel NL (bevat alles van live). Inhoud:
