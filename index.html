@@ -1517,6 +1517,7 @@ T||61500,518827,-90,157,-148,86</script>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 const ONLY_MAP=false,ONLY_FLY=false;if(ONLY_MAP)document.body.classList.add('onlymap');if(ONLY_FLY)document.body.classList.add('onlyfly');
 
 // ---------- projectie ----------
@@ -1732,6 +1733,7 @@ function placeLabels(){lmMinSize();
   const W=innerWidth,H=innerHeight,placed=[];const cam=camera.position;
   for(const L of labels){L.prev=L.show;L.show=false;}// eerst: hysterese moet het vorige frame lezen, niet dat van twee frames terug (dat gaf knipperen 0101…, bug 24 nov Deelen)
   const list=labels.filter(L=>{
+    if(L.tile&&!TILE_ST[L.tile].on)return false;// heel NL: labels van een verre tegel niet
     if(L.ref&&(L.ref.hidden||!(vis[L.ref.group.id]||L.ref.forceShow)))return false;
     if(L.tickFt!==undefined&&L.tickFt>CAP)return false;
     if(L.isSlice&&!SLICE_ON)return false;
@@ -1930,6 +1932,55 @@ for(const [t,name,s] of OSM){if(t==='L')continue;const pts=decode(s).map(([lo,la
   else{const ref=name.replace(' ','').replace('E34','A67');ribbon(pts,.16,-0.02,0xf0a33a,-0.3);
     for(const p of along(pts,24,Math.min(6,plen(pts)/2)))addLabel(ref,'road',()=>new THREE.Vector3(p[0],.02,-p[1]),4.5);}}
 for(const [nm,{pts}] of Object.entries(waterLab)){const L=plen(pts);for(const p of along(pts,28,L/2>14?8:L/2))addLabel(nm,'water',()=>new THREE.Vector3(p[0],.02,-p[1]),6);}
+// ---------- heel NL (28 nov): landschap buiten de regio per tegel (data/osm-nl/nl-XY.json, OSM ODbL), pas laden als je in de buurt komt ----------
+/* Waarom: heel NL is ±1 MB landschap; alles bij het openen bouwen kost een telefoon seconden en geheugen. Een tegel (1,0° × 0,6°) wordt geladen
+   binnen TILE_R km van toestel/kaartmidden en verborgen buiten TILE_R+20. Binnen de oorspronkelijke regio blijft de ingebakken data leidend
+   (handgemaakte herkenningspunten, VRP's); tegeldata daar wordt overgeslagen. Per tegel één mesh per soort (weinig draw calls). */
+const REGION={x0:4.75,y0:51.2,x1:6.15,y1:52.15},TILE_R=60,TILE_ST={},TILES=[];
+for(const [i,la] of [50.7,51.3,51.9,52.5,53.1].entries())for(const [j,lo] of [3.3,4.3,5.3,6.3].entries()){if([[3,0],[4,0],[0,3]].some(([a,b])=>a===i&&b===j))continue;
+  const [x0,n0]=proj(lo,la),[x1,n1]=proj(lo+1,la+.6);TILES.push({id:`nl-${i}${j}`,x0,n0,x1,n1});}
+const inRegion=(lo,la)=>lo>=REGION.x0&&lo<=REGION.x1&&la>=REGION.y0&&la<=REGION.y1;
+const TM={urb:new THREE.MeshBasicMaterial({color:0xcdcac6,side:THREE.DoubleSide,depthWrite:false}),heath:new THREE.MeshBasicMaterial({color:0xc7b8d4,side:THREE.DoubleSide,depthWrite:false}),
+  lake:new THREE.MeshBasicMaterial({color:0x6fa8dc,side:THREE.DoubleSide,depthWrite:false}),road:new THREE.MeshBasicMaterial({color:0xf0a33a,side:THREE.DoubleSide,depthWrite:false}),
+  river:new THREE.MeshBasicMaterial({color:0x6fa8dc,side:THREE.DoubleSide,depthWrite:false}),paved:new THREE.MeshBasicMaterial({color:0x50565d}),grass:new THREE.MeshBasicMaterial({color:0x6fae3f}),
+  rail:new THREE.LineBasicMaterial({color:0x2d2f33,depthWrite:false}),railW:new THREE.LineDashedMaterial({color:0xffffff,dashSize:.25,gapSize:.25,depthWrite:false}),
+  pw3:new THREE.LineBasicMaterial({color:0x6b7076}),pw1:new THREE.LineBasicMaterial({color:0x8a8f96,transparent:true,opacity:.5})};
+function ribbonGeo(P,w,y){const pos=[],idx=[];for(let i=0;i<P.length;i++){const a=P[Math.max(0,i-1)],b=P[Math.min(P.length-1,i+1)];let dx=b[0]-a[0],dy=b[1]-a[1];const L=Math.hypot(dx,dy)||1;dx/=L;dy/=L;
+  const nx=-dy*w/2,ny=dx*w/2;pos.push(P[i][0]+nx,y,-(P[i][1]+ny),P[i][0]-nx,y,-(P[i][1]-ny));if(i)idx.push(2*i-2,2*i-1,2*i,2*i-1,2*i+1,2*i);}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);return g;}
+function tileMesh(geos,mat,y,order,grp){if(!geos.length)return;const g=mergeGeometries(geos.map(x=>x.index?x.toNonIndexed():x));geos.forEach(x=>x.dispose());const m=new THREE.Mesh(g,mat);m.position.y=y;m.renderOrder=order;grp.add(m);}
+async function buildTile(id,d){/* in plakjes van ±6 ms (telefoon ±4× trager): een tegel bouwen mag zelf geen stotter geven */let tY=performance.now(),busy=0;const Y=async()=>{if(performance.now()-tY>6){const dt=performance.now()-tY;busy+=dt;TILE_ST[id].max=Math.max(TILE_ST[id].max||0,Math.round(dt));await new Promise(r=>setTimeout(r));tY=performance.now();}};const AL=(...a)=>{const L=addLabel(...a);L.tile=id;st.nlab=(st.nlab||0)+1;return L;};const T0=performance.now(),st=TILE_ST[id],grp=new THREE.Group(),lab=[];grp.visible=false;scene.add(grp);
+  const G={U:[],H:[],Q:[],road:[],river:[]},rail=[],P3=[],P1=[],rw={paved:[],grass:[]};
+  const pl=d.places||{},cities=(pl.cities||[]).filter(([,lo,la])=>!inRegion(lo,la)),towns=(pl.towns||[]).filter(([,lo,la])=>!inRegion(lo,la));
+  const cxy=cities.map(([nm,lo,la])=>{const [x,n]=proj(lo,la);return {nm,x,n};}),txy=towns.map(([nm,lo,la])=>{const [x,n]=proj(lo,la);return {nm,x,n};});
+  for(const c of cxy){if(!CITYXY.some(o=>o.nm===c.nm)){CITYXY.push(c);AL('● '+c.nm,'city',()=>new THREE.Vector3(c.x,0,-c.n),9);}}
+  for(const l of d.areadata||[]){await Y();const a=l.split('|'),ll=decode(a[2]||'');if(ll.length<2||inRegion(...ll[0]))continue;const pts=ll.map(([lo,la])=>proj(lo,la));
+    if(a[0]==='T'){rail.push(pts);continue;}if(pts.length<4)continue;
+    if(a[0]==='U'){const big=cxy.filter(c=>insideRing([c.x,c.n],pts)),sm=txy.filter(c=>insideRing([c.x,c.n],pts));if(!big.length&&!sm.length)continue;window.__URBAN.push(pts);
+      for(const t of sm)if(!big.some(c=>Math.hypot(c.x-t.x,c.n-t.n)<3)&&!TOWNXY.some(o=>o.nm===t.nm)){TOWNXY.push(t);const LL=AL('• '+t.nm,'city town',()=>new THREE.Vector3(t.x,0,-t.n),9.5);LL.isTown=true;}}
+    if(!G[a[0]])continue;const geo=new THREE.ShapeGeometry(new THREE.Shape(pts.map(([x,n])=>new THREE.Vector2(x,n))));geo.rotateX(-Math.PI/2);G[a[0]].push(geo);
+    if(a[1]&&a[0]==='Q'){const lp=labelPoint(pts);const LL=AL('💧 '+a[1],'lm',()=>new THREE.Vector3(lp[0],.05,-lp[1]),2);LL.isLm=true;LL.isLake=true;LL.prio=1.8;}}
+  const wl={};
+  for(const l of d.osm||[]){await Y();const [t,name,str]=l.split('|');if(t==='L')continue;const ll=decode(str);if(ll.length<2||inRegion(...ll[0]))continue;const pts=ll.map(([lo,la])=>proj(lo,la));
+    if(t==='W'){G.river.push(ribbonGeo(pts,/Maas|Amer|Waal|IJssel|Rijn|Lek/.test(name)?.32:.14,0));if(!wl[name]||plen(pts)>wl[name].len)wl[name]={len:plen(pts),pts};}
+    else{G.road.push(ribbonGeo(pts,.16,0));const ref=name.replace(' ','');for(const p of along(pts,24,Math.min(6,plen(pts)/2)))AL(ref,'road',()=>new THREE.Vector3(p[0],.02,-p[1]),4.5);}}
+  for(const [nm,{pts}] of Object.entries(wl)){const L=plen(pts);for(const p of along(pts,28,L/2>14?8:L/2))AL(nm,'water',()=>new THREE.Vector3(p[0],.02,-p[1]),6);}
+  for(const l of d.rwdata||[]){await Y();const a=l.split('|');if(a.length<7)continue;const ll=a[6].split(' ').map(q=>q.split(',').map(Number));if(inRegion(...ll[0]))continue;const pts=ll.map(q=>proj(...q));
+    const isG=a[2]==='grass',W=Math.max(.09,(+a[3]||(isG?30:45))/1000*2.5);rw[isG?'grass':'paved'].push(ribbonGeo(pts,W,0));}
+  for(const l of d.pwdata||[]){await Y();const [k,body]=l.split('|');if(!body)continue;let x=0,y=0;const ll=body.split(' ').map(q=>{const v=q.split(',').map(Number);x+=v[0];y+=v[1];return [x/1e4,y/1e4];});
+    if(k[0]!=='P'||ll.length<2||inRegion(...ll[0]))continue;const H=k==='P3'?.055:.045;const v=ll.map(q=>{const [px,pn]=proj(...q);return new THREE.Vector3(px,H,-pn);});
+    const S=k==='P3'?P3:P1;for(let i=1;i<v.length;i++){S.push(v[i-1],v[i]);}for(const q of v)S.push(new THREE.Vector3(q.x,0,q.z),q);}/* eenvoudig: draad + mast per knik (licht) */
+  await Y();tileMesh(G.U,TM.urb,-.04,-.5,grp);await Y();tileMesh(G.H,TM.heath,-.042,-.55,grp);tileMesh(G.Q,TM.lake,-.035,-.45,grp);tileMesh(G.river,TM.river,-.03,-.4,grp);tileMesh(G.road,TM.road,-.02,-.3,grp);
+  tileMesh(rw.paved,TM.paved,.006,2,grp);tileMesh(rw.grass,TM.grass,.006,2,grp);
+  if(rail.length){const S=[],D=[];for(const pts of rail)for(let i=1;i<pts.length;i++){S.push(new THREE.Vector3(pts[i-1][0],.006,-pts[i-1][1]),new THREE.Vector3(pts[i][0],.006,-pts[i][1]));D.push(new THREE.Vector3(pts[i-1][0],.007,-pts[i-1][1]),new THREE.Vector3(pts[i][0],.007,-pts[i][1]));}
+    const a=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(S),TM.rail),b=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(D),TM.railW);b.computeLineDistances();a.renderOrder=2;b.renderOrder=3;grp.add(a,b);}
+  if(P3.length)pwGroup.add(st.pw3=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(P3),TM.pw3));if(P1.length)pwGroup.add(st.pw1=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(P1),TM.pw1));
+  st.group=grp;grp.visible=st.on;st.state='ready';busy+=performance.now()-tY;st.ms=Math.round(busy);st.wall=Math.round(performance.now()-T0);}
+function tileDist(t,x,n){const dx=Math.max(t.x0-x,0,x-t.x1),dn=Math.max(t.n0-n,0,n-t.n1);return Math.hypot(dx,dn);}
+let TILE_AT=null;function tileTick(){const c=MODE==='fly'?[PLANE.x,PLANE.n]:[controls.target.x,-controls.target.z];if(TILE_AT&&Math.hypot(c[0]-TILE_AT[0],c[1]-TILE_AT[1])<2)return;TILE_AT=c;
+  for(const t of TILES){const d=tileDist(t,c[0],c[1]);let st=TILE_ST[t.id];
+    if(!st&&d<TILE_R){st=TILE_ST[t.id]={state:'loading',on:true};fetch(`data/osm-nl/${t.id}.json`).then(r=>r.ok?r.json():null).then(j=>{if(j)buildTile(t.id,j);else st.state='missing';}).catch(()=>{st.state='missing';});}
+    if(st){st.on=d<TILE_R+20;if(st.group)st.group.visible=st.on;if(st.pw3)st.pw3.visible=st.on;if(st.pw1)st.pw1.visible=st.on;}}}
 // herkenningspunten als kleine 3D-modellen (breedte aangedikt, hoogte op ware schaal × overdrijving)
 const LM={
   'Evoluon':{icon:'🛸',build:g=>{// Ø 77 m, schotel op betonnen V-poten (ware maat; wordt gelijkmatig geschaald)
@@ -2960,8 +3011,8 @@ try{const hid=[];scene.traverse(o=>{if(!o.visible){hid.push(o);o.visible=true;}}
   if(camTween){const k=Math.min(1,(now-camTween.st)/camTween.ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;camera.position.lerpVectors(camTween.p0,camTween.p1,e);controls.target.lerpVectors(camTween.t0,camTween.t1,e);if(k>=1)camTween=null;}
   if(MODE==='fly'){if(!PAUSED)sim(dt);if(dragging){const k=Math.min(1,dt*14);camYaw+=(CT.yaw-camYaw)*k;CAM.pitch+=(CT.pitch-CAM.pitch)*k;if(pinch0)CAM.dist+=(CT.dist-CAM.dist)*k;}else if(performance.now()-REL_T>1500){const f=Math.pow(REDUCED?0:.975,dt*60);camYaw*=f;CAM.pitch*=f;}/* S1b panel: niet direct terugveren */CAM.free=Math.abs(CAM.dist-1)>.05;VZ_S+=((PAUSED?0:VZ)-VZ_S)*Math.min(1,dt*3);chase(dt);document.body.classList.toggle('bal',ACTYPE==='balloon');document.body.classList.add('flying');}else{controls.update();document.body.classList.remove('flying');}
   placePlane();acc+=dt;if(acc>.15){acc=0;hudTick();}
-  const tA=performance.now();farTick();goalVizTick(now);renderer.render(scene,camera);const tB=performance.now();placeLabels();const tC=performance.now();drawCompass();drawTape();drawMini();if(FPS)FPS.seg=[Math.round(tA-now),Math.round(tB-tA),Math.round(tC-tB),Math.round(performance.now()-tC)];})();
-window.__vfr={placeLabels,extraGroups:()=>[pwGroup,windGroup,vrpGroup,rwGroup].filter(Boolean),scene,get FAIL_SHOWN(){return FAIL_SHOWN},acRect,chase,model:()=>models[ACTYPE],pickHits,ray,goalDist,decode,get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,MPT_EXTRA,genAsync,GEN_RUN,misVerify,MIS_OK,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine,update};
+  const tA=performance.now();farTick();tileTick();goalVizTick(now);renderer.render(scene,camera);const tB=performance.now();placeLabels();const tC=performance.now();drawCompass();drawTape();drawMini();if(FPS)FPS.seg=[Math.round(tA-now),Math.round(tB-tA),Math.round(tC-tB),Math.round(performance.now()-tC)];})();
+window.__vfr={TILE_ST,TILES,tileTick,placeLabels,extraGroups:()=>[pwGroup,windGroup,vrpGroup,rwGroup].filter(Boolean),scene,get FAIL_SHOWN(){return FAIL_SHOWN},acRect,chase,model:()=>models[ACTYPE],pickHits,ray,goalDist,decode,get INSIDE(){return INSIDE},THREE,get EXAG(){return EXAG},TOUR,tourStart,get TI_(){return TI_},scr:(x,n)=>{const v=new THREE.Vector3(x,0,-n).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight];},XS,showXS,xsStart,xsClose,warnText,HG,hgNear,hgGroup,hgCyl,balloonPlan,MISSIONS,misStart,nextMission,misDone,get MISSION(){return MISSION},windAt,TAX,CLR,labels,vis,landText,builtUp,proj,goalViz,get GVPOS(){return goalViz.visible?[beacon.position.x,-beacon.position.z]:null},get LOOP(){return LOOP},tiltAngles,resetTilt(){TILT=null},get LASTGOAL(){return LASTGOAL},balloonReach,windAt,get AHEAD(){return LASTAHEAD},get TILT(){return TILT},tiltAng,set PAUSED(v){PAUSED=v},set TASK(t){TASK=t},set NOTICE(v){NOTICE=v},rtClick,RTOUT,REFUSED,FAILS,pickTask,distPoly,TASKF,newTask,BRIDGES,keyCard,keyCardClose,kbText,AIPINFO,AC,oneMenu,get CAMT(){return CT},get dbg(){const m=models[ACTYPE];return {MODE,ct:camTarget.toArray().map(a=>+a.toFixed(2)),mv:m.visible,mp:m.position.toArray().map(a=>+a.toFixed(2)),ms:m.scale.x,rot:[m.rotation.x,m.rotation.y],CHOSEN,ACTYPE,camYaw,dragging,CAM,VZ_S,hdg:PLANE.hdg,ptr:PTR.size}},camera,controls,WARNED,get NOTICE(){return NOTICE},get GOAL(){return GOAL},set GOAL(g){GOAL=g},get VRP(){return VRP},get TASK(){return TASK},lmGroup,MPT_EXTRA,genAsync,GEN_RUN,misVerify,MIS_OK,balloonSim,driftStep,genMission,genPool,GEN,planRoute,planBlocked,applies,needsClr,rmzLive,MPT,BOUNDS:[gx0,gn0,gx1,gn1],misSeries,misStars,get MDIST(){return MDIST},get MREF(){return MREF},lmScale:()=>lmGroup.children.slice(0,3).map(g=>g.scale.x.toFixed(2)).join('/'),PLANE,PROBE,get MODE(){return MODE},get ACTYPE(){return ACTYPE},get TEMPO(){return TEMPO()},get PAUSED(){return PAUSED},setMode,setTempo,keys,hudTick,showProbe,LAYERS,featsAt,governing,inNL,freeLine,update};
 
 </script>
 </body>

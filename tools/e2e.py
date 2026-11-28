@@ -20,6 +20,7 @@ def serve():
     html = open(os.environ.get('E2E_INDEX', os.path.join(ROOT, 'index.html')), encoding='utf-8').read()
     html = html.replace('https://cdn.jsdelivr.net/npm/three@0.160.0/', '/three/')
     open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(html)
+    if os.path.isdir(os.path.join(ROOT, 'data')): os.symlink(os.path.join(ROOT, 'data'), os.path.join(d, 'data'))  # heel NL: tegels data/osm-nl
     try: os.symlink(THREE, os.path.join(d, 'three'))
     except OSError: shutil.copytree(THREE, os.path.join(d, 'three'))  # Windows zonder symlinkrecht
     class Q(http.server.SimpleHTTPRequestHandler):
