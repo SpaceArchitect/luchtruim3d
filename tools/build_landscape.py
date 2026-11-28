@@ -25,14 +25,20 @@ def linemerge(g):
 from shapely.geometry import LineString, Polygon, MultiPolygon, box, Point
 from shapely.ops import unary_union
 
-RIVERS = {'Waal', 'Nederrijn', 'Lek', 'Boven-Rijn', 'Pannerdensch Kanaal', 'IJssel', 'Maas', 'Maas-Waalkanaal', 'Amsterdam-Rijnkanaal', 'Linge', 'Afgedamde Maas'}  # wat je vanuit de lucht als navigatielijn gebruikt
+RIVERS = {'Waal', 'Nederrijn', 'Lek', 'Boven-Rijn', 'Pannerdensch Kanaal', 'IJssel', 'Maas', 'Maas-Waalkanaal', 'Amsterdam-Rijnkanaal', 'Linge', 'Afgedamde Maas',
+          # heel NL (26 nov): grote navigatielijnen elders
+          'Noordzeekanaal', 'Nieuwe Waterweg', 'Nieuwe Maas', 'Oude Maas', 'Noord', 'Boven Merwede', 'Beneden Merwede', 'Nieuwe Merwede', 'Hollandsch Diep',
+          'Twentekanaal', 'Zuid-Willemsvaart', 'Julianakanaal', 'Wilhelminakanaal', 'Kanaal door Zuid-Beveland', 'Kanaal Gent-Terneuzen', 'Van Starkenborghkanaal',
+          'Prinses Margrietkanaal', 'Vecht', 'Zwarte Water', 'Overijsselse Vecht', 'Eemskanaal', 'Hollandse IJssel', 'Gouwe'}  # wat je vanuit de lucht als navigatielijn gebruikt
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LON0, LAT0 = 5.45, 51.5; KX = 111.32 * math.cos(math.radians(LAT0)); KY = 111.25
 km = lambda lo, la: ((lo - LON0) * KX, (la - LAT0) * KY)
 ll = lambda x, y: (x / KX + LON0, y / KY + LAT0)
 
 
-def load(region):
+def load(region, src=None):
+    if src:  # ruwe tegel direct uit de Action (niet uit git)
+        return {f[:-5]: json.load(open(os.path.join(src, f))) for f in os.listdir(src) if f.endswith('.json') and f != 'meta.json'}
     d = tempfile.mkdtemp()
     subprocess.run(f'git -C "{ROOT}" archive origin/data/osm osm/{region} | tar -x -C "{d}"', shell=True, check=True)
     p = os.path.join(d, 'osm', region)
@@ -87,11 +93,13 @@ def ring_lines(tag, geom, name='', min_km2=0.0, simp=0.06):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--region', required=True); ap.add_argument('--clip', required=True)
-    ap.add_argument('--write', action='store_true'); o = ap.parse_args()
+    ap.add_argument('--write', action='store_true'); ap.add_argument('--src', help='map met ruwe OSM-json (Action)'); ap.add_argument('--out', help='compact resultaat als json')
+    o = ap.parse_args()
     x0, y0, x1, y1 = map(float, o.clip.split(','))
-    CL = box(*km(x0, y0), *km(x1, y1)); D = load(o.region); out = {k: [] for k in ('osm', 'areadata', 'rwdata', 'pwdata', 'nl', 'borders')}
+    CL = box(*km(x0, y0), *km(x1, y1)); D = load(o.region, o.src); out = {k: [] for k in ('osm', 'areadata', 'rwdata', 'pwdata', 'nl', 'borders')}
     # snelwegen per wegnummer, rivieren per naam
     roads, rivers = {}, {}
+    for k in ('motorways', 'rivers', 'urban', 'water', 'heath_sand', 'aeroways', 'power', 'places'): D.setdefault(k, {'elements': []})
     for el in D['motorways']['elements']:
         t = el.get('tags', {}); ref = (t.get('ref') or '').split(';')[0].replace(' ', '')
         if t.get('highway') == 'motorway' and ref: roads.setdefault(ref, []).append(LineString(way_km(el)))
@@ -146,7 +154,7 @@ def main():
     towns = [t for t in towns if inU(t)]
     out['places'] = {'cities': cities, 'towns': towns}
     for k, v in out.items(): print(k, len(v) if not isinstance(v, dict) else {a: len(b) for a, b in v.items()})
-    json.dump(out, open(os.path.join(tempfile.gettempdir(), f'landscape-{o.region}.json'), 'w'), ensure_ascii=False)
+    json.dump(out, open(o.out or os.path.join(tempfile.gettempdir(), f'landscape-{o.region}.json'), 'w'), ensure_ascii=False)
     if o.write: write(out)
 
 

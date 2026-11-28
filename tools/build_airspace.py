@@ -79,6 +79,18 @@ def main():
     new_ids = {l.split('|')[1] for l in lines}; cur_ids = {l.split('|')[1] for l in cur}
     print(f'Geoportaal: {len(lines)} volumes in bbox · huidig: {len(cur)} · buitenland behouden: {len(foreign)}')
     print('nieuw:', sorted(new_ids - cur_ids)); print('verdwijnt:', sorted(cur_ids - new_ids - {l.split("|")[1] for l in foreign}))
+    # 28 nov (AIRAC-vangnet): ook per volume vergelijken; een gewijzigde grens, klasse of vorm telde eerst niet mee
+    curd = {l.split('|')[1]: l for l in cur}; changed = []
+    for l in lines:
+        c = curd.get(l.split('|')[1])
+        if c is None or c == l: continue
+        a, b = c.split('|'), l.split('|')
+        what = [n for n, i in (('klasse', 4), ('ondergrens', slice(5, 8)), ('bovengrens', slice(8, 11)), ('naam', 2)) if a[i] != b[i]]
+        if a[11] != b[11]: what.append('vorm')
+        changed.append(f"{b[1]} ({b[2]}): " + ', '.join(what) + (f" · {'|'.join(a[5:11])} → {'|'.join(b[5:11])}" if 'ondergrens' in what or 'bovengrens' in what else ''))
+    print('gewijzigd:', len(changed)); [print('  ' + c) for c in changed]
+    diff = bool(changed or (new_ids - cur_ids) or (cur_ids - new_ids - {l.split("|")[1] for l in foreign}))
+    if o.check and not o.write: sys.exit(1 if diff else 0)
     if o.write:
         html = html[:m.start(2)] + '\n'.join(lines + foreign) + html[m.end(2):]
         open(os.path.join(ROOT, 'index.html'), 'w', encoding='utf-8').write(html); print('index.html bijgewerkt')
