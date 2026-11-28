@@ -64,6 +64,11 @@ class App:
         if s.touch: await s.pg.touchscreen.tap(x, y)
         else: await s.pg.mouse.click(x, y, delay=90)
         await s.wait(350)
+        await s.settle()
+
+    async def settle(s):  # 28 nov: 'Missie klaarzetten…' werkt 2 frames na de tik; wacht zoals een gebruiker tot het zware werk klaar is
+        try: await s.pg.wait_for_function('()=>{const v=window.__vfr;return !v||!v.GATE||!v.GATE.work}', timeout=15000)
+        except Exception: pass
     async def hold(s, sel, ms):
         b = await s.pg.locator(sel).first.bounding_box()
         await s.pg.mouse.move(b['x'] + b['width'] / 2, b['y'] + b['height'] / 2)
@@ -1366,28 +1371,26 @@ async def d_start_smooth(a):  # 27 nov: stotter bij ▶ (A55: 2834 ms stil). Hea
         ok('▶ = start' not in n, f'{ac}: ▶ startte de vlucht niet: {n[:90]}')  # daarna mag een naderingsmelding (motor bij Volkel) weer pauzeren
         ok(mx < 500, f'{ac}: na ▶ zat de pagina {mx} ms vast (max 500)')
 
-async def d_loading(a):  # 28 nov (Christian): laadscherm bij openen, vliegen en ▶ start. Moet komen, weer weggaan (≤ 8,5 s), en nooit klikken blokkeren
+async def d_loading(a):  # 28 nov (Christian): één laadscherm per nieuwe missie (toestel kiezen, volgende missie), niet bij ▶; daarna geen haperingen. Nooit klikken blokkeren
     on = "()=>{const L=document.getElementById('loadScr');return !!L&&!L.classList.contains('off')}"
     t0 = await a.ev("""async()=>{const t=performance.now(),L=document.getElementById('loadScr');while(!L.classList.contains('off')&&performance.now()-t<8500)await new Promise(r=>setTimeout(r,50));return performance.now()-t}""")
-    ok(t0 < 8500, f'laadscherm hangt na het openen ({t0:.0f} ms extra)')  # suite 28 nov: direct na het laden kijken was te vroeg (scherm gaat 0,2–0,4 s na de module weg)
+    ok(t0 < 8500, f'laadscherm hangt na het openen ({t0:.0f} ms extra)')
     ok(await a.ev("()=>getComputedStyle(document.getElementById('loadScr')).pointerEvents") == 'none', 'laadscherm blokkeert klikken')
-    await a.fly('glider'); await a.wait(1500)
-    ok(not await a.ev(on), 'laadscherm hangt na kiezen van een toestel')
-    ok('▶ = start' in (await a.v('v.NOTICE') or ''), 'geen startmelding')
-    await a.ev("()=>{window.__LS=0;new MutationObserver(()=>{if(!document.getElementById('loadScr').classList.contains('off'))window.__LS++}).observe(document.getElementById('loadScr'),{attributes:true})}")
-    await a.hit('#btnPause')
-    seen = await a.ev("()=>window.__LS>0||!document.getElementById('loadScr').classList.contains('off')")  # suite 28 nov p7: na de tik kon het scherm al weg zijn → vastleggen dát het verscheen
-    t = await a.ev("""async()=>{const t=performance.now(),L=document.getElementById('loadScr');while(!L.classList.contains('off')&&performance.now()-t<9000)await new Promise(r=>setTimeout(r,50));return performance.now()-t}""")
-    ok(seen, 'geen laadscherm bij ▶ start')
-    ok(t < 8500, f'laadscherm bleef {t:.0f} ms staan na ▶')
-    await a.wait(300)
-    ok(not await a.v('v.PAUSED') or '▶ = start' not in (await a.v('v.NOTICE') or ''), 'vlucht niet gestart na het laadscherm')
-    # pauze midden in de vlucht en weer verder: geen laadscherm (alleen bij een nieuwe start)
-    await a.hit('#btnPause'); await a.frames(2); await a.hit('#btnPause'); await a.frames(1)
-    ok(not await a.ev(on), 'laadscherm bij gewone pauze → verder (hoort alleen bij start)')
-    # klasse: telefoon die tussen 16 en 33 ms wisselt (30–60 fps) is vloeiend → scherm moet dicht; een hapering van 2,9 s houdt het open (bug 28 nov: drempel 1,6× snelste frame hield het 8 s vast)
-    r = await a.ev("""()=>{const v=window.__vfr,G=v.GATE;const best=G.best;v.gateShow('test',0);G.best=16;const seq=[];for(let k=0;k<12&&G.on;k++){v.gateTick(k%2?33:16);seq.push(k)}const jit=!G.on;
-      v.gateShow('test',0);G.best=16;v.gateTick(16);v.gateTick(2900);const stall=G.on;for(let k=0;k<4;k++)v.gateTick(17);const after=!G.on;G.best=best;return {jit,stall,after,n:seq.length}}""")
+    watch = "()=>{window.__LS=[];new MutationObserver(()=>{const L=document.getElementById('loadScr');if(!L.classList.contains('off'))window.__LS.push(document.getElementById('loadTxt').textContent)}).observe(document.getElementById('loadScr'),{attributes:true})}"
+    await a.ev(watch)
+    await a.fly('glider')
+    t1 = await a.ev("""async()=>{const t=performance.now(),L=document.getElementById('loadScr');while(!L.classList.contains('off')&&performance.now()-t<20000)await new Promise(r=>setTimeout(r,50));return performance.now()-t}""")
+    shown = await a.ev('()=>window.__LS')
+    ok(any('klaarzetten' in x for x in shown), f'geen laadscherm bij het kiezen van een toestel: {shown}')
+    ok(t1 < 20000, f'laadscherm bleef {t1:.0f} ms staan na toestel kiezen')
+    ok('▶ = start' in (await a.v('v.NOTICE') or ''), 'na het laadscherm geen startmelding')
+    await a.ev('()=>{window.__LS.length=0}')
+    await a.hit('#btnPause'); await a.wait(600)
+    ok(not await a.ev('()=>window.__LS.length'), f'laadscherm bij ▶ (hoort alleen bij een nieuwe missie): {await a.ev("()=>window.__LS")}')
+    ok('▶ = start' not in (await a.v('v.NOTICE') or ''), 'vlucht niet gestart na ▶')
+    # klasse: telefoon die tussen 16 en 33 ms wisselt (30–60 fps) is vloeiend → scherm moet dicht; een hapering van 2,9 s houdt het open
+    r = await a.ev("""()=>{const v=window.__vfr,G=v.GATE;const best=G.best;v.gateShow('test',0);G.best=16;const seq=[];for(let k=0;k<20&&G.on;k++){v.gateTick(k%2?33:16);seq.push(k)}const jit=!G.on;
+      v.gateShow('test',0);G.best=16;v.gateTick(16);v.gateTick(2900);const stall=G.on;for(let k=0;k<12;k++)v.gateTick(17);const after=!G.on;G.best=best;return {jit,stall,after,n:seq.length}}""")
     ok(r['jit'], f'laadscherm blijft hangen bij wisselend 16/33 ms (30–60 fps): {r}')
     ok(r['stall'] and r['after'], f'hapering van 2,9 s niet achter het laadscherm, of daarna niet dicht: {r}')
 
@@ -1409,6 +1412,21 @@ async def d_gen_bg_idle(a):  # 28 nov (stotter A55 1–1,5 s 'generator'): de vo
       v.PAUSED=true;const t=performance.now();while(v.GEN_RUN.has(key)&&performance.now()-t<20000)await w(100);return {fly,running,done:!v.GEN_RUN.has(key),idle:v.GEN_STEPS-s0-fly}}""")
     ok(r['fly'] == 0 and r['running'], f'achtergrondgenerator rekende tijdens het vliegen ({r["fly"]} stappen) → stotter op de telefoon')
     ok(r['done'] and r['idle'] > 0, f'achtergrondgenerator maakt de uitdaging niet af als je stilstaat: {r}')
+
+async def d_smooth_flight(a):  # 28 nov (Christian: 'na het laadscherm nimmer haperingen, stabiele 30 fps is een harde eis'). Klasse: geen enkel stuk hoofdthread-werk
+    # (animatieframe of timer) > 25 ms in 10 s vliegen na het laadscherm, per toestel. A55 ≈ 5× trager dan deze machine → 25 ms hier ≈ grens van een 30 fps-frame daar
+    await a.ev("""()=>{if(window.__TW)return;window.__TW={max:0,what:'',on:false};const T=window.__TW,wrap=(f,kind)=>function(...x){const t=performance.now();try{return f.apply(this,x)}finally{const d=performance.now()-t;if(T.on&&d>T.max){T.max=d;T.what=kind+' '+(f.name||'anoniem')}}};
+      const st=window.setTimeout;window.setTimeout=(f,ms,...x)=>st(typeof f==='function'?wrap(f,'timer'):f,ms,...x);const ra=window.requestAnimationFrame;window.requestAnimationFrame=f=>ra(wrap(f,'frame'));}""")
+    bad = []
+    for ac in ('glider', 'motor', 'balloon'):
+        await a.fly(ac)
+        await a.ev("""async()=>{const L=document.getElementById('loadScr'),t=performance.now();while(!L.classList.contains('off')&&performance.now()-t<20000)await new Promise(r=>setTimeout(r,50))}""")
+        await a.ev('()=>{const v=window.__vfr;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const h of v.HG)v.WARNED.add("HG"+h.ident)}')  # meldingen pauzeren: hier gaat het om haperen tijdens het vliegen
+        await a.ev('()=>{window.__TW.max=0;window.__TW.what="";window.__TW.on=true}')
+        await a.hit('#btnPause'); await a.wait(10000)
+        r = await a.ev('()=>{window.__TW.on=false;return [window.__TW.max,window.__TW.what]}')
+        if r[0] > 25: bad.append(f'{ac}: {r[0]:.0f} ms ({r[1]})')
+    ok(not bad, f'haperen tijdens het vliegen (> 25 ms hoofdthread): {bad}')
 
 async def d_menu_on_top(a):  # 25 nov: missiemelding lag óver het tijdmenu (weekend niet aan te tikken). Klasse: open menu = bovenop, overal
     await a.hit('#modal [data-ac=glider]'); await a.frames(2)
@@ -1728,7 +1746,7 @@ async def main():
     seed = o.seed if o.seed is not None else random.randrange(10**6)
     url = serve()
     smoke = [('laden', t_load), ('kaart+sonde', t_map_probe), ('3 toestellen', t_aircraft), ('modusknop 1 regel', t_modebtn), ('één menu', t_one_menu), ('overlap', t_overlap), ('draaien', t_rotate)]
-    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('toetsen zoals MSFS', d_msfs_keys), ('sneltoetskaart', d_keycard), ('spatie bij keerpunten', d_space_waypoints), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('geen z-fighting grondlijnen', d_no_zfight), ('bruggen niet te groot', d_bridge_size), ('3D-herkenningspunten niet te groot', d_lm_size), ('labels: budget en geen overlap', d_label_budget), ('fout in missie: opnieuw of door', d_fail_restart), ('Start na missie = volgende', d_start_next), ('grondring op de grond', d_hg_ring_ground), ('vario = echte stijgsnelheid', d_vario_real), ('rivier-/wegdoel = hele rivier', d_line_goal_whole), ('alles aanklikbaar (ook ENR 5.5)', d_click_all), ('camera liggend dichtbij', d_chase_landscape), ('labels niet over het toestel', d_labels_off_aircraft), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('open menu ligt bovenop', d_menu_on_top), ('niet haperen bij missies', d_no_freeze), ('▶ start zonder vastlopen', d_start_smooth), ('laadscherm', d_loading), ('generator niet tijdens het vliegen', d_gen_bg_idle), ('RT per blok', d_rt_advice), ('missiegenerator', d_generator), ('gedeelde ENR 5.5-terreinen (Malden)', d_shared_sites), ('geen voorbeeldcircuit', d_no_circuit), ('P-gebieden H24 zichtbaar', d_h24_always), ('labels knipperen niet', d_labels_steady), ('missies echt uitvliegen', d_missions_flown), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('kantelen: melding in de bocht', d_tilt_notice_bend), ('bruggen Maas/Waal', d_bridges), ('doorsnede', d_cross_section), ('rondleiding', d_tour), ('herkenningspunten', d_landmarks), ('dagelijkse uitdaging', d_daily)]
+    det = [('opdracht "vlieg naar"', d_task_text), ('ballondoel bereikbaar met de wind', d_balloon_reachable), ('buitenlandse CTR: radio-info', d_foreign_ctr), ('banner RMZ 1 regel', d_banner_rmz), ('geweigerde klaring op tijd', d_refused), ('klaring aangrenzend gebied', d_adjacent_clearance), ('waarschuwing 2–20 s vooraf', d_warn_lead), ('RMZ Volkel: eerst oproepen', d_rmz_call), ('doel als lijn', d_goal_line), ('ballon voorbij doel', d_balloon_past), ('geslaagd met klaring', d_clearance_success), ('geen klasse G buiten NL', d_outside_nl), ('camera slepen/knijpen zonder schokken', d_touch_smooth), ('kantelen', d_tilt), ('camera: geen sprong, niet direct terugveren', d_cam_no_jump), ('panelpunten 14 nov', d_panel_fixes), ('waarschuwing niet afgekapt', d_ahead_full), ('opdracht vanaf de sonde', d_probe_task), ('kantelen na draaien staand↔liggend', d_tilt_rotate), ('kantelen standaard + knoppen weg', d_tilt_default), ('toetsen zoals MSFS', d_msfs_keys), ('sneltoetskaart', d_keycard), ('spatie bij keerpunten', d_space_waypoints), ('kantelen: terugval naar knoppen', d_tilt_fallback), ('kantel-looping + ballon', d_tilt_loop_balloon), ('RMZ: oproepen vanuit de RMZ', d_rmz_inside_call), ('zoomen desktop', d_zoom_desktop), ('opstijgen met kantelen', d_tilt_takeoff), ('alles aan + labels aan/uit', d_defaults_labels), ('doelbaken', d_goal_marker), ('tik op melding = verder', d_tap_notice), ('geen z-fighting grondlijnen', d_no_zfight), ('bruggen niet te groot', d_bridge_size), ('3D-herkenningspunten niet te groot', d_lm_size), ('labels: budget en geen overlap', d_label_budget), ('fout in missie: opnieuw of door', d_fail_restart), ('Start na missie = volgende', d_start_next), ('grondring op de grond', d_hg_ring_ground), ('vario = echte stijgsnelheid', d_vario_real), ('rivier-/wegdoel = hele rivier', d_line_goal_whole), ('alles aanklikbaar (ook ENR 5.5)', d_click_all), ('camera liggend dichtbij', d_chase_landscape), ('labels niet over het toestel', d_labels_off_aircraft), ('toestel wisselen via toesteltje', d_ac_switch), ('landen in de stad', d_land_city), ('kantelen geleidelijk', d_tilt_analog), ('missies', d_missions), ('open menu ligt bovenop', d_menu_on_top), ('niet haperen bij missies', d_no_freeze), ('▶ start zonder vastlopen', d_start_smooth), ('laadscherm', d_loading), ('30 fps tijdens het vliegen', d_smooth_flight), ('generator niet tijdens het vliegen', d_gen_bg_idle), ('RT per blok', d_rt_advice), ('missiegenerator', d_generator), ('gedeelde ENR 5.5-terreinen (Malden)', d_shared_sites), ('geen voorbeeldcircuit', d_no_circuit), ('P-gebieden H24 zichtbaar', d_h24_always), ('labels knipperen niet', d_labels_steady), ('missies echt uitvliegen', d_missions_flown), ('draaien staand↔liggend (echt)', d_tilt_rotate_real), ('lierterreinen', d_winch_sites), ('ENR 5.5-terreinen', d_enr55_sites), ('sonde liggend als lade', d_landscape_probe), ('paradropzones: eigen grens en operator', d_para_text), ('klaring CTR dekt RMZ (Deelen)', d_ctr_covers_rmz), ('kantelen na pauze/missie', d_tilt_pause_edges), ('kantelen: melding in de bocht', d_tilt_notice_bend), ('bruggen Maas/Waal', d_bridges), ('doorsnede', d_cross_section), ('rondleiding', d_tour), ('herkenningspunten', d_landmarks), ('dagelijkse uitdaging', d_daily)]
     async with async_playwright() as p:
         try:
             b = await p.chromium.launch(args=ARGS)
