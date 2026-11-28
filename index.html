@@ -2644,7 +2644,7 @@ function fpsTick(now,raw){if(!FPS)return;if(document.hidden||FPS.hid){FPS.hid=do
   if(FPS.t0&&since<3000){FPS.top.push([Math.round(raw),Math.round(since),(NOTICE?'melding ':'')+(TILT&&TILT.pend?'ijken ':'')+(GEN_RUN.size?'generator':''),(FPS.seg||[]).join('/'),Math.round(FPS.hnd||0)]);FPS.hnd=0;FPS.top.sort((a,b)=>b[0]-a[0]);FPS.top.length=Math.min(2,FPS.top.length);}
   FPS.n=(FPS.n||0)+1;if(FPS.n%10===0)FPS.d.textContent=`frame ${Math.round(raw)} ms`+(FPS.top||[]).map((t,i)=>`\nna ▶ #${i+1}: ${t[0]} ms @ ${t[1]} ms ${t[2]}\n   js ${t[3]} (sim/render/labels/hud) · knop ${t[4]}`).join('')+`\nversie ${FPS_VER}`;}
 /* 28 nov: JS-tijd per frame (sim/render/labels/hud, van het vorige frame) en de duur van de ▶-handler naast de frame-gap: grote gap + kleine JS = GPU/pipeline-stall; grote render-JS = shader-link; grote knop = synchrone missieberekening */
-const FPS_VER='stotter-d';
+const FPS_VER='live-28nov';
 document.addEventListener('visibilitychange',()=>{if(FPS)FPS.hid=true;});
 /* 26 nov (stotter A55, 112 ms bij ▶): shaders van alles wat later pas in beeld komt (doel, schaduw, verre volumes) bij het laden al compileren, ook wat nu verborgen is; anders compileert de GPU midden in de vlucht */
 try{/* stotter-d: echt tekenen (1×1 px, alles zichtbaar, geen culling) bij het laden, zodat de GPU-pipelines (ANGLE/Vulkan) al bestaan vóór ▶ */const hid=[],cul=[];scene.traverse(o=>{if(!o.visible){hid.push(o);o.visible=true;}if(o.frustumCulled){cul.push(o);o.frustumCulled=false;}});renderer.setScissorTest(true);renderer.setScissor(0,0,1,1);renderer.render(scene,camera);renderer.setScissorTest(false);for(const o of hid)o.visible=false;for(const o of cul)o.frustumCulled=true;}catch(_){renderer.setScissorTest(false);}
