@@ -2512,7 +2512,10 @@ const unitS=u=>{const m=u.match(/(Tower|Arrival|Approach|Ground|Radio|MIL Info|I
 const TYP={P:'Verboden',R:'Beperkt',D:'Gevaar',TRA:'TRA',TSA:'TSA',PJA:'Para',UAS:'Drones',TMZ:'TMZ',RMZ:'RMZ',ATZ:'ATZ'};
 const short=f=>{let n=nm(f);const t=TYP[f.layer];if(t&&!n.toUpperCase().includes(t.toUpperCase()))n=t+' '+n;if(f.layer==='TRA'||f.layer==='TSA')n+=' (mil.)';return `${n}${f.cls?' ('+f.cls+')':''}`;};
 const dpr=Math.min(devicePixelRatio,2);
-function prep(c){const W=c.clientWidth,H=c.clientHeight;if(c.width!==W*dpr||c.height!==H*dpr){c.width=W*dpr;c.height=H*dpr;}const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);return [g,W,H];}
+/* 28 nov (30 fps): canvasmaten niet elk frame opvragen. placeLabels schrijft eerst stijlen; daarna clientWidth lezen dwong elk frame een volledige layout (honderden labels) */
+const SZ=new WeakMap(),RO=typeof ResizeObserver!=='undefined'?new ResizeObserver(es=>{for(const e of es)SZ.set(e.target,[e.target.clientWidth,e.target.clientHeight]);}):null;
+function csz(c){let v=SZ.get(c);if(!v){v=[c.clientWidth,c.clientHeight];SZ.set(c,v);if(RO)RO.observe(c);}return v;}
+function prep(c){const [W,H]=csz(c);if(c.width!==W*dpr||c.height!==H*dpr){c.width=W*dpr;c.height=H*dpr;}const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);return [g,W,H];}
 function drawCompass(){if(MODE!=='fly'){const d=controls.target.clone().sub(camera.position);const h=Math.atan2(d.x,-d.z);$('northIn').style.transform=`rotate(${-h}rad)`;return;}const [g,W,H]=prep($('compass'));const span=120,px=W/span;
   g.fillStyle='rgba(255,255,255,.95)';g.beginPath();g.roundRect(0,0,W,H,8);g.fill();
   g.strokeStyle='#1c2024';g.fillStyle='#1c2024';g.textAlign='center';g.font='700 13px system-ui';
@@ -2520,7 +2523,7 @@ function drawCompass(){if(MODE!=='fly'){const d=controls.target.clone().sub(came
     const big=dd%10===0;g.beginPath();g.moveTo(x,H-2);g.lineTo(x,H-(big?10:6));g.lineWidth=1;g.stroke();
     if(dd%30===0)g.fillText(dd===0?'N':String(dd/10).padStart(2,'0'),x,16);}
   g.fillStyle='#1c2024';g.beginPath();g.moveTo(W/2-7,H);g.lineTo(W/2+7,H);g.lineWidth=0;g.lineTo(W/2,H-10);g.fill();}
-function drawTape(){if(!$('tape').clientWidth)return;const [g,W,H]=prep($('tape'));const top=CAP,pad=18,y=a=>H-pad-(Math.min(a,top)/top)*(H-2*pad-14);
+function drawTape(){if(!csz($('tape'))[0])return;const [g,W,H]=prep($('tape'));const top=CAP,pad=18,y=a=>H-pad-(Math.min(a,top)/top)*(H-2*pad-14);
   g.fillStyle='rgba(255,255,255,.95)';g.beginPath();g.roundRect(0,0,W,H,10);g.fill();
   g.fillStyle='#1c2024';g.font='700 11.5px system-ui';g.textAlign='center';g.fillText(MODE==='fly'?'Boven en onder je':'Boven de sonde',W/2,14);
   g.font='600 10.5px system-ui';g.textAlign='left';g.fillStyle='#3a3f45';g.strokeStyle='#c1c6cd';
@@ -2539,13 +2542,18 @@ function drawTape(){if(!$('tape').clientWidth)return;const [g,W,H]=prep($('tape'
   if(MODE==='fly'&&ACTYPE==='balloon'){g.fillStyle='#b4410b';g.font='700 10px system-ui';for(let a=1000;a<top;a+=1000){const w=windAt(a),yy=y(a);g.save();g.translate(W-10,yy-7);g.rotate(((w.from+180)%360)*Math.PI/180);g.beginPath();g.moveTo(0,-6);g.lineTo(4,4);g.lineTo(-4,4);g.closePath();g.fill();g.restore();}}
   const ya=y(curAlt());g.strokeStyle='#1c2024';g.lineWidth=3;g.beginPath();g.moveTo(34,ya);g.lineTo(W-2,ya);g.stroke();
   g.fillStyle='#1c2024';g.beginPath();g.moveTo(36,ya);g.lineTo(26,ya-6);g.lineTo(26,ya+6);g.fill();}
-function drawMini(){const c=$('mini');if(!c.clientWidth)return;const [g,W,H]=prep(c);const s=Math.min(W/(gx1-gx0),H/(gn1-gn0));
+let MINI_KEY='',MINI_CV=null;
+function drawMini(){const c=$('mini');if(!csz(c)[0])return;const [g,W,H]=prep(c);const s=Math.min(W/(gx1-gx0),H/(gn1-gn0));
   const X=x=>(x-gx0)*s,Y=n=>H-(n-gn0)*s;
+  /* 28 nov (30 fps): veelhoeken en steden alleen opnieuw tekenen als grootte, zichtbare groepen of 'waar ben ik in' veranderen */
+  const key=W+'x'+H+'|'+GROUPS.map(q=>vis[q.id]?1:0).join('')+'|'+INSIDE.map(f=>f.ident).join(',')+'|'+CITYXY.length+'|'+LAYERS.length;
+  if(key!==MINI_KEY||!MINI_CV){MINI_KEY=key;MINI_CV=MINI_CV||document.createElement('canvas');MINI_CV.width=W*dpr;MINI_CV.height=H*dpr;{const g=MINI_CV.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
   g.fillStyle='rgba(255,255,255,.95)';g.fillRect(0,0,W,H);
   for(const f of LAYERS){if(!vis[f.group.id]||!['CTR','TMA','CTA','P','R','ATZ'].includes(f.layer))continue;const inn=INSIDE.includes(f);
     g.strokeStyle=f.color;g.lineWidth=inn?2:1;g.globalAlpha=f.cls==='E'?.5:.9;
     for(const r of f.rings){g.beginPath();r.forEach(([x,n],i)=>i?g.lineTo(X(x),Y(n)):g.moveTo(X(x),Y(n)));g.closePath();if(inn){g.fillStyle=f.color;g.globalAlpha=.25;g.fill();g.globalAlpha=.9;}g.stroke();}}
-  g.globalAlpha=1;g.fillStyle='#3a3f45';for(const c2 of CITYXY)g.fillRect(X(c2.x)-1.5,Y(c2.n)-1.5,3,3);
+  g.globalAlpha=1;g.fillStyle='#3a3f45';for(const c2 of CITYXY)g.fillRect(X(c2.x)-1.5,Y(c2.n)-1.5,3,3);}}
+  g.setTransform(1,0,0,1,0,0);g.drawImage(MINI_CV,0,0);g.setTransform(dpr,0,0,dpr,0,0);
   const px=MODE==='fly'?PLANE.x:PROBE.x,pn=MODE==='fly'?PLANE.n:PROBE.n;
   g.save();g.translate(X(px),Y(pn));g.fillStyle='#1c2024';if(MODE==='fly'){g.rotate(PLANE.hdg*Math.PI/180);g.beginPath();g.moveTo(0,-8);g.lineTo(6,6);g.lineTo(0,2);g.lineTo(-6,6);g.closePath();g.fill();}else{g.beginPath();g.arc(0,0,4,0,7);g.fill();}g.restore();
   g.strokeStyle='#9aa1a9';g.lineWidth=1;g.strokeRect(.5,.5,W-1,H-1);}
@@ -2670,7 +2678,7 @@ function fpsTick(now,raw){if(!FPS)return;if(document.hidden||FPS.hid){FPS.hid=do
   if(FPS.t0&&since<10000){FPS.top.push([Math.round(raw),Math.round(since),(NOTICE?'melding ':'')+(TILT&&TILT.pend?'ijken ':'')+(GEN_RUN.size?'generator':''),(FPS.seg||[]).join('/'),Math.round(FPS.hnd||0)]);FPS.hnd=0;FPS.top.sort((a,b)=>b[0]-a[0]);FPS.top.length=Math.min(3,FPS.top.length);}
   FPS.n=(FPS.n||0)+1;if(FPS.n%10===0)FPS.d.textContent=`frame ${Math.round(raw)} ms`+(FPS.top||[]).map((t,i)=>`\nna ▶ #${i+1}: ${t[0]} ms @ ${t[1]} ms ${t[2]}\n   js ${t[3]} (sim/render/labels/hud) · knop ${t[4]}`).join('')+(GATE&&GATE.offAt&&FPS.t0&&GATE.offAt>FPS.t0?`\nlaadscherm weg @ ${Math.round(GATE.offAt-FPS.t0)} ms na ▶`:'')+`\nversie ${FPS_VER}`;}
 /* 28 nov: JS-tijd per frame (sim/render/labels/hud, van het vorige frame) en de duur van de ▶-handler naast de frame-gap: grote gap + kleine JS = GPU/pipeline-stall; grote render-JS = shader-link; grote knop = synchrone missieberekening */
-const FPS_VER='labels-vooraf';
+const FPS_VER='vloeiend';
 document.addEventListener('visibilitychange',()=>{if(FPS)FPS.hid=true;});
 /* 26 nov (stotter A55, 112 ms bij ▶): shaders van alles wat later pas in beeld komt (doel, schaduw, verre volumes) bij het laden al compileren, ook wat nu verborgen is; anders compileert de GPU midden in de vlucht */
 try{/* stotter-d: echt tekenen (1×1 px, alles zichtbaar, geen culling) bij het laden, zodat de GPU-pipelines (ANGLE/Vulkan) al bestaan vóór ▶ */const hid=[],cul=[];scene.traverse(o=>{if(!o.visible){hid.push(o);o.visible=true;}if(o.frustumCulled){cul.push(o);o.frustumCulled=false;}});try{renderer.setScissorTest(true);renderer.setScissor(0,0,1,1);renderer.render(scene,camera);}finally{renderer.setScissorTest(false);for(const o of hid)o.visible=false;for(const o of cul)o.frustumCulled=true;}}catch(_){}/* review 28 nov: herstel altijd, ook als render gooit */
