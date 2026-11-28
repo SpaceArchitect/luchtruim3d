@@ -356,10 +356,10 @@ ulm|Weert/Budel|EHBDULT001|5.60083|51.25444|0.25|500|AMSL||
 <div id="miniwrap"><canvas id="mini" class="off"></canvas><div id="loc"></div></div>
 <div id="flash"></div><div id="tChip">×5</div>
 <div id="ctrl">
-  <button data-k="arrowup" title="Stijgen (S of ↓)">▲</button>
+  <button data-k="arrowup" title="Stijgen">▲</button>
   <button id="tSlow" title="Langzamer (− of scrollen)">⏪</button><button id="tFast" title="Sneller (+ of scrollen)">⏩</button>
   <button data-k="arrowleft" title="Links (← of A)">◀</button><button id="btnPause" title="Pauze (spatie)">❚❚</button><button data-k="arrowright" title="Rechts (→ of D)">▶</button>
-  <button data-k="arrowdown" title="Dalen (W of ↑)">▼</button>
+  <button data-k="arrowdown" title="Dalen">▼</button>
   <button id="btnLoop" title="Looping (L)" aria-label="Looping">🔄<small>looping</small></button>
 </div>
 <div id="modal"><div class="box">
@@ -1852,12 +1852,12 @@ addEventListener('keydown',e=>{const t=e.target.tagName;if(t==='INPUT'||t==='SEL
   if($('keycard')){if(!['shift','control','alt','meta'].includes(k0)){e.preventDefault();keyCardClose();}return;}
   if((k0==='?'||k0==='h')&&MODE==='fly'){keyCard();return;}
   if(e.shiftKey&&(k0==='s'||k0==='arrowdown')){e.preventDefault();startLoop();return;}
-  const k=KMAP[k0]||k0;
+  const k=(ACTYPE==='balloon'?null:KMAP[k0])||k0;/* 28 nov: MSFS-omkering alleen voor vliegtuigen; ballon W/↑ = branden (besluit 23 nov) */
   if(k===' '){e.preventDefault();/* Christian 21 nov: missie klaar → Spatie = volgende missie; keerpunt → Spatie = door naar het volgende */playNext();return;}
   if(k==='l'){startLoop();return;}if(k==='c'){camReset();return;}
   if(k==='+'||k==='='){setTempo(TI+1);return;} if(k==='-'||k==='_'){setTempo(TI-1);return;}
   if(['arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();keys[k]=true;});
-addEventListener('keyup',e=>{const k0=e.key.toLowerCase();keys[KMAP[k0]||k0]=false;});
+addEventListener('keyup',e=>{const k0=e.key.toLowerCase();keys[k0]=false;if(KMAP[k0])keys[KMAP[k0]]=false;});
 const releaseAll=()=>{for(const k in keys)keys[k]=false;if(typeof PTR!=='undefined'){PTR.clear();pinch0=null;dragging=false;}document.querySelectorAll('[data-k].on').forEach(b=>b.classList.remove('on'));};
 addEventListener('blur',releaseAll);document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseAll();});addEventListener('pointerleave',releaseAll);
 document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
@@ -1874,7 +1874,7 @@ function kbText(n){if(!document.body.classList.contains('kbd'))return n;
 function keyCard(){if($('keycard'))return;const b=ACTYPE==='balloon',d=document.createElement('div');d.id='keycard';d.setAttribute('role','dialog');d.setAttribute('aria-label','Sneltoetsen');
   const r=(k,t)=>`<tr><td>${k}</td><td>${t}</td></tr>`;
   d.innerHTML=`<h3>⌨ Sneltoetsen · ${b?'ballon':ACTYPE==='glider'?'zweefvliegtuig':'motorvliegtuig'}</h3><table>`+
-   (b?r('<kbd>S</kbd> <kbd>↓</kbd>','stijgen (branden)')+r('<kbd>W</kbd> <kbd>↑</kbd>','dalen')+r('','sturen doe je met de wind: elke hoogte heeft een andere windrichting')
+   (b?r('<kbd>W</kbd> <kbd>↑</kbd>','stijgen (branden)')+r('<kbd>S</kbd> <kbd>↓</kbd>','dalen')+r('','sturen doe je met de wind: elke hoogte heeft een andere windrichting')
      :r('<kbd>S</kbd> <kbd>↓</kbd>','neus omhoog (klimmen)')+r('<kbd>W</kbd> <kbd>↑</kbd>','neus omlaag (dalen)')+r('<kbd>A</kbd> <kbd>D</kbd> <kbd>←</kbd> <kbd>→</kbd>','bocht links / rechts')+r('<kbd>Shift</kbd>+<kbd>S</kbd>','looping'))+
    r('<kbd>Spatie</kbd>','pauze / verder · na een keerpunt: door naar het volgende')+r('scrollen, <kbd>+</kbd> <kbd>−</kbd>','tempo')+r('slepen, <kbd>C</kbd>','rondkijken, camera terug')+r('<kbd>?</kbd>','deze kaart')+
    `</table><div class="go"><label><input type="checkbox" id="kcNo"> Niet meer tonen</label><span>Elke toets of klik = sluiten</span></div>`;
