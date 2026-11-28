@@ -28,24 +28,42 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
   - **Bodemsoorten:** OSM `forest.json`/`heath_sand.json` (staat al op `data/osm`) → bos donkergroen met instanced boompjes (LOD: alleen dichtbij), heide paars-bruin, stuifzand licht beige met duinribbels; gedempt, zodat de luchtruimkleuren blijven winnen.
   - **Luchtvaartkant:** met reliëf worden AGL-grenzen (bv. Malden 2300 ft AGL) en de grondafstand echt; landen/grond raken op terreinhoogte.
   - **Licht genoeg:** pagina < 2 MB, ≥ 30 fps op een middenklasse-Android; meten vóór/na met een fps-test in e2e. Eerst een proef Nijmegen–Berg en Dal–Malden, screenshot aan Christian, dan uitrollen.
-- [L] UX-flow: rondleiding + "Wat is er veranderd?" na AIRAC → keuzescherm (Kaart / Missies / Verkenningsvlucht / Dagelijkse uitdaging), toestelkeuze, menu herindelen; eerst mock — Christian 21+23 nov → C (vervangt OPDRACHT-21nov blok 5)
+- **Story — UX-flow** (Christian 21+23 nov, OPDRACHT-23nov §C; refinement Claude 28 nov). Noordster: een nieuwe bezoeker weet binnen 1 min wat hij hier kan en zit binnen 2 tikken in de kaart of de lucht. Nu bestaan er geen keuzescherm, verkenningsvlucht-ingang en "Wat is er veranderd?" (alleen rondleiding).
+  - U1. [S] Mock: 3 schermen (startrondleiding, keuzescherm, toestelkeuze) statisch op `wip/ux-mock`, screenshots desk + p7 naar Christian, **gebundeld met andere vragen**. Daarna pas U2–U4.
+  - U2. [M] Keuzescherm met 4 tegels: Kaart verkennen · Missies (→ toestel zweef/motor/ballon) · Verkenningsvlucht (met/zonder luchtruim, keuze onthouden → toestel) · Dagelijkse uitdaging. Terugkerende bezoeker komt hier direct; menu: "Terug naar start" + rondleidingen; menu herindelen = alleen wat niet op het keuzescherm staat. Klaar: elke tegel ≤ 2 tikken tot kaart/vliegen; laadscherm 'Missie klaarzetten…' blijft het enige laadmoment. Vangnet: d_chooser (elke tegel → juiste modus + toestel), 4 vormen, d_smooth_flight groen.
+  - U3. [S] Startrondleiding ±1 min in kaartmodus, "Sla over" altijd zichtbaar, daarna keuzescherm; gezien = localStorage (`l3d_tour`). Vangnet: nieuw → rondleiding, terugkerend → keuzescherm.
+  - U4. [M] "Wat is er veranderd?": `build_airspace.py` schrijft per AIRAC een lijst gewijzigde gebieden (nieuw/weg/grens/hoogte/tijden) t.o.v. de vorige; bij het eerste bezoek na een nieuwe AIRAC vliegt de camera langs elk gebied met één zin; laatst geziene AIRAC in localStorage; geen wijzigingen → overslaan. Wordt een stap in de P0-AIRAC-wissel (lijst nalezen). Vangnet: test met een nep-diff (1 gebied verplaatst) + lege diff.
 - [M] Feedbackkanaal route A (Worker → GitHub-issues, e-mail privé, "Vlieg je zelf?") + stappenplan Cloudflare/token voor Christian — Christian 23 nov → I
 - [S–M] Vindbaarheid 'educatie' (J): blok 1 klaar (review: eAIP-licentie gecorrigeerd) op `wip/vindbaar-28nov` (head-metadata zonder spel/game, JSON-LD, over.html, robots, sitemap). **Christian keurt over.html (privacytekst 'verwerkingsverantwoordelijke') goed**, dan mee live. Rest: favicon, manifest, mailtje IT.
 - [S] Cookieloze teller (opties naast elkaar, Christian kiest) + privacytekst — Christian 23 nov → F
 - [S] UX-review door een losse subagent na elk zichtbaar blok — Christian 23 nov → G
 - [S] Vangnet: elke ident uniek per luchtruimsoort: **gebouwd** op wip/heelnl/wip/tiles (d_unique_idents, suffix 'T' in build_airspace); live met heel NL — 26 nov
 
-- [M] Heel NL missies (28 nov onderzocht): (1) landdoel **gebouwd** (wip/tiles, missie 'lely'); Eelde valt af zolang PJA's altijd verboden zijn (veld in PJA Winde) → eerst 'PJA actief/niet actief' modelleren (AUP/NOTAM, P3); (2) De Kooy CTR ligt > 18 km van Texel → misStart met langere aanloop of tussenpunt; (3) Teuge: veld in een paradropzone → planner vindt geen route; doel net buiten de PJA kiezen. (4) **CTR-openingstijden per veld landelijk** (Eelde weekend 0630–2100 UTC, De Kooy weekend 0600–1100/1400–1900 UTC, Lelystad 0600–2100 UTC; AD 2.17) controleren in AIPINFO/hrs op wip/heelnl; nu alleen eh/mil gemodelleerd.
+- [M] Heel NL missies (28 nov onderzocht): (1) landdoel **gebouwd** (wip/tiles, missie 'lely'); Eelde valt af zolang PJA's altijd verboden zijn (veld in PJA Winde) → eerst 'PJA actief/niet actief' modelleren (AUP/NOTAM, P3); (2) De Kooy CTR ligt > 18 km van Texel → misStart met langere aanloop of tussenpunt; (3) Teuge: veld in een paradropzone → planner vindt geen route; doel net buiten de PJA kiezen. (4) CTR/RMZ-openingstijden landelijk: **gebouwd op wip/tiles** (uit de AIP-tekst, d_ctr_hours). Rest: steekproef Eelde/De Kooy/Lelystad tegen AD 2.17 bij de heel NL-suite.
+
+- **Story — "Waar ben ik?"-quiz** (Christian 23 nov, OPDRACHT-23nov §E; refinement Claude 28 nov; van P3 naar P2: dit ís de noordster, begrip toetsen zonder vliegvaardigheid).
+  - Q1. [M] Ronde van 10: je hangt stil op een plek en hoogte (uit de missiepool, landelijk na heel NL), luchtruim verborgen, alleen terrein + herkenningspunten. Eén meerkeuzevraag (3–4 opties): *in welk luchtruim zit je?* / *klaring nodig?* / *hoe hoog mag je hier zonder klaring?* Na het antwoord faden de volumes in en verschijnt de sonde-uitleg ('Wat doe je'). Antwoorden komen uit dezelfde sonde-functie als de app (geen tweede waarheid). Score lokaal. Ingang: menu, later tegel op het keuzescherm (U2). Vangnet: d_quiz (elk goed antwoord = sonde-uitkomst; 10 vragen zonder dubbele plek), 4 vormen.
+  - Q2. [S] Oplopend: ronde 1 CTR/P/R, daarna TMA-trappen en klasse, dan TRA/TSA, RMZ/TMZ, PJA; afleiders uit naburige gebieden.
 
 - [S] OSM heel NL: **opgelost 28 nov** via Geofabrik + osmium (data-osm-pbf). Open: grensstrook BE/DE zonder landschap (extract = alleen NL); bij uitbreiden naar BE/DE het Geofabrik-extract van die landen toevoegen.
 
-- [M] Ideeën Raquel (via Christian 28 nov): 5 sterren i.p.v. 3 voor een perfecte score; beloning bij het halen van een missie: hoedje (sombrero) op het toestel; hangaar met skins. Voortgang zonder accounts/cookies: localStorage per apparaat (functioneel, zonder ID's: mag volgens de privacyregel); ander apparaat = voortgangscode om over te zetten (kopiëren of QR), geen server nodig.
+- **Story — beloning en hangaar** (ideeën Raquel via Christian 28 nov; **besluit Christian 28 nov: plezier mag**, het houdt mensen oefenen; refinement Claude 28 nov). Grens: beloningen alleen voor goed luchtruimgedrag, nooit voor vliegkunst; geen accounts, alles in localStorage (functioneel, zonder ID's).
+  - R1. [S] 5 sterren i.p.v. 3: ⭐ gehaald · ⭐ zonder overtreding · ⭐ strakke route (zoals nu) · ⭐ alle verplichte meldingen/klaringen gedaan (RT per blok) · ⭐ nergens binnen 200 ft van een grens (marge). Oude scores (`l3d_sterren`, max 3) blijven geldig. Vangnet: d_stars (elke ster apart te halen en te missen), mission_report: 5 sterren haalbaar per vaste missie.
+  - R2. [M] Hoedjes: elke behaalde missie levert een goofy hoedje op (sombrero, cowboyhoed, pet, kroon, pylon, verjaardagshoedje…), op het toestel gestapeld tot een **hoedentoren** zoals in ARAM (Christian 28 nov). Lowpoly, procedureel in three.js (geen externe assets/licenties), samengevoegd tot één mesh, max ±30 zichtbaar. Alleen in de buitencamera; de vrije zone voor labels groeit mee. Uitzetten in de hangaar. Vangnet: d_smooth_flight met 30 hoedjes, 4 vormen.
+  - R3. [M] Hangaar (vanuit toestelkeuze/keuzescherm): toestel + livery kiezen (3–4 kleurstellingen per toestel, geen nieuwe modellen, vlieggedrag identiek), livery's vrijspelen met sterren, hoedjes aan/uit. Na U2.
+  - R4. [S] Voortgangscode: missies, sterren, dag, hoedjes, livery als korte tekstcode (+ controlegetal) om te kopiëren; plakken op een ander apparaat = overzetten. QR alleen als het zonder externe bibliotheek kan. Geen server. Vangnet: export → wissen → import = zelfde stand; foute code → nette melding.
 
 ## P3 — koers (top 5, even zwaar) en groter werk
-- [M] Generator v2: smalle gangen tussen gebieden, wind voor zweef/motor, tijdsgebonden gebieden (CTR open/dicht), RMZ-oproep als opdracht, plafond aan de moeilijkheid; leerdoel uit de werkelijk geraakte gebieden — Christian 22–25 nov (v1 staat, zie docs/MISSIES.md)
-- [L] Live NOTAM uit een primaire bron (AUP: zie P1-1). Spike 26 nov: EAD Basic ongeschikt (niet operationeel, login), LVNL NOTAM Portal = aanvragen, NM B2B = certificaat + overeenkomst (beslissing Christian, P1-2). Automatische AIRAC-check: data-acties draaien op do, maar de cron kan overslaan → vangnet-Action die op AIRAC-dag de datum van data/eaip controleert — Christian 22 + 25 nov
-- [M] Ballon realistischer: traagheid, dagdeel/thermiek-uren (eerst AIP checken). Gedaan 25 nov: stijgen/dalen 500 ft/min in het hoogteplan, missie langs een CTR — OPDRACHT-21nov blok 6
-- [M] "Waar ben ik?"-quiz — Christian 23 nov → E
+- **Story — generator v2** (Christian 22–25 nov; v1 staat, zie docs/MISSIES.md; opgesplitst door Claude 28 nov). Elke stap: generator blijft alleen missies leveren die de vlucht-check haalt, nooit generatorwerk tijdens het vliegen (d_gen_bg_idle, d_smooth_flight).
+  - G1. [S] Leerdoel uit de werkelijk geraakte gebieden (sonde langs de geplande route) i.p.v. het doelgebied + plafond aan de moeilijkheid (max. aantal conflicten per niveau). Eerst, want G2–G5 leunen erop.
+  - G2. [M] Smalle gangen: keerpunt of route door een gang < 3 km tussen twee gebieden (bv. tussen CTR en TMA-trap). Vangnet: elke gang-missie heeft een route met ≥ 300 m marge.
+  - G3. [S] RMZ/TMZ-oproep als opdracht: missie door een RMZ, ster alleen met de melding (koppelt aan R1).
+  - G4. [M] Tijdsgebonden: CTR open/dicht met missietijd (na heel NL live; openingstijden staan op wip/tiles, regel 'buiten openingstijden' in CLAUDE.md). Zelfde route, ander antwoord = het leerdoel.
+  - G5. [L] Wind voor zweef/motor: windvector per missie in de sim (drift), planner rekent ermee; ballon later. Pas na G1–G4.
+- [L] Live NOTAM uit een primaire bron (AUP: zie P1-1). Spike 26 nov: EAD Basic ongeschikt (niet operationeel, login), LVNL NOTAM Portal = aanvragen, NM B2B = certificaat + overeenkomst (geparkeerd 28 nov). Wacht op de uitkomst van P1-1a (NOP). *(AIRAC-vangnet-Action: live 28 nov.)* — Christian 22 + 25 nov
+- Ballon realistischer (OPDRACHT-21nov blok 6; gedaan 25 nov: 500 ft/min in het hoogteplan, missie langs een CTR):
+  - B1. [S] Traagheid: branden/dalen werkt met ±10 s vertraging en loopt uit; hoogteplan en planner rekenen ermee. Vangnet: mission_report --fly, alle ballonmissies gehaald.
+  - B2. [S] Spike: wat zeggen AIP/regelgeving over ballonvaren en dagdeel (ENR 1.2/1.4, SERA zonsopkomst/-ondergang)? Alleen opnemen wat in de bron staat → go/no-go in LOG.
 - [S] Test GitHub Issues als backlog-werkvorm (naast dit bestand) — Christian 23 nov
 - [M] RT per blok: sondepaneel **live 28 nov** ('Wat doe je', d_rt_advice). Rest: dezelfde tekst bij naderen in de vliegmodus (melding) — Christian/KNVvL RT-syllabus
 
@@ -63,6 +81,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 ## Open vragen aan Christian
 - Vught 's avonds onzichtbaar: niet te reproduceren (EHP29 is H24 en in de app altijd actief). Zie je het nog, stuur dan een screenshot met tijd en modus.
 - Verduidelijkingsmails feedback: per stuk goedkeuren of vaste standaardvraag? → I
+- "Test GitHub Issues als backlog-werkvorm" (P3, 23 nov): nog nodig nu BACKLOG.md de enige lijst is? Zo niet: schrappen.
 
 ## Besloten (23 nov)
 - Ballon: W/↑ = branden (omhoog), S/↓ = dalen; uitleg per toestel in de sneltoetskaart.
