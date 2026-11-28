@@ -1390,6 +1390,13 @@ async def d_tiles(a):  # 28 nov heel NL: landschap per tegel. Laadt in de buurt,
     dup = await a.ev("""()=>{const v=window.__vfr,R={x0:4.75,y0:51.2,x1:6.15,y1:52.15},[a0,b0]=v.proj(R.x0,R.y0),[a1,b1]=v.proj(R.x1,R.y1);
       return v.labels.filter(L=>L.tile&&L.el.textContent.startsWith('●')).map(L=>{const p=L.pos3();return [L.el.textContent,p.x,-p.z]}).filter(([t,x,n])=>x>a0+1&&x<a1-1&&n>b0+1&&n<b1-1).map(q=>q[0]).slice(0,5)}""")
     ok(not dup, f'tegel tekent steden binnen de ingebakken regio (dubbel): {dup}')
+    # opdracht vanaf de sonde, ver buiten de oude regio (Groningen): doel uit de tegeldata
+    await a.ev(go, [6.56, 53.22])
+    r = await a.ev("""()=>{const v=window.__vfr,[x,n]=v.proj(6.62,53.20);Object.assign(v.PROBE,{x,n,user:true});v.setMode('fly','glider');return {task:v.TASK,goal:v.GOAL&&[v.GOAL.x,v.GOAL.n],name:v.GOAL&&v.GOAL.name,me:[x,n]}}""")
+    ok(r['task'] and r['goal'], f'geen opdracht vanaf de sonde in Groningen: {r}')
+    if r['goal']:
+        d = ((r['goal'][0] - r['me'][0]) ** 2 + (r['goal'][1] - r['me'][1]) ** 2) ** .5
+        ok(d < 25, f'doel ligt niet in de buurt van de sonde ({d:.0f} km): {r["name"]}')
 
 async def d_loading(a):  # 28 nov (Christian): laadscherm bij openen, vliegen en ▶ start. Moet komen, weer weggaan (≤ 8,5 s), en nooit klikken blokkeren
     on = "()=>{const L=document.getElementById('loadScr');return !!L&&!L.classList.contains('off')}"

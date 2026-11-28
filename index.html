@@ -1962,16 +1962,17 @@ async function buildTile(id,d){/* in plakjes van ±6 ms (telefoon ±4× trager):
   const G={U:[],H:[],Q:[],road:[],river:[]},rail=[],P3=[],P1=[],rw={paved:[],grass:[]};
   const pl=d.places||{},cities=(pl.cities||[]).filter(([,lo,la])=>!inRegion(lo,la)),towns=(pl.towns||[]).filter(([,lo,la])=>!inRegion(lo,la));
   const cxy=cities.map(([nm,lo,la])=>{const [x,n]=proj(lo,la);return {nm,x,n};}),txy=towns.map(([nm,lo,la])=>{const [x,n]=proj(lo,la);return {nm,x,n};});
-  for(const c of cxy){if(!CITYXY.some(o=>o.nm===c.nm)){CITYXY.push(c);AL('● '+c.nm,'city',()=>new THREE.Vector3(c.x,0,-c.n),9);}}
+  const TF=(t,name,pts)=>{if(t==='L'){if(!TASKF.some(f=>f.t==='L'&&f.name===name))TASKF.push({t,name,pts});return;}const o=TASKF.find(f=>f.t===t&&f.name===name);if(o){o.pts=o.pts.concat(pts);o.lines.push(pts);}else TASKF.push({t,name,pts,lines:[pts]});};/* opdrachten vanaf de sonde, overal in NL */
+  for(const c of cxy){TF('L',c.nm,[[c.x,c.n]]);if(!CITYXY.some(o=>o.nm===c.nm)){CITYXY.push(c);AL('● '+c.nm,'city',()=>new THREE.Vector3(c.x,0,-c.n),9);}}
   for(const l of d.areadata||[]){await Y();const a=l.split('|'),ll=decode(a[2]||'');if(ll.length<2||inRegion(...ll[0]))continue;const pts=ll.map(([lo,la])=>proj(lo,la));
     if(a[0]==='T'){rail.push(pts);continue;}if(pts.length<4)continue;
     if(a[0]==='U'){const big=cxy.filter(c=>insideRing([c.x,c.n],pts)),sm=txy.filter(c=>insideRing([c.x,c.n],pts));if(!big.length&&!sm.length)continue;window.__URBAN.push(pts);
-      for(const t of sm)if(!big.some(c=>Math.hypot(c.x-t.x,c.n-t.n)<3)&&!TOWNXY.some(o=>o.nm===t.nm)){TOWNXY.push(t);const LL=AL('• '+t.nm,'city town',()=>new THREE.Vector3(t.x,0,-t.n),9.5);LL.isTown=true;}}
+      for(const t of sm)if(!big.some(c=>Math.hypot(c.x-t.x,c.n-t.n)<3)&&!TOWNXY.some(o=>o.nm===t.nm)){TOWNXY.push(t);TF('L',t.nm,[[t.x,t.n]]);const LL=AL('• '+t.nm,'city town',()=>new THREE.Vector3(t.x,0,-t.n),9.5);LL.isTown=true;}}
     if(!G[a[0]])continue;const geo=new THREE.ShapeGeometry(new THREE.Shape(pts.map(([x,n])=>new THREE.Vector2(x,n))));geo.rotateX(-Math.PI/2);G[a[0]].push(geo);
     if(a[1]&&a[0]==='Q'){const lp=labelPoint(pts);const LL=AL('💧 '+a[1],'lm',()=>new THREE.Vector3(lp[0],.05,-lp[1]),2);LL.isLm=true;LL.isLake=true;LL.prio=1.8;}}
   const wl={};
   for(const l of d.osm||[]){await Y();const [t,name,str]=l.split('|');if(t==='L')continue;const ll=decode(str);if(ll.length<2||inRegion(...ll[0]))continue;const pts=ll.map(([lo,la])=>proj(lo,la));
-    if(t==='W'){G.river.push(ribbonGeo(pts,/Maas|Amer|Waal|IJssel|Rijn|Lek/.test(name)?.32:.14,0));if(!wl[name]||plen(pts)>wl[name].len)wl[name]={len:plen(pts),pts};}
+    if(name)TF(t==='W'?'W':'R',t==='W'?name:name.replace('A ','A'),pts);if(t==='W'){G.river.push(ribbonGeo(pts,/Maas|Amer|Waal|IJssel|Rijn|Lek/.test(name)?.32:.14,0));if(!wl[name]||plen(pts)>wl[name].len)wl[name]={len:plen(pts),pts};}
     else{G.road.push(ribbonGeo(pts,.16,0));const ref=name.replace(' ','');for(const p of along(pts,24,Math.min(6,plen(pts)/2)))AL(ref,'road',()=>new THREE.Vector3(p[0],.02,-p[1]),4.5);}}
   for(const [nm,{pts}] of Object.entries(wl)){const L=plen(pts);for(const p of along(pts,28,L/2>14?8:L/2))AL(nm,'water',()=>new THREE.Vector3(p[0],.02,-p[1]),6);}
   for(const l of d.rwdata||[]){await Y();const a=l.split('|');if(a.length<7)continue;const ll=a[6].split(' ').map(q=>q.split(',').map(Number));if(inRegion(...ll[0]))continue;const pts=ll.map(q=>proj(...q));
