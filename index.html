@@ -2576,7 +2576,7 @@ const misSeries=ac=>MISSIONS.filter(m=>m.ac===ac).sort((a,b)=>a.lvl-b.lvl||MIS_O
 function nextMission(ac){if(RELAX)return null;const done=misDone();
   if(DAY_REQ===ac){const sd=daySeed(),key=ac+DAY_L+'d'+sd;if(!GEN.has(key))return {pending:key,ac,L:DAY_L,seed:sd};DAY_REQ=null;const g=GEN.get(key);if(g)return {m:g,st:MIS_ST.get(g.id)};}for(const m of misSeries(ac)){if(m.ac!==ac||done.includes(m.id))continue;const st=misStart(m);if(st&&misVerify(m,st))return {m,st};}/* na een AIRAC onhaalbaar? overslaan, nooit aanbieden */
   // vaste reeks klaar → gegenereerde uitdagingen, oplopend (besluit 23 nov); alleen missies met een bewezen route zonder klaring
-  for(let L=1+done.filter(i=>i.startsWith('gen-'+ac+'-')).length,k=0;k<4;L++,k++){if(!GEN.has(ac+L))return {pending:ac+L,ac,L};const g=GEN.get(ac+L);if(g)return {m:g,st:MIS_ST.get(g.id)};}return null;}
+  for(let L=1+done.filter(i=>i.startsWith('gen-'+ac+'-')).length,k=0;k<4;L++,k++){const gk=genKey(ac,L,0);if(!GEN.has(gk))return {pending:gk,ac,L};const g=GEN.get(gk);if(g)return {m:g,st:MIS_ST.get(g.id)};}return null;}
 // ---------- missie eerst zelf volledig vliegen (Christian 25 nov) ----------
 // Loopt de route van de planner af in stappen van 0,1 km (stijgen/dalen op de plek, zoals cirkelen) en past dezelfde regels toe als
 // FAILS in de app: nooit in P/PJA/UAS, geen klaringsgebied zonder klaring (allowClr: klaring mag, alleen voor vaste klaringsmissies),
@@ -2601,16 +2601,18 @@ function misVerify(m,st){if(MIS_OK.has(m.id))return MIS_OK.get(m.id);const L=MPT
 // Moeilijker per niveau: meer keerpunten, meer gebieden op de rechte lijn, hoogtewissels nodig, grotere omweg. Zelfde niveau = zelfde missie (seed).
 const GEN=new Map();
 function rng(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
-function genPool(ac){const L=MPT(),out=[],nMax=proj(5.5,51.98)[1];for(const [nm,p] of Object.entries(L)){const [x,n]=p;if(/^(Lommel|Turnhout|Arendonk|Neerpelt|Hamont|Bimmen)$/.test(nm)/* buitenland: geen luchtruimdata */||n>nMax/* kerngebied: Brabant, Rivierenland, Arnhem–Nijmegen */||!inNL(x,n)||x<gx0+5||x>gx1-5||n<gn0+5||n>gn1-5)continue;
+/* heel NL (28 nov): start je via de sonde buiten het kerngebied, dan maakt de generator uitdagingen rond die plek (≤ 40 km). Dagelijkse uitdaging blijft in het kerngebied (zelfde voor iedereen). */
+let GEN_AREA=null;const genKey=(ac,L,seed)=>ac+L+(seed?'d'+seed:'')+(!seed&&GEN_AREA?'@'+GEN_AREA.join(','):'');
+function genPool(ac,area){const L=MPT(),out=[],nMax=proj(5.5,51.98)[1];for(const [nm,p] of Object.entries(L)){const [x,n]=p;if(/^(Lommel|Turnhout|Arendonk|Neerpelt|Hamont|Bimmen)$/.test(nm)/* buitenland: geen luchtruimdata */||(area?Math.hypot(x-area[0],n-area[1])>40:n>nMax)/* kerngebied: Brabant, Rivierenland, Arnhem–Nijmegen */||!inNL(x,n)||x<gx0+5||x>gx1-5||n<gn0+5||n>gn1-5)continue;
   if(planBlocked(x,n,1000,true,.3,[x,n])&&planBlocked(x,n,500,true,.3,[x,n]))continue;out.push({nm,x,n});}return out;}// doelen buiten CTR's en verboden gebieden
 function lineAreas(a,b,alt){const d=Math.hypot(b[0]-a[0],b[1]-a[1]),on=new Map();for(let s2=0;s2<=d;s2+=.3){const x=a[0]+(b[0]-a[0])*s2/d,n=a[1]+(b[1]-a[1])*s2/d;
   for(const f of applies(featsAt(x,n),alt))if(PLAN_BAD.includes(f.layer)||needsClr(f))on.set(f.ident,f);for(const h of HG)if(Math.hypot(h.x-x,h.n-n)<h.r+.3&&alt<=h.top+700&&Math.hypot(h.x-b[0],h.n-b[1])>1.5)on.set('HG'+h.nm,{ident:'HG'+h.ident,layer:'HG',name:h.nm});}return [...on.values()];}
-function* genSteps(ac,L,seed=0){const key=ac+L+(seed?'d'+seed:'');if(GEN.has(key))return GEN.get(key);const pool=genPool(ac);yield 0;let best=null,spare=null;
+function* genSteps(ac,L,seed=0){const key=genKey(ac,L,seed);if(GEN.has(key))return GEN.get(key);const pool=genPool(ac,seed?null:GEN_AREA);yield 0;let best=null,spare=null;
   for(let att=0;att<3&&!best&&!spare;att++){const r=rng(L*7919+{glider:11,motor:23,balloon:37}[ac]+att*104729+seed*131);
   const nl=ac==='balloon'?1:L<=2?1:L<=5?2:3,minC=ac==='balloon'?Math.min(1+Math.floor((L-1)/3),2):Math.min(1+Math.floor((L-1)/2),4),wantAlt=L>=3&&L%2===1&&ac!=='balloon',alts=ac==='motor'?[1000,1500,2000,2500]:[1000,1500,2000];
   for(let tr=0,planned=0;tr<300&&planned<(ac==='balloon'?30:8)&&!best;tr++){if(tr%15===14)yield 0;const alt=alts[Math.floor(r()*alts.length)],legs=[];let p=pool[Math.floor(r()*pool.length)];legs.push(p);
     for(let k=1;k<nl;k++){const c=pool.filter(q=>!legs.includes(q)&&Math.hypot(q.x-p.x,q.n-p.n)>6&&Math.hypot(q.x-p.x,q.n-p.n)<20);if(!c.length)break;p=c[Math.floor(r()*c.length)];legs.push(p);}
-    if(legs.length<nl)continue;{const pv=seed?null:GEN.get(ac+(L-1));if(pv&&pv.legs[0]===legs[0].nm)continue;}/* niet twee keer achter elkaar hetzelfde doel */const W0=WIND;const wind=ac==='balloon'&&L>=3?{f0:180+r()*120,f1:240+r()*90,k0:6,k1:24}:null;if(ac==='balloon')WIND=wind;
+    if(legs.length<nl)continue;{const pv=seed?null:GEN.get(genKey(ac,L-1,0));if(pv&&pv.legs[0]===legs[0].nm)continue;}/* niet twee keer achter elkaar hetzelfde doel */const W0=WIND;const wind=ac==='balloon'&&L>=3?{f0:180+r()*120,f1:240+r()*90,k0:6,k1:24}:null;if(ac==='balloon')WIND=wind;
     const dd=8+r()*(6+Math.min(L,8)),b0=ac==='balloon'?windAt(alt).from-25:r()*360;let sx=null,sn=null;
     for(let k=0;k<12&&sx===null;k++){const brg=(b0+(ac==='balloon'?k*5:k*30))*Math.PI/180,x=legs[0].x+Math.sin(brg)*dd,n=legs[0].n+Math.cos(brg)*dd;if(misFree(x,n,alt)&&!planBlocked(x,n,alt,true,.6))[sx,sn]=[x,n];}// ballon: bovenwinds van het doel
     WIND=W0;if(sx===null)continue;
@@ -2625,13 +2627,13 @@ function* genSteps(ac,L,seed=0){const key=ac+L+(seed?'d'+seed:'');if(GEN.has(key
   best=best||spare;if(!best){GEN.set(key,null);return null;}
   const ar=best.areas,has=l=>ar.some(f=>f.layer===l),nm=f=>f.layer==='HG'?f.name:short(f);
   const goal=best.ach?'Hoogte als uitweg: daal onder een ondergrens of klim over een bovengrens (met marge).':has('P')||has('R')?'Om een verboden of beperkt gebied heen: plan je bocht op tijd.':has('TRA')||has('TSA')?'Militaire oefengebieden (TRA/TSA): als ze actief zijn, blijf je eruit; plan om of onderdoor.':ar.some(needsClr)?'Om een klaringsgebied heen, of erover/eronder: klaring is een keuze, geen moetje.':'Lees vooruit: wat ligt er op je route?';
-  const m={id:seed?`day-${seed}-${ac}`:`gen-${ac}-${L}`,gen:true,day:seed||undefined,lvl:Math.min(3,1+Math.floor((L-1)/3)),genL:L,ac,goal,title:seed?'📅 Uitdaging van vandaag':`Uitdaging ${L}`,legs:best.legs.map(q=>q.nm),les:null,teach:ar.filter(f=>f.layer!=='HG').slice(0,2).map(f=>f.ident),alt:best.st.alt,wind:best.wind||undefined,
+  const m={id:seed?`day-${seed}-${ac}`:`gen-${ac}-${L}`+(GEN_AREA?`@${GEN_AREA.join(',')}`:''),gen:true,day:seed||undefined,lvl:Math.min(3,1+Math.floor((L-1)/3)),genL:L,ac,goal,title:seed?'📅 Uitdaging van vandaag':`Uitdaging ${L}`,legs:best.legs.map(q=>q.nm),les:null,teach:ar.filter(f=>f.layer!=='HG').slice(0,2).map(f=>f.ident),alt:best.st.alt,wind:best.wind||undefined,
     brief:`${best.legs.map(q=>q.nm).join(' → ')}. `+(L<=3?`Op de rechte lijn: ${[...new Set(ar.map(nm))].slice(0,3).join(', ')}${ar.length>3?' en meer':''}. `:`Kijk zelf wat er op de rechte lijn ligt (${ar.length} gebieden). `)+(ac==='balloon'?'Er is altijd een hoogteplan dat het haalt.':'Er is altijd een route zonder klaring: om, over of onder.')};
   MIS_ST.set(m.id,best.st);GEN.set(key,m);return m;}
 function genMission(ac,L){const it=genSteps(ac,L);let r;do{r=it.next();}while(!r.done);return r.value;}// synchroon (tests, rapport)
 // in de app: in plakjes van ±25 ms rekenen, zodat de pagina (knijpen, knoppen, 60 fps) nooit vastzit (25 nov: suite ving haperen)
 const GEN_RUN=new Map(),GEN_WAIT='🛠 Nieuwe uitdaging wordt gemaakt en eerst zelf uitgevlogen…<br><small>Even geduld, hij start vanzelf.</small>';
-function genAsync(ac,L,cb,seed=0){const key=ac+L+(seed?'d'+seed:'');if(GEN.has(key)){if(cb)cb(GEN.get(key));return;}if(GEN_RUN.has(key)){if(cb)GEN_RUN.get(key).push(cb);return;}
+function genAsync(ac,L,cb,seed=0){const key=genKey(ac,L,seed);if(GEN.has(key)){if(cb)cb(GEN.get(key));return;}if(GEN_RUN.has(key)){if(cb)GEN_RUN.get(key).push(cb);return;}
   const cbs=cb?[cb]:[];GEN_RUN.set(key,cbs);const it=genSteps(ac,L,seed);
   const tick=()=>{const t0=performance.now();let r;do{r=it.next();}while(!r.done&&performance.now()-t0<25);
     if(!r.done){setTimeout(tick,0);return;}GEN_RUN.delete(key);for(const f of cbs)try{f(r.value)}catch(_){}};setTimeout(tick,0);}
@@ -2698,7 +2700,7 @@ function setMode(m,ac){
   $('btnMode').innerHTML=m==='fly'?'→ Kaart':'→ Vliegen';
   $('tape').classList.toggle('off',m==='fly'?!$('optTape').checked:false);
   if(m==='fly'&&(prev!=='fly'||ac)){camReset();keyCardAuto();if(typeof gateShow==='function'&&prev!=='fly')gateShow('Vliegen laden…',0);}else if(m!=='fly')keyCardClose();// elke vlucht begint met de camera achter het toestel
-  if(m==='fly'&&prev!=='fly'&&PROBE.user){PLANE.x=PROBE.x;PLANE.n=PROBE.n;if(SLICE>0&&ACTYPE!=='balloon')PLANE.alt=SLICE;PROBE.user=false;WARNED.clear();FAILS.clear();CLR.clear();
+  if(m==='fly'&&prev!=='fly'&&PROBE.user){{const lo=PROBE.x/KX+LON0,la=PROBE.n/KY+LAT0;GEN_AREA=inRegion(lo,la)?null:[Math.round(PROBE.x/10)*10,Math.round(PROBE.n/10)*10];}PLANE.x=PROBE.x;PLANE.n=PROBE.n;if(SLICE>0&&ACTYPE!=='balloon')PLANE.alt=SLICE;PROBE.user=false;WARNED.clear();FAILS.clear();CLR.clear();
     {let t=null,hd=PLANE.hdg;const hs=ACTYPE==='balloon'?[(windAt(Math.max(300,PLANE.alt)).from+180)%360]:[0,45,90,135,180,225,270,315];for(const h of hs){t=pickTask(PLANE.x,PLANE.n,h,ACTYPE);if(t){hd=h;break;}}/* S1b panel (Fatima): ook vanaf de sonde een opdracht */
      TASK=t&&!RELAX?t:'';GOAL=TASK?{...LASTGOAL}:null;PLANE.hdg=hd;if(TASK){PAUSED=true;NOTICE=`🎯 ${t}<br><small>▶ = start</small>`;}}}
   if(m==='fly'){$('info').style.display='none';if(prev!=='fly')chase(0,true);}

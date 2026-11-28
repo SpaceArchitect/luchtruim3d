@@ -1397,6 +1397,12 @@ async def d_tiles(a):  # 28 nov heel NL: landschap per tegel. Laadt in de buurt,
     if r['goal']:
         d = ((r['goal'][0] - r['me'][0]) ** 2 + (r['goal'][1] - r['me'][1]) ** 2) ** .5
         ok(d < 25, f'doel ligt niet in de buurt van de sonde ({d:.0f} km): {r["name"]}')
+    # generator rond Groningen (heel NL): uitdaging binnen 45 km van de sonde, niet in Brabant
+    g = await a.ev("""()=>{const v=window.__vfr;const m=v.genMission('glider',1);if(!m)return null;const st=v.misStart(m);return {id:m.id,st:st&&[st.x,st.n]}}""")
+    ok(g and g['st'], f'generator maakt geen uitdaging rond Groningen: {g}')
+    if g and g['st']:
+        d = ((g['st'][0] - r['me'][0]) ** 2 + (g['st'][1] - r['me'][1]) ** 2) ** .5
+        ok(d < 45 and '@' in g['id'], f'uitdaging niet rond Groningen ({d:.0f} km, {g["id"]})')
 
 async def d_loading(a):  # 28 nov (Christian): laadscherm bij openen, vliegen en ▶ start. Moet komen, weer weggaan (≤ 8,5 s), en nooit klikken blokkeren
     on = "()=>{const L=document.getElementById('loadScr');return !!L&&!L.classList.contains('off')}"
