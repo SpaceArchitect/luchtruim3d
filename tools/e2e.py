@@ -1374,8 +1374,9 @@ async def d_loading(a):  # 28 nov (Christian): laadscherm bij openen, vliegen en
     await a.fly('glider'); await a.wait(1500)
     ok(not await a.ev(on), 'laadscherm hangt na kiezen van een toestel')
     ok('▶ = start' in (await a.v('v.NOTICE') or ''), 'geen startmelding')
+    await a.ev("()=>{window.__LS=0;new MutationObserver(()=>{if(!document.getElementById('loadScr').classList.contains('off'))window.__LS++}).observe(document.getElementById('loadScr'),{attributes:true})}")
     await a.hit('#btnPause')
-    seen = await a.ev(on)
+    seen = await a.ev("()=>window.__LS>0||!document.getElementById('loadScr').classList.contains('off')")  # suite 28 nov p7: na de tik kon het scherm al weg zijn → vastleggen dát het verscheen
     t = await a.ev("""async()=>{const t=performance.now(),L=document.getElementById('loadScr');while(!L.classList.contains('off')&&performance.now()-t<9000)await new Promise(r=>setTimeout(r,50));return performance.now()-t}""")
     ok(seen, 'geen laadscherm bij ▶ start')
     ok(t < 8500, f'laadscherm bleef {t:.0f} ms staan na ▶')
