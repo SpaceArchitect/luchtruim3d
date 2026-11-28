@@ -1531,7 +1531,7 @@ function pickHits(){if(RELAX)return [];const ms=airGroup.children.filter(o=>o.is
 function closeInfo(){$('info').style.display='none';selected=null;update();}
 const hgItem=h=>{const t=HGT[h.typ];return `<div class="item hgitem" style="border-left-color:#${t.c.toString(16).padStart(6,'0')}"><h4>${t.icon} ${t.what} ${h.nm}</h4><div class="lim">ENR 5.5 · GND – ${h.top} ft ${h.ref}</div><p>${t.txt}${h.nowinch?' (geen lierstarts)':''}. Blijf erbuiten of eroverheen als er activiteit is; activiteit wordt dagelijks bekendgemaakt (UDP).${h.com?' Radio: <b>'+h.com+'</b> (uitluisteren).':''}</p>${h.shared.length?'<p>'+hgShareTxt(h.typ==='gld'?h.shared[0]:h)+'</p>':''}</div>`;};
 function showInfo(fs,hs=[]){
-  const box=$('info');box.innerHTML='<button class="close">✕</button><div class="note">Langs deze kijklijn, van hoog naar laag:</div>'+hs.map(hgItem).join('')+fs.map(f=>`<div class="item" style="border-left-color:${f.color}"><h4>${f.name}</h4>
+  const box=$('info');box.classList.remove('mini');/* Christian 28 nov: sonde-lade 'mini' uit de kaart bleef staan → in de vliegmodus alleen ✕ zichtbaar */box.scrollTop=0;box.innerHTML='<button class="close">✕</button><div class="note">Langs deze kijklijn, van hoog naar laag:</div>'+hs.map(hgItem).join('')+fs.map(f=>`<div class="item" style="border-left-color:${f.color}"><h4>${f.name}</h4>
   <div class="lim">${f.layer}${f.cls?' · klasse '+f.cls:''} · ${f.loTxt} – ${f.hiTxt}</div>
   <p>${TYPE_TXT[f.layer]||''}</p>${CLS_TXT[f.cls]&&['CTR','TMA','CTA'].includes(f.layer)?`<p>${CLS_TXT[f.cls]}</p>`:''}</div>`).join('')+'<p class="note">Vereenvoudigd. Controleer altijd de AIP en NOTAMs.</p>';
   box.style.display='block';box.querySelector('.close').onclick=closeInfo;}
