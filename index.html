@@ -1262,8 +1262,9 @@ const TYPE_TXT={
   P:'Verboden gebied: niet invliegen.',
   R:'Beperkt gebied: alleen onder voorwaarden (zie AIP).',
   D:'Gevaarlijk gebied: er kunnen activiteiten zijn die gevaarlijk zijn voor vliegverkeer.',
-  TRA:'Tijdelijk gereserveerd gebied (vaak militair). Als het actief is, mag je er niet in zonder toestemming. Check AIP en NOTAM.',
-  TSA:'Tijdelijk gescheiden gebied (militair). Als het actief is: niet invliegen. Check AIP en NOTAM.',
+  /* AIP ENR 5.2 (AIRAC 12-2026): 'Activated by AUP/UUP or NOTAM outside defined period' · 'Prohibited when activated, unless permission from military ATS provider'. Live status: nog geen open primaire bron (spike 26 nov) → nooit 'inactief' tonen */
+  TRA:'Tijdelijk gereserveerd gebied (militair). Actief volgens het dagelijkse luchtruimgebruiksplan (AUP/UUP) of, buiten de vaste tijden, per NOTAM (AIP ENR 5.2). Als het actief is: verboden zonder toestemming van de militaire verkeersleiding. Of het nu actief is, weet deze app niet: check vóór je vlucht de NOTAMs en het AUP.',
+  TSA:'Tijdelijk gescheiden gebied (militair). Actief volgens het dagelijkse luchtruimgebruiksplan (AUP/UUP) of, buiten de vaste tijden, per NOTAM (AIP ENR 5.2). Als het actief is: verboden zonder toestemming van de militaire verkeersleiding. Of het nu actief is, weet deze app niet: check vóór je vlucht de NOTAMs en het AUP.',
   PJA:'Paradropzone: hier springen parachutisten, tot de bovengrens op het label. Activiteit wordt dagelijks bekendgemaakt (UDP): bel de operator of luister uit.',
   UAS:'Dronegebied (militair, RPAS). Actief via NOTAM: dan verboden zonder toestemming van MILATCC Schiphol.',
   GLD:'Zweefvlieggebied: reken op intensief zweefvliegverkeer.',
