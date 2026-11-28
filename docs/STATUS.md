@@ -34,7 +34,7 @@
 - Reset geldig t/m 10 dec. 27 nov–4 dec heel NL voorbereiden; 7–10 dec bouwen; Christian test 11–14 dec, vóór Mexico (15 dec).
 
 ## Budget
-- 1 SP ≈ 5,5 M tokens (ccusage). Sessie 27–28 nov: zie LOG (SP-regel).
+- 1 SP ≈ 10 M tokens (ccusage; ijking Christian 28 nov: 13% bij ±128 M).
 
 ## Werkwijze
 - Volledige suite in twee helften parallel (`--forms desk,p7` / `--forms p7l,se`, eigen `E2E_PORT`, `python3 -u`, time-out 7000 s); **géén andere browsertests tegelijk**.
