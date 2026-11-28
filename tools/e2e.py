@@ -1453,15 +1453,15 @@ async def d_ctr_hours(a):  # heel NL 28 nov: CTR-openingstijden uit de AIP-tekst
         if not want and id_ in ('EHGG', 'EHKD', 'EHLW', 'EHEH') and not r['rmz']: bad.append(f'{id_} dicht maar geen RMZ (Dutch MIL Info) ervoor in de plaats')
     ok(not bad, f'CTR-openingstijden wijken af van de AIP: {bad[:5]}')
 
-async def d_land_goal(a):  # 28 nov: landdoel. Boven het veld overvliegen (3500 ft, boven de CTR) is geen landen; laag mét klaring wel
+async def d_land_goal(a):  # 28 nov: landdoel. Boven het veld te hoog (2000 ft, in de CTR mét klaring) is geen landen → daalmelding; laag (800 ft) wél geslaagd
     await a.hit('#modal [data-ac=motor]'); await a.frames(2)
-    r = await a.ev("""()=>{const v=window.__vfr;localStorage.setItem('l3d_missies',JSON.stringify(v.MISSIONS.filter(x=>x.ac==='motor'&&x.id!=='eelde').map(x=>x.id)));v.newTask();
-      if(!v.MISSION||v.MISSION.id!=='eelde')return {id:v.MISSION&&v.MISSION.id};const g=v.GOAL;for(const f of v.LAYERS)v.WARNED.add(f.ident);
-      Object.assign(v.PLANE,{x:g.x,n:g.n,alt:3500});v.NOTICE='';v.PAUSED=false;v.hudTick();const hi=v.NOTICE;const done1=/geslaagd/.test(hi);
-      v.NOTICE='';v.PAUSED=false;v.CLR.add('EHGG');v.PLANE.alt=1000;v.hudTick();return {id:'eelde',hi,done1,lo:v.NOTICE,fails:[...v.FAILS.values()]}}""")
-    ok(r.get('id') == 'eelde', f'missie eelde niet gekozen: {r}')
-    ok(not r['done1'] and 'daal' in r['hi'], f'overvliegen op 3500 ft telde als landen of geen daalmelding: {r["hi"][:120]}')
-    ok('geslaagd' in r['lo'], f'laag mét klaring niet geslaagd: {r["lo"][:120]} {r["fails"]}')
+    r = await a.ev("""()=>{const v=window.__vfr;localStorage.setItem('l3d_missies',JSON.stringify(v.MISSIONS.filter(x=>x.ac==='motor'&&x.id!=='lely').map(x=>x.id)));v.newTask();
+      if(!v.MISSION||v.MISSION.id!=='lely')return {id:v.MISSION&&v.MISSION.id};const g=v.GOAL;for(const f of v.LAYERS)v.WARNED.add(f.ident);for(const id of ['EHLE1','EHLE2','EHLE1T','EHLE2T','EHLERMZ'])v.CLR.add(id);
+      Object.assign(v.PLANE,{x:g.x,n:g.n,alt:2000});v.NOTICE='';v.PAUSED=false;v.hudTick();const hi=v.NOTICE;const done1=/geslaagd/.test(hi);
+      v.NOTICE='';v.PAUSED=false;v.PLANE.alt=800;v.hudTick();return {id:'lely',hi,done1,lo:v.NOTICE,fails:[...v.FAILS.values()]}}""")
+    ok(r.get('id') == 'lely', f'missie lely niet gekozen: {r}')
+    ok(not r['done1'] and 'daal' in r['hi'], f'boven het veld op 2000 ft telde als landen of geen daalmelding: {r["hi"][:140]} {r.get("fails")}')
+    ok('geslaagd' in r['lo'], f'laag mét klaring niet geslaagd: {r["lo"][:140]} {r["fails"]}')
 
 async def d_rt_advice(a):  # BACKLOG P3 'RT per blok' (28 nov): per luchtruim wat je op de radio/transponder doet, met de juiste eenheid (eAIP)
     await a.hit('#modal [data-ac=map]'); await a.frames(2)
