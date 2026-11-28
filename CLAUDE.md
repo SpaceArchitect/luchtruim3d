@@ -151,7 +151,7 @@ Regel: `- <datum> SP: <model> · schatting X · werkelijk Y · <plan/les>`.
   (max ±25% van de weeklimiet per sessie; Christians harde grens is 80% van de week).
 - **Zelf publiceren mag** als de volledige suite groen is en het geen kantelen/touch/sensoren raakt.
   Raakt het dat wel: previewlink in STATUS, Christian test, dan pas live.
-- **Licht genoeg:** middenklasse Android van een paar jaar oud ≥ 30 fps, pagina < 2 MB.
+- **Licht genoeg:** middenklasse Android van een paar jaar oud ≥ 30 fps, pagina < 2 MB. **Harde eis (Christian 28 nov): na het laadscherm nooit haperen, stabiel 30 fps.** Zwaar werk (missie maken, startpunt, tegels) alleen onder één laadscherm per nieuwe missie (mag 5–10 s); niets zwaars tijdens het vliegen. Vangnet: d_smooth_flight.
 - **Geen handmatige acties van Christian.** Zoek eerst zelf een route (GitHub Actions, openbare
   bronnen). Alleen inloggen/2FA blijft van hem (grens 4).
 - **Model:** sessies draaien op Opus (ontwerp, bugs, AIP-juistheid); routinewerk (data omzetten,
