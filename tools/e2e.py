@@ -147,7 +147,8 @@ async def t_aircraft(a):
         await a.hit('#btnPause'); ok(not await a.v('v.PAUSED'), f'{ac}: start-knop hervat niet ({(await a.v("v.NOTICE") or "")[:60]!r})')
         alt0 = await a.v('v.PLANE.alt')
         if a.touch: await a.hold('#ctrl [data-k=arrowup]', 900)
-        else: await a.pg.keyboard.down('ArrowDown'); await a.wait(900); await a.pg.keyboard.up('ArrowDown')  # MSFS: ↓ = neus omhoog
+        else:  # MSFS: ↓ = neus omhoog; ballon: ↑ = branden (besluit 23 nov)
+            kk = 'ArrowUp' if ac == 'balloon' else 'ArrowDown'; await a.pg.keyboard.down(kk); await a.wait(900); await a.pg.keyboard.up(kk)
         alt1 = await a.v('v.PLANE.alt')
         ok(alt1 > alt0 or await a.v('v.PAUSED'), f'{ac}: stijgen werkt niet ({alt0}->{alt1})')
         if ac != 'balloon':
