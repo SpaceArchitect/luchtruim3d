@@ -53,7 +53,6 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
   - R3. [M] Hangaar (vanuit toestelkeuze/keuzescherm): toestel + livery kiezen (3–4 kleurstellingen per toestel, geen nieuwe modellen, vlieggedrag identiek), livery's vrijspelen met sterren, hoedjes aan/uit. Na U2.
   - R4. [S] Voortgangscode: missies, sterren, dag, hoedjes, livery als korte tekstcode (+ controlegetal) om te kopiëren; plakken op een ander apparaat = overzetten. QR alleen als het zonder externe bibliotheek kan. Geen server. Vangnet: export → wissen → import = zelfde stand; foute code → nette melding.
 
-- [M] **Echte telefoons in de testronde** (Christian 28 nov): cloud-device-dienst (echte Android met GPU) vanuit GitHub Actions. Account = Christian (grens 4); eerst opties en kosten uitzoeken.
 - [M] **Bugregister:** script dat elke bug-regel in LOG koppelt aan een test in de suite. Eerst kantelen en knipperende lijnen (Christian: komen terug).
 - [M] **Vaste missies heel NL** (Christian 28 nov: nu vooral Zuid-Nederland): per regio missies met één leerdoel; generator werkt op wip/tiles al landelijk.
 
@@ -93,4 +92,5 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 - Na de vaste missies: oneindige generator (staat sinds 25 nov; docs/MISSIES.md).
 
 ## Niet doen (besluit Christian)
+- Betaalde device-testdienst (BrowserStack e.d.) — Christian 28 nov: geen abonnement; liever schone code. Vervanging: structurele klasse-tests (d_smooth_flight, bugregister) + meetlat ?fps=1 bij twijfel.
 - Voorbeeldcircuit en circuits per zweefveld · thermiek/zweven · MSFS-export · accounts met inloggen · cookiemelding · "spel"/"game" in metadata · IGC op de openbare site · AR-bril (apart project)
