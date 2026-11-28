@@ -17,3 +17,5 @@ get "https://english.defensie.nl/topics/military-aviation-authority" mil.html
 # snelle aanwijzingen: links naar AUP/UUP/download in de opgehaalde pagina's
 for f in probe/*.html; do echo "== $f" >> probe/hints.txt; grep -oiE '(href|src)="[^"]*(aup|uup|fua|download|xml|json|csv|terms|b2b|notam)[^"]*"' "$f" | sort -u | head -30 >> probe/hints.txt; done
 ls -la probe >> probe/summary.txt
+# 28 nov: spike 1a (live status militaire gebieden): welke dataverzoeken doet de NOP-web-app voor de EAUP/EUUP?
+pip install -q playwright >> probe/errors.txt 2>&1 && python3 -m playwright install --with-deps chromium >> probe/errors.txt 2>&1 && python3 tools/probe_nop.py >> probe/summary.txt 2>>probe/errors.txt || echo "FAIL probe_nop" >> probe/summary.txt
