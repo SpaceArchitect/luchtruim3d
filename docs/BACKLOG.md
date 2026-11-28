@@ -35,7 +35,7 @@ Nieuwe feedback (chat, app, testers) komt hier binnen; issues met label `feedbac
 
 - [M] Heel NL missies (28 nov onderzocht): (1) **landdoel** ontbreekt: een veld ín een CTR (Eelde, klasse C) haal je nu ook door er bovenover te vliegen → missietype 'landen' (doel pas gehaald onder ±1000 ft AGL, autopilot daalt) en dan 'eelde'; (2) De Kooy CTR ligt > 18 km van Texel → misStart met langere aanloop of tussenpunt; (3) Teuge: veld in een paradropzone → planner vindt geen route; doel net buiten de PJA kiezen. (4) **CTR-openingstijden per veld landelijk** (Eelde weekend 0630–2100 UTC, De Kooy weekend 0600–1100/1400–1900 UTC, Lelystad 0600–2100 UTC; AD 2.17) controleren in AIPINFO/hrs op wip/heelnl; nu alleen eh/mil gemodelleerd.
 
-- [M] OSM heel NL robuuster: Overpass doet ±30–70 min per tegel (run 27–28 nov: 5/17 na 9 u; nl-01 4-uurs time-out). Alternatief: Geofabrik `netherlands-latest.osm.pbf` (ODbL) + osmium tags-filter/export in de Action, omzetten naar het Overpass-JSON dat build_landscape leest. Pas doen als de lopende run niet vóór ±1 dec klaar is. data-osm-nl.yml + fetch_osm.py moeten op main staan voor workflow_dispatch (nl-01): meenemen in de main-kandidaat, níet via een wip-push (start data-osm, wist data/osm).
+- [S] OSM heel NL: **opgelost 28 nov** via Geofabrik + osmium (data-osm-pbf). Open: grensstrook BE/DE zonder landschap (extract = alleen NL); bij uitbreiden naar BE/DE het Geofabrik-extract van die landen toevoegen.
 
 ## P3 — koers (top 5, even zwaar) en groter werk
 - [M] Generator v2: smalle gangen tussen gebieden, wind voor zweef/motor, tijdsgebonden gebieden (CTR open/dicht), RMZ-oproep als opdracht, plafond aan de moeilijkheid; leerdoel uit de werkelijk geraakte gebieden — Christian 22–25 nov (v1 staat, zie docs/MISSIES.md)
