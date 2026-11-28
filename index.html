@@ -1985,7 +1985,7 @@ async function buildTile(id,d){/* in plakjes van ±6 ms (telefoon ±4× trager):
   if(rail.length){const S=[],D=[];for(const pts of rail)for(let i=1;i<pts.length;i++){S.push(new THREE.Vector3(pts[i-1][0],.006,-pts[i-1][1]),new THREE.Vector3(pts[i][0],.006,-pts[i][1]));D.push(new THREE.Vector3(pts[i-1][0],.007,-pts[i-1][1]),new THREE.Vector3(pts[i][0],.007,-pts[i][1]));}
     const a=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(S),TM.rail),b=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(D),TM.railW);b.computeLineDistances();a.renderOrder=2;b.renderOrder=3;grp.add(a,b);}
   if(P3.length)pwGroup.add(st.pw3=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(P3),TM.pw3));if(P1.length)pwGroup.add(st.pw1=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(P1),TM.pw1));
-  st.group=grp;grp.visible=st.on;st.state='ready';busy+=performance.now()-tY;st.ms=Math.round(busy);st.wall=Math.round(performance.now()-T0);}
+  st.group=grp;grp.visible=st.on;st.state='ready';if(PROBE_PEND&&MODE==='fly'&&!TASK&&PAUSED)probeTask();busy+=performance.now()-tY;st.ms=Math.round(busy);st.wall=Math.round(performance.now()-T0);}
 /* laadscherm wacht op tegels vlak bij het toestel/kaartmidden (heel NL): nooit beginnen in een leeg landschap */
 window.GATE_WAIT=()=>{const c=MODE==='fly'?[PLANE.x,PLANE.n]:[controls.target.x,-controls.target.z];if(!TILE_AT||Math.hypot(c[0]-TILE_AT[0],c[1]-TILE_AT[1])>=2)tileTick();return TILES.some(t=>TILE_ST[t.id]&&TILE_ST[t.id].state==='loading'&&tileDist(t,c[0],c[1])<30);};
 function tileDist(t,x,n){const dx=Math.max(t.x0-x,0,x-t.x1),dn=Math.max(t.n0-n,0,n-t.n1);return Math.hypot(dx,dn);}
@@ -2692,6 +2692,8 @@ let FAIL_SHOWN=false;
 function newTask(){const st=randomStart(ACTYPE);if(st.pending){TASK='';GOAL=null;PAUSED=true;NOTICE=GEN_WAIT;hudTick();return;}if(TILT)TILT.hist=[];/* geen koers/hoogte van de vorige opdracht terugzetten */Object.assign(PLANE,{x:st.x,n:st.n,alt:st.alt,hdg:st.hdg,bank:0,pitch:0});WARNED.clear();FAILS.clear();CLR.clear();REFUSED.clear();REFW.clear();
   TASK=st.task||'';GOAL=st.task?{...LASTGOAL}:null;PAUSED=true;NOTICE=(st.task?`🎯 ${st.task}<br>`:'')+'<small>▶ = start</small>'+(MISSION&&!MISSION.day&&!RELAX?' <button class="nt day mini">📅 Vandaag</button>':'');chase(0,true);hudTick();}
 function setHTML(el,h){if(el.__last!==h){el.__last=h;el.innerHTML=h;}}
+let PROBE_PEND=false;function probeTask(){PROBE_PEND=false;let t=null,hd=PLANE.hdg;const hs=ACTYPE==='balloon'?[(windAt(Math.max(300,PLANE.alt)).from+180)%360]:[0,45,90,135,180,225,270,315];for(const h of hs){t=pickTask(PLANE.x,PLANE.n,h,ACTYPE);if(t){hd=h;break;}}/* S1b panel (Fatima): ook vanaf de sonde een opdracht */
+  TASK=t&&!RELAX?t:'';GOAL=TASK?{...LASTGOAL}:null;PLANE.hdg=hd;if(TASK){PAUSED=true;NOTICE=`🎯 ${t}<br><small>▶ = start</small>`;chase(0,true);}}
 function setMode(m,ac){
   if(ONLY_MAP)m='map';if(ONLY_FLY&&m==='map')m='fly';
   const prev=MODE;MODE=m;LOOP=null;FAR_AT=null;setTimeout(update,0);/* verre volumes (vliegmodus) weer tonen of opnieuw bepalen */if(ac&&AC[ac]){ACTYPE=ac;CHOSEN=true;}
@@ -2701,8 +2703,7 @@ function setMode(m,ac){
   $('tape').classList.toggle('off',m==='fly'?!$('optTape').checked:false);
   if(m==='fly'&&(prev!=='fly'||ac)){camReset();keyCardAuto();if(typeof gateShow==='function'&&prev!=='fly')gateShow('Vliegen laden…',0);}else if(m!=='fly')keyCardClose();// elke vlucht begint met de camera achter het toestel
   if(m==='fly'&&prev!=='fly'&&PROBE.user){{const lo=PROBE.x/KX+LON0,la=PROBE.n/KY+LAT0;GEN_AREA=inRegion(lo,la)?null:[Math.round(PROBE.x/10)*10,Math.round(PROBE.n/10)*10];}PLANE.x=PROBE.x;PLANE.n=PROBE.n;if(SLICE>0&&ACTYPE!=='balloon')PLANE.alt=SLICE;PROBE.user=false;WARNED.clear();FAILS.clear();CLR.clear();
-    {let t=null,hd=PLANE.hdg;const hs=ACTYPE==='balloon'?[(windAt(Math.max(300,PLANE.alt)).from+180)%360]:[0,45,90,135,180,225,270,315];for(const h of hs){t=pickTask(PLANE.x,PLANE.n,h,ACTYPE);if(t){hd=h;break;}}/* S1b panel (Fatima): ook vanaf de sonde een opdracht */
-     TASK=t&&!RELAX?t:'';GOAL=TASK?{...LASTGOAL}:null;PLANE.hdg=hd;if(TASK){PAUSED=true;NOTICE=`🎯 ${t}<br><small>▶ = start</small>`;}}}
+    probeTask();if(!TASK&&window.GATE_WAIT&&GATE_WAIT())PROBE_PEND=true;/* heel NL: tegels bouwen nog → opnieuw zodra ze klaar zijn */}
   if(m==='fly'){$('info').style.display='none';if(prev!=='fly')chase(0,true);}
   else{
     if(prev==='fly'&&CHOSEN){PROBE.user=false;PROBE.x=PLANE.x;PROBE.n=PLANE.n;PROBE.name=whereText(PLANE.x,PLANE.n)+' (je toestel)';
