@@ -1414,13 +1414,15 @@ async def d_tiles(a):  # 28 nov heel NL: landschap per tegel. Laadt in de buurt,
 
 async def d_loading(a):  # 28 nov (Christian): laadscherm bij openen, vliegen en ▶ start. Moet komen, weer weggaan (≤ 8,5 s), en nooit klikken blokkeren
     on = "()=>{const L=document.getElementById('loadScr');return !!L&&!L.classList.contains('off')}"
-    ok(not await a.ev(on), 'laadscherm hangt na het openen')
+    t0 = await a.ev("""async()=>{const t=performance.now(),L=document.getElementById('loadScr');while(!L.classList.contains('off')&&performance.now()-t<8500)await new Promise(r=>setTimeout(r,50));return performance.now()-t}""")
+    ok(t0 < 8500, f'laadscherm hangt na het openen ({t0:.0f} ms extra)')  # suite 28 nov: direct na het laden kijken was te vroeg (scherm gaat 0,2–0,4 s na de module weg)
     ok(await a.ev("()=>getComputedStyle(document.getElementById('loadScr')).pointerEvents") == 'none', 'laadscherm blokkeert klikken')
     await a.fly('glider'); await a.wait(1500)
     ok(not await a.ev(on), 'laadscherm hangt na kiezen van een toestel')
     ok('▶ = start' in (await a.v('v.NOTICE') or ''), 'geen startmelding')
+    await a.ev("()=>{window.__LS=0;new MutationObserver(()=>{if(!document.getElementById('loadScr').classList.contains('off'))window.__LS++}).observe(document.getElementById('loadScr'),{attributes:true})}")
     await a.hit('#btnPause')
-    seen = await a.ev(on)
+    seen = await a.ev("()=>window.__LS>0||!document.getElementById('loadScr').classList.contains('off')")  # suite 28 nov p7: na de tik kon het scherm al weg zijn → vastleggen dát het verscheen
     t = await a.ev("""async()=>{const t=performance.now(),L=document.getElementById('loadScr');while(!L.classList.contains('off')&&performance.now()-t<9000)await new Promise(r=>setTimeout(r,50));return performance.now()-t}""")
     ok(seen, 'geen laadscherm bij ▶ start')
     ok(t < 8500, f'laadscherm bleef {t:.0f} ms staan na ▶')

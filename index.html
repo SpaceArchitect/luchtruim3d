@@ -448,6 +448,7 @@ ulm|Ypecolsga|EHAAULT009|5.60222|52.92694|0.25|500|AMSL||
 </head>
 <body class="welcome">
 <div id="loadScr" role="status" aria-live="polite"><div class="box"><span id="loadTxt">Luchtruim laden…</span><div class="bar"><i></i></div></div></div>
+<script>/* review 28 nov: start de app niet (geen WebGL, three.js niet geladen), dan na 12 s een melding i.p.v. eeuwig 'laden…' */setTimeout(()=>{if(!window.__vfr){const t=document.getElementById('loadTxt');if(t)t.textContent='Laden lukt niet. Ververs de pagina, of probeer een andere browser (WebGL nodig).';}},12000);</script>
 <div id="app"><div id="labels"></div></div>
 <header>
   <div class="title">Luchtruim in 3D · kaart &amp; vliegen<small>Nederland · LVNL, CC BY 4.0 (AIRAC 26 nov 2026) · © OpenStreetMap</small></div>
@@ -2273,7 +2274,7 @@ function keyCardAuto(){if(!document.body.classList.contains('kbd'))return;try{if
 /* Christian 25 nov: na geslaagd/mislukt is ▶ (knop, tik op de melding, Spatie) = de volgende opdracht, niet doorvliegen zonder opdracht */
 const MIS_OVER=()=>MODE==='fly'&&PAUSED&&/<button class="nt">/.test(NOTICE);function playNext(){const t=performance.now();try{if(MIS_OVER()){newTask();hudTick();return;}togglePause();}finally{if(FPS)FPS.hnd=(FPS.hnd||0)+performance.now()-t;}}
 let START_PEND=false;function togglePause(){if(PAUSED&&!START_PEND&&MODE==='fly'&&(/▶ = start/.test(NOTICE)||!FLOWN)&&typeof gateShow==='function'){/* 28 nov: eerst het laadscherm tekenen, dan pas starten: de stilstand valt erachter */
-    START_PEND=true;gateShow('Starten…',350);requestAnimationFrame(()=>requestAnimationFrame(()=>{START_PEND=false;if(PAUSED)togglePause0();}));return;}if(START_PEND)return;togglePause0();}
+    START_PEND=true;const n0=NOTICE;gateShow('Starten…',350);requestAnimationFrame(()=>requestAnimationFrame(()=>{START_PEND=false;if(PAUSED&&MODE==='fly'&&NOTICE===n0)togglePause0();}));return;}/* review 28 nov: niet starten als je intussen de kiezer opende of van modus wisselde */if(START_PEND)return;togglePause0();}
 function togglePause0(){const st=/▶ = start/.test(NOTICE)||!FLOWN;PAUSED=!PAUSED;$('stillHint').hidden=true;if(!PAUSED){NOTICE='';FLOWN=true;if(st)tiltRecal();/* Christian 25 nov: alleen ijken bij de start (eerste vlucht, nieuwe opdracht); nooit door een melding, pauze of resize (bocht was daarna niet voort te zetten). Draaien staand↔liggend ijkt apart. */}}
 let FLOWN=false;
 function tiltRecal(){/* Christian 21 nov: na ▶ of een nieuwe opdracht ging kantelen soms de mist in: er werd geijkt op het eerste sensorsignaal (de tik-schok), scheef vasthouden (>25°) werd een vaste bocht en de vergrendelde liggende houding ging verloren. Nu: besturing even neutraal, ijken zodra de telefoon 0,3 s rustig is (uiterlijk 1,2 s), rol tot 45° telt als rechtuit, fysieke houding blijft. */
@@ -3064,7 +3065,7 @@ function fpsTick(now,raw){if(!FPS)return;if(document.hidden||FPS.hid){FPS.hid=do
 const FPS_VER='live-28nov';
 document.addEventListener('visibilitychange',()=>{if(FPS)FPS.hid=true;});
 /* 26 nov (stotter A55, 112 ms bij ▶): shaders van alles wat later pas in beeld komt (doel, schaduw, verre volumes) bij het laden al compileren, ook wat nu verborgen is; anders compileert de GPU midden in de vlucht */
-try{/* stotter-d: echt tekenen (1×1 px, alles zichtbaar, geen culling) bij het laden, zodat de GPU-pipelines (ANGLE/Vulkan) al bestaan vóór ▶ */const hid=[],cul=[];scene.traverse(o=>{if(!o.visible){hid.push(o);o.visible=true;}if(o.frustumCulled){cul.push(o);o.frustumCulled=false;}});renderer.setScissorTest(true);renderer.setScissor(0,0,1,1);renderer.render(scene,camera);renderer.setScissorTest(false);for(const o of hid)o.visible=false;for(const o of cul)o.frustumCulled=true;}catch(_){renderer.setScissorTest(false);}
+try{/* stotter-d: echt tekenen (1×1 px, alles zichtbaar, geen culling) bij het laden, zodat de GPU-pipelines (ANGLE/Vulkan) al bestaan vóór ▶ */const hid=[],cul=[];scene.traverse(o=>{if(!o.visible){hid.push(o);o.visible=true;}if(o.frustumCulled){cul.push(o);o.frustumCulled=false;}});try{renderer.setScissorTest(true);renderer.setScissor(0,0,1,1);renderer.render(scene,camera);}finally{renderer.setScissorTest(false);for(const o of hid)o.visible=false;for(const o of cul)o.frustumCulled=true;}}catch(_){}/* review 28 nov: herstel altijd, ook als render gooit */
 /* Laadscherm-poort: weg na 4 vloeiende frames (≤ max(70 ms, 1,6× het snelste frame), zodat het ook op trage apparaten en headless werkt), minstens GATE.min ms, uiterlijk 8 s. */
 var GATE={on:true,ok:0,t0:performance.now(),min:0,best:1e9};
 function gateShow(txt,min=350,soft=true){if(!GATE)return;const L=document.getElementById('loadScr');GATE.on=true;GATE.ok=0;GATE.t0=performance.now();GATE.min=min;document.getElementById('loadTxt').textContent=txt;L.classList.toggle('soft',soft);L.classList.remove('off');}
