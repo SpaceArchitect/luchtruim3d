@@ -1380,7 +1380,7 @@ async def d_tiles_probe_cold(a):  # 28 nov: sonde in Groningen en meteen vliegen
     ok(r['task'] and '▶ = start' in r['notice'], f'geen opdracht vanaf de sonde in Groningen (koude tegels): {r}')
 
 async def d_tiles(a):  # 28 nov heel NL: landschap per tegel. Laadt in de buurt, verbergt ver weg, bouwt zonder lange blokkade, geen dubbel landschap in de regio
-    await a.hit('#modal [data-ac=map]'); await a.frames(2)
+    await a.hit('#modal [data-ac=map]'); await a.frames(2); await a.wait(1500)  # openingsanimatie van de kaartcamera eerst af (die zet het midden terug)
     go = """async([lo,la])=>{const v=window.__vfr,[x,n]=v.proj(lo,la);v.controls.target.set(x,0,-n);v.camera.position.set(x,30,-n+25);v.controls.update();
       for(let i=0;i<120;i++){await new Promise(r=>setTimeout(r,100));const s=Object.values(v.TILE_ST);if(s.length&&s.every(t=>t.state!=='loading'))break;}
       return Object.fromEntries(Object.entries(v.TILE_ST).map(([k,t])=>[k,{state:t.state,on:t.on,max:t.max||0,vis:!!(t.group&&t.group.visible)}]))}"""
